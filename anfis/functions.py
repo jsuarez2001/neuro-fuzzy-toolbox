@@ -7,12 +7,12 @@ def gaussian2(x, p):
     more than one input (batches).
     
     Parameters:
-    - x (torch.Tensor): Tensor of 2D or 3D input data (for single or batch input respectively).
+    - x (torch.Tensor): Tensor of input data.
     - p (torch.Tensor): 3D parameter tensor containing 'mu' and 'sigma' parameters by data dimension 
                         and by ANFIS rule.
     
     Returns:
-    - torch.Tensor: 2D or 3D tensor with Resulting Gaussian values (for single or batch input 
+    - torch.Tensor: Tensor with Resulting Gaussian values (for single or batch input 
                     respectively).
 
     Explanation:
@@ -37,12 +37,12 @@ def gaussian3(x, p):
     more than one input (batches).
     
     Parameters:
-    - x (torch.Tensor): Tensor of 2D or 3D input data (for single or batch input respectively).
+    - x (torch.Tensor): Tensor of input data.
     - p (torch.Tensor): 3D parameter tensor containing 'mu', 'sigma' and 'f' parameters by data 
                         dimension and by ANFIS rule.
     
     Returns:
-    - torch.Tensor: 2D or 3D tensor with Resulting Gaussian values (for single or batch input 
+    - torch.Tensor: Tensor with Resulting Gaussian values (for single or batch input 
                     respectively).
 
     Explanation:
@@ -89,25 +89,6 @@ def weighted_linear(x, c, w):
     """
     return (x @ c[:, :-1].t() + c[:, -1]).mul(w)
 
-
-
-def sum(x):
-    """
-    Calculate the sum along the last dimension of the input tensor. It will be used to compute the final output
-    of the ANFIS model.
-
-    Parameters:
-    - x (torch.Tensor): Input tensor.
-
-    Returns:
-    - torch.Tensor: Sum along the last dimension.
-
-    Explanation:
-    This function computes the sum of elements along the last dimension of the input tensor `x`.
-    The `dim=-1` argument specifies the last dimension.
-    
-    """
-    return torch.sum(x, dim=-1)
 
 
 
