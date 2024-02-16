@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>anfis.train &mdash; ANFIS-ToolBox 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ANFIS-ToolBox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ANFIS-ToolBox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">anfis.train</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for anfis.train</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
+
+<div class="viewcode-block" id="OLS">
+<a class="viewcode-back" href="../../anfis.html#anfis.train.OLS">[docs]</a>
+<span class="k">class</span> <span class="nc">OLS</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Ordinary Least Squares (OLS) optimizer for training an Adaptive Neuro-Fuzzy Inference System (ANFIS) model.</span>
+
+<span class="sd">    **Attributes:**</span>
+<span class="sd">    </span>
+<span class="sd">    .. attribute:: epochs</span>
+<span class="sd">    </span>
+<span class="sd">        Number of training epochs.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: int</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: y</span>
+<span class="sd">    </span>
+<span class="sd">        Learning rate for premises update.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: float</span>
+<span class="sd">        :default: 0.01</span>
+
+<span class="sd">    .. attribute:: loss_function</span>
+<span class="sd">    </span>
+<span class="sd">        Loss function for training.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: torch.nn.Module</span>
+<span class="sd">        :default: nn.functional.mse_loss</span>
+
+<span class="sd">    .. attribute:: validation</span>
+<span class="sd">    </span>
+<span class="sd">        Proportion of the training data to use for validation.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: float</span>
+<span class="sd">        :default: 0</span>
+
+<span class="sd">    .. attribute:: train_history</span>
+<span class="sd">    </span>
+<span class="sd">        Training loss history.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: torch.Tensor</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: val_history</span>
+<span class="sd">    </span>
+<span class="sd">        Validation loss history.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: torch.Tensor</span>
+<span class="sd">        </span>
+<span class="sd">    **To initialize it:**</span>
+<span class="sd">        </span>
+<span class="sd">    The parameters that must be taken into account are the following:</span>
+
+<span class="sd">    :param epochs: Number of training epochs.</span>
+<span class="sd">    :type epochs: int</span>
+
+<span class="sd">    :param y: Learning rate for premises update (default: 0.01).</span>
+<span class="sd">    :type y: float</span>
+<span class="sd">        </span>
+<span class="sd">    :param loss_function: Loss function for training (default: nn.functional.mse_loss).</span>
+<span class="sd">    :type loss_function: torch.nn.Module</span>
+<span class="sd">        </span>
+<span class="sd">    :param validation: Proportion of the training data to use for validation (default: 0).</span>
+<span class="sd">    :type validation: float</span>
+<span class="sd">    </span>
+<span class="sd">    **Example Usage:**</span>
+<span class="sd">    </span>
+<span class="sd">    .. code::</span>
+<span class="sd">    </span>
+<span class="sd">        &gt;&gt;&gt; input_data = torch.rand(100,2)</span>
+<span class="sd">        &gt;&gt;&gt; anfis_model = Type3ANFIS(input_data, init_rules=3)</span>
+<span class="sd">        &gt;&gt;&gt; train_loader = data.DataLoader(data.TensorDataset(x_train, y_train), batch_size = 8)</span>
+<span class="sd">        &gt;&gt;&gt; ols_optimizer = OLS(20, y=0.001)</span>
+<span class="sd">        &gt;&gt;&gt; ols_optimizer(anfis_model, train_loader)</span>
+
+<span class="sd">    **Methods:**</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">loss_function</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">,</span> <span class="n">validation</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a new OLS instance.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - epochs (int): Number of training epochs (default: 1).</span>
+<span class="sd">        - y (float): Learning rate for premises update (default: 0.01).</span>
+<span class="sd">        - loss_function (torch.nn.Module): Loss function for training (default: nn.functional.mse_loss).</span>
+<span class="sd">        - validation (float): Proportion of the training data to use for validation (default: 0).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span> <span class="o">=</span> <span class="n">epochs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span> <span class="o">=</span> <span class="n">loss_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">=</span> <span class="n">validation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_history</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_history</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">freezed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs training using OLS on the provided ANFIS model and data loader.</span>
+
+<span class="sd">        :param ANFISmodel: An instance of the Type3ANFIS model.</span>
+<span class="sd">        :type ANFISmodel: Type3ANFIS</span>
+<span class="sd">        </span>
+<span class="sd">        :param loader: Data loader for training.</span>
+<span class="sd">        :type loader: torch.utils.data.DataLoader</span>
+<span class="sd">        </span>
+<span class="sd">        :param freezed: Binary tensor indicating which premises to freeze (default: None).</span>
+<span class="sd">        :type freezed: torch.Tensor or None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x_train</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y_train</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">split_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span><span class="p">)</span>
+            <span class="n">x_train</span><span class="p">,</span> <span class="n">x_val</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="p">[</span><span class="n">split_index</span><span class="p">,</span> <span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">split_index</span><span class="p">])</span>
+            <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="p">[</span><span class="n">split_index</span><span class="p">,</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">split_index</span><span class="p">])</span>
+
+        <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">consequentsUpdate</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">freezed</span><span class="p">))</span>
+        <span class="n">ep</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">ep</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">):</span>
+            <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_premises</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">premisesUpdate</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">,</span> <span class="n">freezed</span><span class="p">))</span>
+            <span class="n">ep</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">consequentsUpdate</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">freezed</span><span class="p">))</span>
+
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">val_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">(</span><span class="n">x_val</span><span class="p">),</span> <span class="n">y_val</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">val_history</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">val_history</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">val_loss</span><span class="p">])])</span>
+
+            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">(</span><span class="n">x_train</span><span class="p">),</span> <span class="n">y_train</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_history</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">train_history</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">loss</span><span class="p">])])</span>
+
+<div class="viewcode-block" id="OLS.consequentsUpdate">
+<a class="viewcode-back" href="../../anfis.html#anfis.train.OLS.consequentsUpdate">[docs]</a>
+    <span class="k">def</span> <span class="nf">consequentsUpdate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">freezed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the consequents (linear coefficients) of the ANFIS model.</span>
+<span class="sd">        </span>
+<span class="sd">        :param ANFISmodel: An instance of the Type3ANFIS model.</span>
+<span class="sd">        :type ANFISmodel: Type3ANFIS</span>
+<span class="sd">        </span>
+<span class="sd">        :param x_train: Input training data.</span>
+<span class="sd">        :type x_train: torch.Tensor</span>
+<span class="sd">        </span>
+<span class="sd">        :param y_train: Target training data.</span>
+<span class="sd">        :type y_train: torch.Tensor</span>
+<span class="sd">        </span>
+<span class="sd">        :param freezed: Binary tensor indicating which premises to freeze (default: None).</span>
+<span class="sd">        :type freezed: torch.Tensor or None</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Updated consequent parameters.</span>
+<span class="sd">        :rtype: torch.Tensor</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_consequents</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">consequents</span>
+        <span class="n">new_consequents</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">consequents</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">w_norm</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">intermediate_values</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+        <span class="n">xe</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">x_train</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">freezed</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">)</span>
+
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">w_norm</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">xe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">w_norm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">xe</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">)</span>
+
+        <span class="n">new_consequents</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">fs</span> <span class="o">*</span> <span class="n">X</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="n">new_consequents</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">new_consequents</span><span class="p">,</span> <span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">,</span> <span class="n">xe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="n">current_consequents</span><span class="p">[</span><span class="n">freezed</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_consequents</span><span class="p">[</span><span class="n">freezed</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">new_consequents</span><span class="p">;</span></div>
+
+
+<div class="viewcode-block" id="OLS.premisesUpdate">
+<a class="viewcode-back" href="../../anfis.html#anfis.train.OLS.premisesUpdate">[docs]</a>
+    <span class="k">def</span> <span class="nf">premisesUpdate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">loss_function</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">,</span> <span class="n">freezed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the premises (fuzzy sets) of the ANFIS model.</span>
+<span class="sd">        </span>
+<span class="sd">        :param ANFISmodel: An instance of the Type3ANFIS model.</span>
+<span class="sd">        :type ANFISmodel: Type3ANFIS</span>
+<span class="sd">        </span>
+<span class="sd">        :param x_train: Input training data.</span>
+<span class="sd">        :type x_train: torch.Tensor</span>
+<span class="sd">        </span>
+<span class="sd">        :param y_train: Target training data.</span>
+<span class="sd">        :type y_train: torch.Tensor</span>
+<span class="sd">        </span>
+<span class="sd">        :param y: Learning rate for premises update (default: 0.01).</span>
+<span class="sd">        :type y: float</span>
+<span class="sd">        </span>
+<span class="sd">        :param loss_function: Loss function for training (default: nn.functional.mse_loss).</span>
+<span class="sd">        :type loss_function: torch.nn.Module</span>
+<span class="sd">        </span>
+<span class="sd">        :param freezed: Binary tensor indicating which premises to freeze (default: None).</span>
+<span class="sd">        :type freezed: torch.Tensor or None</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Updated fuzzy premises.</span>
+<span class="sd">        :rtype: torch.Tensor</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">y</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">fuzzify_layer</span><span class="o">.</span><span class="n">premises</span><span class="o">.</span><span class="n">grad</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="n">freezed</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">consequents</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">new_premises</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">premises</span>
+
+        <span class="n">vs</span> <span class="o">=</span> <span class="n">new_premises</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+        <span class="n">sigmas</span> <span class="o">=</span> <span class="n">new_premises</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+
+        <span class="n">new_vs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span>
+        <span class="n">new_sigmas</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sigmas</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">w_norm</span><span class="p">,</span> <span class="n">outputs_by_rule</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">intermediate_values</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">freezed</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">A</span> <span class="o">=</span> <span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">sigmas</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">x_train</span> <span class="o">-</span> <span class="n">vs</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+                <span class="n">B</span> <span class="o">=</span> <span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">sigmas</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="mi">3</span><span class="p">))</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="n">x_train</span> <span class="o">-</span> <span class="n">vs</span><span class="p">[</span><span class="n">k</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="n">wk</span> <span class="o">=</span> <span class="n">w_norm</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+                <span class="n">fk</span> <span class="o">=</span> <span class="n">outputs_by_rule</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">zk</span> <span class="o">=</span> <span class="p">((</span><span class="n">fk</span><span class="o">-</span><span class="n">pred</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">y_train</span><span class="o">-</span><span class="n">pred</span><span class="p">))</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+
+                <span class="n">new_vs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">A</span><span class="o">*</span><span class="n">wk</span><span class="o">*</span><span class="n">zk</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">new_sigmas</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">B</span><span class="o">*</span><span class="n">wk</span><span class="o">*</span><span class="n">zk</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">new_premises</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">new_vs</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+        <span class="n">new_premises</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">new_sigmas</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">new_premises</span><span class="p">;</span></div>
+</div>
+
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Juan Suárez Aguilera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

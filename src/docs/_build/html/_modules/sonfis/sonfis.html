@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sonfis.sonfis &mdash; ANFIS-ToolBox 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ANFIS-ToolBox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ANFIS-ToolBox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sonfis.sonfis</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sonfis.sonfis</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
+<span class="kn">import</span> <span class="nn">anfis.train</span> <span class="k">as</span> <span class="nn">train</span>
+
+
+<div class="viewcode-block" id="SONFIS">
+<a class="viewcode-back" href="../../sonfis.html#sonfis.sonfis.SONFIS">[docs]</a>
+<span class="k">class</span> <span class="nc">SONFIS</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Self-Organizing Algorithm for Neuro-Fuzzy Inference Systems (SONFIS) for online learning and adaptation.</span>
+
+<span class="sd">    **Attributes:**</span>
+<span class="sd">    </span>
+<span class="sd">    .. attribute:: max</span>
+<span class="sd">    </span>
+<span class="sd">        Maximum number of iterations for SONFIS learning.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: int</span>
+<span class="sd">    </span>
+<span class="sd">    .. attribute:: y</span>
+<span class="sd">    </span>
+<span class="sd">        Learning rate for OLS (Ordinary Least Squares) optimizer.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: float</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: OLSepochs</span>
+<span class="sd">    </span>
+<span class="sd">        Number of epochs for OLS optimizer during each SONFIS iteration.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: int</span>
+<span class="sd">    </span>
+<span class="sd">    .. attribute:: Ngrow</span>
+<span class="sd">    </span>
+<span class="sd">        Threshold for growing a new rule based on firing levels.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: int</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: dGrow</span>
+<span class="sd">    </span>
+<span class="sd">        Threshold for deciding whether to grow a new rule based on firing level spread.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: float</span>
+<span class="sd">    </span>
+<span class="sd">    .. attribute:: Nsplit</span>
+<span class="sd">    </span>
+<span class="sd">        Threshold for splitting a sub-network based on rule contribution.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: int</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: eSplit</span>
+<span class="sd">    </span>
+<span class="sd">        Threshold for deciding whether to split a sub-network based on rule error.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: float</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: Nvanish</span>
+<span class="sd">    </span>
+<span class="sd">        Threshold for deciding whether to vanish a rule based on the number of samples.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: int</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: lVanish</span>
+<span class="sd">    </span>
+<span class="sd">        Threshold for deciding whether to vanish a rule based on its age.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: int</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: loss_function</span>
+<span class="sd">    </span>
+<span class="sd">        Loss function for training (specifically, to update the premise parameters).</span>
+<span class="sd">        </span>
+<span class="sd">        :type: torch.nn.Module</span>
+<span class="sd">        :default: nn.functional.mse_loss</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: validation</span>
+<span class="sd">    </span>
+<span class="sd">        Proportion of the training data to use for validation.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: float</span>
+<span class="sd">        :default: 0</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: ols</span>
+<span class="sd">    </span>
+<span class="sd">        The OLS instance to be applied while the SONFIS algorithm is running.</span>
+
+<span class="sd">        :type: OLS</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: freezed</span>
+<span class="sd">    </span>
+<span class="sd">        Tensor indicating which rules are frozen (whose parameters should not be updated).</span>
+
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: ages</span>
+<span class="sd">    </span>
+<span class="sd">        Tensor that contains the ages of each of the rules of the ANFIS model.</span>
+
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: last_best_rules</span>
+
+<span class="sd">        Tensor containing which rules modeled the most samples in the last iteration (used in the VanishNet operator).</span>
+<span class="sd">        </span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: train_history</span>
+
+<span class="sd">        Training loss history.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: torch.tensor</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: val_history</span>
+<span class="sd">    </span>
+<span class="sd">        Validation loss history.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: torch.Tensor</span>
+<span class="sd">    </span>
+<span class="sd">    **To initialize it:**</span>
+<span class="sd">    </span>
+<span class="sd">    The parameters that must be taken into account are the following:</span>
+<span class="sd">    </span>
+<span class="sd">    :param max: Maximum number of iterations for SONFIS learning.</span>
+<span class="sd">    :type max: int</span>
+<span class="sd">    </span>
+<span class="sd">    :param y: Learning rate for premises update.</span>
+<span class="sd">    :type y: float</span>
+<span class="sd">    </span>
+<span class="sd">    :param OLSepochs: Number of training epochs.</span>
+<span class="sd">    :type OLSepochs: int</span>
+<span class="sd">    </span>
+<span class="sd">    :param Ngrow: Threshold for growing a new rule based on firing levels.</span>
+<span class="sd">    :type Ngrow: int</span>
+<span class="sd">    </span>
+<span class="sd">    :param dGrow: Threshold for deciding whether to grow a new rule based on firing level spread.</span>
+<span class="sd">    :type dGrow: float</span>
+<span class="sd">    </span>
+<span class="sd">    :param Nsplit: Threshold for splitting a sub-network based on rule contribution.</span>
+<span class="sd">    :type Nsplit: int</span>
+<span class="sd">    </span>
+<span class="sd">    :param eSplit: Threshold for deciding whether to split a sub-network based on rule error.</span>
+<span class="sd">    :type eSplit: float</span>
+<span class="sd">    </span>
+<span class="sd">    :param Nvanish: Threshold for deciding whether to vanish a rule based on the number of samples.</span>
+<span class="sd">    :type Nvanish: int</span>
+<span class="sd">    </span>
+<span class="sd">    :param lVanish: Threshold for deciding whether to vanish a rule based on its age.</span>
+<span class="sd">    :type lVanish: int</span>
+<span class="sd">        </span>
+<span class="sd">    :param loss_function: Loss function for training (default: nn.functional.mse_loss).</span>
+<span class="sd">    :type loss_function: torch.nn.Module</span>
+<span class="sd">        </span>
+<span class="sd">    :param validation: Proportion of the training data to use for validation (default: 0).</span>
+<span class="sd">    :type validation: float</span>
+
+<span class="sd">    **Example Usage:**</span>
+<span class="sd">    </span>
+<span class="sd">    .. code::</span>
+<span class="sd">    </span>
+<span class="sd">        &gt;&gt;&gt; train_loader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True)</span>
+<span class="sd">        &gt;&gt;&gt; x_train = train_loader.dataset.tensors[0]</span>
+<span class="sd">        &gt;&gt;&gt; anfis_model = Type3ANFIS(x_train, init_rules=1)</span>
+<span class="sd">        &gt;&gt;&gt; sonfis = SONFIS(max=50, y=0.01, OLSepochs=5, Ngrow=20, dGrow=1.5, Nsplit=30, eSplit=0.2, Nvanish=2, lVanish=15)</span>
+<span class="sd">        &gt;&gt;&gt; sonfis(anfis_model, train_loader)</span>
+<span class="sd">        &gt;&gt;&gt; print(sonfis.train_history)</span>
+<span class="sd">    </span>
+<span class="sd">    **Methods:**</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">OLSepochs</span><span class="p">,</span> <span class="n">Ngrow</span><span class="p">,</span> <span class="n">dGrow</span><span class="p">,</span> <span class="n">Nsplit</span><span class="p">,</span> <span class="n">eSplit</span><span class="p">,</span> <span class="n">Nvanish</span><span class="p">,</span> <span class="n">lVanish</span><span class="p">,</span> <span class="n">loss_function</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">,</span> <span class="n">validation</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a new SONFIS instance.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - max (int): Maximum number of iterations for SONFIS learning (default: 100).</span>
+<span class="sd">        - y (float): Learning rate for OLS optimizer (default: 0.01).</span>
+<span class="sd">        - OLSepochs (int): Number of epochs for OLS optimizer during each SONFIS iteration (default: 1).</span>
+<span class="sd">        - Ngrow (int): Threshold for growing a new rule based on firing levels (default: 1).</span>
+<span class="sd">        - dGrow (float): Threshold for deciding whether to grow a new rule based on firing level spread (default: 1.0).</span>
+<span class="sd">        - Nsplit (int): Threshold for splitting a sub-network based on rule contribution (default: 1).</span>
+<span class="sd">        - eSplit (float): Threshold for deciding whether to split a sub-network based on rule error (default: 0.1).</span>
+<span class="sd">        - Nvanish (int): Threshold for deciding whether to vanish a rule based on the number of samples (default: 1).</span>
+<span class="sd">        - lVanish (int): Threshold for deciding whether to vanish a rule based on age (default: 10).</span>
+<span class="sd">        - loss_function (torch.nn.Module): Loss function for training (default: nn.functional.mse_loss).</span>
+<span class="sd">        - validation (float): Proportion of the training data to use for validation (default: 0).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Hyperparameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="nb">max</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">OLSepochs</span> <span class="o">=</span> <span class="n">OLSepochs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ngrow</span> <span class="o">=</span> <span class="n">Ngrow</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dGrow</span> <span class="o">=</span> <span class="n">dGrow</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Nsplit</span> <span class="o">=</span> <span class="n">Nsplit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eSplit</span> <span class="o">=</span> <span class="n">eSplit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Nvanish</span> <span class="o">=</span> <span class="n">Nvanish</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lVanish</span> <span class="o">=</span> <span class="n">lVanish</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">=</span> <span class="n">validation</span>
+
+        <span class="c1">#OLS</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ols</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">OLSepochs</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">loss_function</span><span class="p">,</span> <span class="n">validation</span><span class="p">)</span>
+
+        <span class="c1">#Other attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ages</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_best_rules</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+
+        <span class="c1">#history</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_history</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_history</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])</span>
+
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs SONFIS learning on the provided ANFIS model and data loader.</span>
+<span class="sd">        </span>
+<span class="sd">        :param ANFISmodel: An instance of the Type3ANFIS model.</span>
+<span class="sd">        :type ANFISmodel: Type3ANFIS</span>
+<span class="sd">        </span>
+<span class="sd">        :param loader: Data loader for training.</span>
+<span class="sd">        :type loader: torch.utils.data.DataLoader</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ages</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">)</span>
+
+        <span class="n">model_updated</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">callOLS</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span>
+        <span class="k">while</span><span class="p">(</span><span class="n">model_updated</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max</span><span class="p">)):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> *******ITERATION:&quot;</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot; ******* &quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">)</span>
+
+            <span class="c1">#GrowNet</span>
+            <span class="n">did_Grow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GrowNet</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span>
+
+            <span class="c1">#Split Sub-network</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">did_Grow</span><span class="p">:</span>
+                <span class="n">did_Split</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SplitSubNetwork</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">did_Split</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1">#VanishNet</span>
+            <span class="n">did_Vanish</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VanishNet</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Rules amount:&quot;</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">model_updated</span> <span class="o">=</span> <span class="n">did_Grow</span> <span class="o">|</span> <span class="n">did_Split</span> <span class="o">|</span> <span class="n">did_Vanish</span>
+            <span class="k">if</span> <span class="n">model_updated</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callOLS</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span>
+
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callOLS</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SONFIS.callOLS">
+<a class="viewcode-back" href="../../sonfis.html#sonfis.sonfis.SONFIS.callOLS">[docs]</a>
+    <span class="k">def</span> <span class="nf">callOLS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calls the OLS optimizer to update the ANFIS model and store the loss history.</span>
+
+<span class="sd">        :param ANFISmodel: An instance of the Type3ANFIS model.</span>
+<span class="sd">        :type ANFISmodel: Type3ANFIS</span>
+<span class="sd">        </span>
+<span class="sd">        :param loader: Data loader for training.</span>
+<span class="sd">        :type loader: torch.utils.data.DataLoader</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">freezed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_history</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">train_history</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ols</span><span class="o">.</span><span class="n">train_history</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="SONFIS.GrowNet">
+<a class="viewcode-back" href="../../sonfis.html#sonfis.sonfis.SONFIS.GrowNet">[docs]</a>
+    <span class="k">def</span> <span class="nf">GrowNet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new rule in the ANFIS model based on the firing levels of each rule, the samples that model best, </span>
+<span class="sd">        and the number of these.</span>
+
+<span class="sd">        :param ANFISmodel: An instance of the Type3ANFIS model.</span>
+<span class="sd">        :type ANFISmodel: Type3ANFIS</span>
+<span class="sd">        </span>
+<span class="sd">        :param loader: Data loader for training.</span>
+<span class="sd">        :type loader: torch.utils.data.DataLoader</span>
+
+<span class="sd">        :returns: True if ANFISmodel is modified, False otherwise.</span>
+<span class="sd">        :rtype: bool </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">first_batch</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">x_batch</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>
+            <span class="c1">#Max firing levels are obtenined</span>
+            <span class="n">firing_levels</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">intermediate_values</span><span class="p">(</span><span class="n">x_batch</span><span class="p">)</span>
+            <span class="n">max_fl</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">firing_levels</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1">#Boolean mask to filter the samples</span>
+            <span class="n">dGrow_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_fl</span><span class="o">.</span><span class="n">values</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dGrow</span><span class="o">**</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">input_size</span><span class="p">)</span>
+
+            <span class="c1">#Necesary tensors are defined on the first iteration</span>
+            <span class="k">if</span> <span class="n">first_batch</span><span class="p">:</span>
+                <span class="n">bad_samples</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])</span>
+                <span class="n">best_bs_rules</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+                <span class="n">first_batch</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1">#The samples are extracted by concatenating tensors (which are filtered by the mask)</span>
+            <span class="n">bad_samples</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">bad_samples</span><span class="p">,</span> <span class="n">x_batch</span><span class="p">[</span><span class="n">dGrow_mask</span><span class="p">]),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">best_bs_rules</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">best_bs_rules</span><span class="p">,</span> <span class="n">max_fl</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">dGrow_mask</span><span class="p">]),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1">#Ngrow parameter filter</span>
+        <span class="n">unique_rules</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">best_bs_rules</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Ngrow_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">counts</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ngrow</span><span class="p">)</span>
+
+        <span class="n">indices_to_keep</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">best_bs_rules</span><span class="p">,</span> <span class="n">unique_rules</span><span class="p">[</span><span class="n">Ngrow_mask</span><span class="p">])</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+
+        <span class="n">bad_samples</span> <span class="o">=</span> <span class="n">bad_samples</span><span class="p">[</span><span class="n">indices_to_keep</span><span class="p">]</span>
+        <span class="n">best_bs_rules</span> <span class="o">=</span> <span class="n">best_bs_rules</span><span class="p">[</span><span class="n">indices_to_keep</span><span class="p">]</span>
+
+        <span class="c1">#return False if ANFISmodel is not modified</span>
+        <span class="k">if</span> <span class="n">bad_samples</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1">#a list of masks called &quot;rules&quot; is created to calculate the necessary means and stds</span>
+        <span class="n">rules</span> <span class="o">=</span> <span class="p">[</span><span class="n">best_bs_rules</span> <span class="o">==</span> <span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">best_bs_rules</span><span class="p">)]</span>
+
+        <span class="c1">#means and stds by rule are calculated</span>
+        <span class="n">means</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([(</span><span class="n">bad_samples</span><span class="p">[</span><span class="n">rule</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span> <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">rules</span><span class="p">])</span>
+        <span class="n">stds</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([(</span><span class="n">bad_samples</span><span class="p">[</span><span class="n">rule</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span> <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">rules</span><span class="p">])</span>
+
+        <span class="c1">#Premises and consequents modifications to add a new rule</span>
+        <span class="n">new_premises</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">means</span><span class="o">.</span><span class="n">t</span><span class="p">(),</span> <span class="n">stds</span><span class="o">.</span><span class="n">t</span><span class="p">()],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_premises</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">premises</span><span class="p">,</span> <span class="n">new_premises</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">new_consequents</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">new_premises</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">input_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">consequents</span><span class="p">,</span> <span class="n">new_consequents</span><span class="p">]))</span>
+
+        <span class="c1">#ages and freezed rules tensors updated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">freezed</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">new_premises</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ages</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">ages</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">new_premises</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">)])</span>
+
+        <span class="c1">#return True if ANFISmodel is modified</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="SONFIS.SplitSubNetwork">
+<a class="viewcode-back" href="../../sonfis.html#sonfis.sonfis.SONFIS.SplitSubNetwork">[docs]</a>
+    <span class="k">def</span> <span class="nf">SplitSubNetwork</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits a sub-network based on rule contribution and error.</span>
+
+<span class="sd">        :param ANFISmodel: An instance of the Type3ANFIS model.</span>
+<span class="sd">        :type ANFISmodel: Type3ANFIS</span>
+<span class="sd">        </span>
+<span class="sd">        :param loader: Data loader for training.</span>
+<span class="sd">        :type loader: torch.utils.data.DataLoader</span>
+
+<span class="sd">        :returns: True if ANFISmodel is modified, False otherwise.</span>
+<span class="sd">        :rtype: bool </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">first_batch</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">x_batch</span><span class="p">,</span> <span class="n">y_batch</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>
+            <span class="c1">#Max firing levels are obtenined</span>
+            <span class="n">firing_levels</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">intermediate_values</span><span class="p">(</span><span class="n">x_batch</span><span class="p">)</span>
+            <span class="n">max_fl</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">firing_levels</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1">#Necesary tensors are defined on the first iteration</span>
+            <span class="k">if</span> <span class="n">first_batch</span><span class="p">:</span>
+                <span class="n">samples</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])</span>
+                <span class="n">samples_output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])</span>
+                <span class="n">best_rules</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+                <span class="n">first_batch</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1">#The best rules are extracted by concatenating tensors</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">samples</span><span class="p">,</span> <span class="n">x_batch</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">samples_output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">samples_output</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">best_rules</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">best_rules</span><span class="p">,</span> <span class="n">max_fl</span><span class="o">.</span><span class="n">indices</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1">#Nsplit parameter filter</span>
+        <span class="n">unique_rules</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">best_rules</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Nsplit_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">counts</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nsplit</span><span class="p">)</span>
+
+        <span class="n">indices_to_keep</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">best_rules</span><span class="p">,</span> <span class="n">unique_rules</span><span class="p">[</span><span class="n">Nsplit_mask</span><span class="p">])</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="n">indices_to_keep</span><span class="p">]</span>
+        <span class="n">samples_output</span> <span class="o">=</span> <span class="n">samples_output</span><span class="p">[</span><span class="n">indices_to_keep</span><span class="p">]</span>
+        <span class="n">best_rules</span> <span class="o">=</span> <span class="n">best_rules</span><span class="p">[</span><span class="n">indices_to_keep</span><span class="p">]</span>
+
+        <span class="c1">#the rules from best_rules tensor are extracted</span>
+        <span class="n">unique_rules</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">best_rules</span><span class="p">)</span>
+
+        <span class="c1">#MSE is calculated by rule</span>
+        <span class="n">mse_values</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="n">samples_output</span><span class="p">[</span><span class="n">best_rules</span> <span class="o">==</span> <span class="n">rule</span><span class="p">]</span> <span class="o">-</span> <span class="n">ANFISmodel</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">best_rules</span> <span class="o">==</span> <span class="n">rule</span><span class="p">])),</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">unique_rules</span><span class="p">])</span>
+
+        <span class="c1">#eSplit parameter filter</span>
+        <span class="n">eSplit_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">mse_values</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">eSplit</span><span class="p">)</span>
+
+        <span class="c1">#return Flase if ANFISmodel is not modified</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">unique_rules</span><span class="p">[</span><span class="n">eSplit_mask</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1">#loop to split each rule one by one and generate the new ones</span>
+        <span class="n">new_premises</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">premises</span> <span class="c1">#new_premises starts being a copy of the current premises</span>
+        <span class="n">new_consequents</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">consequents</span> <span class="c1">#same thing with consequents</span>
+        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">unique_rules</span><span class="p">[</span><span class="n">eSplit_mask</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">long</span><span class="p">()):</span> <span class="c1">#the iteration is performed on a list with the rules in descending order</span>
+            <span class="c1">#the selected premise is extracted from the new_premises tensor and placed into the to_split tensor</span>
+            <span class="n">new_premises</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">new_premises</span><span class="p">[:,</span> <span class="p">:</span><span class="n">rule</span><span class="p">,</span> <span class="p">:],</span> <span class="n">new_premises</span><span class="p">[:,</span> <span class="n">rule</span><span class="o">+</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">to_split</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">premises</span><span class="p">[:,</span> <span class="n">rule</span><span class="p">:</span><span class="n">rule</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+
+            <span class="c1">#the new ones are generated</span>
+            <span class="n">split1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([(</span><span class="n">to_split</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">to_split</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">to_split</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">split2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([(</span><span class="n">to_split</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">to_split</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">to_split</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+            <span class="c1">#both are inserted on the new premises tensor</span>
+            <span class="n">new_premises</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">new_premises</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">split1</span><span class="p">,</span> <span class="n">split2</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1">#the corresponding consequent is taken away</span>
+            <span class="n">new_consequents</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">new_consequents</span><span class="p">[:</span><span class="n">rule</span><span class="p">,</span> <span class="p">:],</span> <span class="n">new_consequents</span><span class="p">[</span><span class="n">rule</span><span class="o">+</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1">#two new consequents are added</span>
+            <span class="n">new_consequents</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">new_consequents</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">input_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1">#same with ages and freezed rules tensor</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ages</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">ages</span><span class="p">[:</span><span class="n">rule</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ages</span><span class="p">[</span><span class="n">rule</span><span class="o">+</span><span class="mi">1</span><span class="p">:]])</span> <span class="c1">#the corresponding rule is taken away</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">freezed</span><span class="p">[:</span><span class="n">rule</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">freezed</span><span class="p">[</span><span class="n">rule</span><span class="o">+</span><span class="mi">1</span><span class="p">:]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ages</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">ages</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">)])</span> <span class="c1">#the new ones are added</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">freezed</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)])</span>
+
+        <span class="c1">#after the loop, the new parameters are set</span>
+        <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_premises</span><span class="p">(</span><span class="n">new_premises</span><span class="p">)</span>
+        <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="n">new_consequents</span><span class="p">)</span>
+
+        <span class="c1">#return True if ANFISmodel is modified</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="SONFIS.VanishNet">
+<a class="viewcode-back" href="../../sonfis.html#sonfis.sonfis.SONFIS.VanishNet">[docs]</a>
+    <span class="k">def</span> <span class="nf">VanishNet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Vanishes rules from the ANFIS model based on its ages and sample counts.</span>
+
+<span class="sd">        :param ANFISmodel: An instance of the Type3ANFIS model.</span>
+<span class="sd">        :type ANFISmodel: Type3ANFIS</span>
+<span class="sd">        </span>
+<span class="sd">        :param loader: Data loader for training.</span>
+<span class="sd">        :type loader: torch.utils.data.DataLoader</span>
+
+<span class="sd">        :returns: True if ANFISmodel is modified, False otherwise.</span>
+<span class="sd">        :rtype: bool </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">first_batch</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">x_batch</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>
+            <span class="c1">#Max firing levels are obtenined</span>
+            <span class="n">firing_levels</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">intermediate_values</span><span class="p">(</span><span class="n">x_batch</span><span class="p">)</span>
+            <span class="n">max_fl</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">firing_levels</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1">#Necesary tensors are defined on the first iteration</span>
+            <span class="k">if</span> <span class="n">first_batch</span><span class="p">:</span>
+                <span class="n">best_rules</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+                <span class="n">first_batch</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1">#the best_rules by sample are extracted</span>
+            <span class="n">best_rules</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">best_rules</span><span class="p">,</span> <span class="n">max_fl</span><span class="o">.</span><span class="n">indices</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1">#Important info for next operations</span>
+        <span class="n">unique_rules</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">best_rules</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">all_rules</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">)</span>
+
+        <span class="c1">#tensor with te amounts of samples modeled for each rule (including those who dont model any sample)</span>
+        <span class="n">total_counts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">total_counts</span><span class="p">[</span><span class="n">unique_rules</span><span class="p">]</span> <span class="o">=</span> <span class="n">counts</span>
+
+        <span class="c1">#if there is no changes with the modeled samples or there is no last_best_rules (first iteration of VanishNet operator)</span>
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">best_rules</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_best_rules</span><span class="p">)</span> <span class="o">|</span> <span class="n">torch</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_best_rules</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">])):</span>
+            <span class="c1">#ages update</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ages</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#last best rules are inspected (only the ones that appeared in the current iteration)</span>
+            <span class="n">last_unique_rules</span><span class="p">,</span> <span class="n">last_counts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_best_rules</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">last_total_counts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+            <span class="n">last_total_counts</span><span class="p">[</span><span class="n">last_unique_rules</span><span class="p">[</span><span class="n">last_unique_rules</span> <span class="o">&lt;</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">]]</span> <span class="o">=</span> <span class="n">last_counts</span><span class="p">[</span><span class="n">last_unique_rules</span> <span class="o">&lt;</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">]</span>
+
+            <span class="c1">#rules categorization</span>
+            <span class="n">improved_rules</span> <span class="o">=</span> <span class="n">all_rules</span><span class="p">[</span><span class="n">last_total_counts</span> <span class="o">&lt;</span> <span class="n">total_counts</span><span class="p">]</span>
+            <span class="n">not_improved_rules</span> <span class="o">=</span> <span class="n">all_rules</span><span class="p">[</span><span class="n">last_total_counts</span> <span class="o">&gt;=</span> <span class="n">total_counts</span><span class="p">]</span>
+
+            <span class="c1">#ages update</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ages</span><span class="p">[</span><span class="n">improved_rules</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ages</span><span class="p">[</span><span class="n">not_improved_rules</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1">#lVanish and Nvanish filters</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">ages</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">lVanish</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">total_counts</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nvanish</span><span class="p">))</span>
+        <span class="n">rules_to_eliminate</span> <span class="o">=</span> <span class="n">all_rules</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">rules_to_eliminate</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1">#Parameters update (the rules are eliminated)</span>
+        <span class="n">new_premises</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">premises</span>
+        <span class="n">new_consequents</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">consequents</span>
+        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">rules_to_eliminate</span><span class="p">:</span>
+            <span class="n">new_premises</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">new_premises</span><span class="p">[:,</span> <span class="p">:</span><span class="n">rule</span><span class="p">,</span> <span class="p">:],</span> <span class="n">new_premises</span><span class="p">[:,</span> <span class="n">rule</span><span class="o">+</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">new_consequents</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">new_consequents</span><span class="p">[:</span><span class="n">rule</span><span class="p">,</span> <span class="p">:],</span> <span class="n">new_consequents</span><span class="p">[</span><span class="n">rule</span><span class="o">+</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ages</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">ages</span><span class="p">[:</span><span class="n">rule</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ages</span><span class="p">[</span><span class="n">rule</span><span class="o">+</span><span class="mi">1</span><span class="p">:]])</span> <span class="c1">#the corresponding rule is taken away</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">freezed</span><span class="p">[:</span><span class="n">rule</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">freezed</span><span class="p">[</span><span class="n">rule</span><span class="o">+</span><span class="mi">1</span><span class="p">:]])</span>
+
+        <span class="c1">#New parameters are set</span>
+        <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_premises</span><span class="p">(</span><span class="n">new_premises</span><span class="p">)</span>
+        <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="n">new_consequents</span><span class="p">)</span>
+
+        <span class="c1">#update last best rules</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_best_rules</span> <span class="o">=</span> <span class="n">best_rules</span>
+
+        <span class="c1">#The best rules tensor is returned for next iterations, also the ages</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Juan Suárez Aguilera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

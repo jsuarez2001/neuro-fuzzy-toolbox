@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ANFIS Package &mdash; ANFIS-ToolBox 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=8d563738"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="sonfis package" href="sonfis.html" />
+    <link rel="prev" title="src" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ANFIS-ToolBox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ANFIS Package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-anfis.functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#anfis.functions.gaussian2"><code class="docutils literal notranslate"><span class="pre">gaussian2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#anfis.functions.gaussian3"><code class="docutils literal notranslate"><span class="pre">gaussian3()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#anfis.functions.weighted_linear"><code class="docutils literal notranslate"><span class="pre">weighted_linear()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#layers">Layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#anfis.layers.FuzzifyLayer"><code class="docutils literal notranslate"><span class="pre">FuzzifyLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#anfis.layers.FiringLevelsLayer"><code class="docutils literal notranslate"><span class="pre">FiringLevelsLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#anfis.layers.NormalizationLayer"><code class="docutils literal notranslate"><span class="pre">NormalizationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#anfis.layers.ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">ConsequentLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#anfis.layers.OutputLayer"><code class="docutils literal notranslate"><span class="pre">OutputLayer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-anfis.anfis">ANFIS Implementation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#anfis.anfis.Type3ANFIS"><code class="docutils literal notranslate"><span class="pre">Type3ANFIS</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-anfis.train">Training Module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#anfis.train.OLS"><code class="docutils literal notranslate"><span class="pre">OLS</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-anfis">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sonfis.html">sonfis package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ANFIS-ToolBox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+      <li class="breadcrumb-item active">ANFIS Package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/anfis.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="anfis-package">
+<h1>ANFIS Package<a class="headerlink" href="#anfis-package" title="Link to this heading"></a></h1>
+<section id="module-anfis.functions">
+<span id="functions"></span><h2>Functions<a class="headerlink" href="#module-anfis.functions" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="anfis.functions.gaussian2">
+<span class="sig-prename descclassname"><span class="pre">anfis.functions.</span></span><span class="sig-name descname"><span class="pre">gaussian2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/functions.html#gaussian2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.functions.gaussian2" title="Link to this definition"></a></dt>
+<dd><p>Calculates Gaussian values based on the input data and premise parameters of the ANFIS model.
+It is used as its membership function. It is manufactured in such a way that it also works with
+more than one input (batches).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>torch.Tensor</em>) – Tensor of input data.</p></li>
+<li><p><strong>p</strong> (<em>torch.Tensor</em>) – 3D parameter tensor containing ‘mu’ and ‘sigma’ parameters by data dimension and by ANFIS rule.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tensor with resulting Gaussian values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+<p><strong>Explanation:</strong>
+This function calculates Gaussian values based on the input data <cite>x</cite> and the parameters <cite>p</cite>.
+It ensures that the standard deviation values in <cite>p</cite> are not zero by replacing them with a small
+value (1e-6). The formula used to compute the Gaussian values is:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If <cite>p[:, :, 1]</cite> is zero, it is replaced with 1e-6 to prevent division by zero.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anfis.functions.gaussian3">
+<span class="sig-prename descclassname"><span class="pre">anfis.functions.</span></span><span class="sig-name descname"><span class="pre">gaussian3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/functions.html#gaussian3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.functions.gaussian3" title="Link to this definition"></a></dt>
+<dd><p>Calculates Gaussian values based on the input data and premise parameters of the ANFIS model.
+It is used as its membership function. It is manufactured in such a way that it also works with
+more than one input (batches).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>torch.Tensor</em>) – Tensor of input data.</p></li>
+<li><p><strong>p</strong> (<em>torch.Tensor</em>) – 3D parameter tensor containing ‘mu’ and ‘sigma’ parameters by data dimension and by ANFIS rule.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tensor with resulting Gaussian values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+<p><strong>Explanation:</strong>
+This function calculates Gaussian values based on the input data <cite>x</cite> and the parameters <cite>p</cite>.
+It ensures that the standard deviation values in <cite>p</cite> are not zero by replacing them with a small
+value (1e-6). The formula used to compute the Gaussian values is:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If <cite>p[:, :, 1]</cite> is zero, it is replaced with 1e-6 to prevent division by zero.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anfis.functions.weighted_linear">
+<span class="sig-prename descclassname"><span class="pre">anfis.functions.</span></span><span class="sig-name descname"><span class="pre">weighted_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/functions.html#weighted_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.functions.weighted_linear" title="Link to this definition"></a></dt>
+<dd><p>Compute the weighted linear combination of input features and coefficients (representing the
+consequent parameters of the ANFIS model). It is manufactured in such a way that it also works with
+more than one input (batches) and will be used to calculate the individual outputs of each rule of
+the ANFIS model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>torch.Tensor</em>) – Tensor of input data.</p></li>
+<li><p><strong>c</strong> (<em>torch.Tensor</em>) – Coefficients tensor for the linear combination (consequent parameters).</p></li>
+<li><p><strong>w</strong> (<em>torch.Tensor</em>) – Weights tensor for element-wise multiplication.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Resulting weighted linear combination.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+<p><strong>Explanation:</strong>
+This function calculates the weighted linear combination of the input features <cite>x</cite> and the coefficients <cite>c</cite>.
+It involves matrix multiplication of the input features by the transposed coefficients (excluding the last column),
+adding the last column of coefficients, and then element-wise multiplication by the weights <cite>w</cite>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The weights <cite>w</cite> are applied element-wise.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="layers">
+<h2>Layers<a class="headerlink" href="#layers" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="anfis.layers.FuzzifyLayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">anfis.layers.</span></span><span class="sig-name descname"><span class="pre">FuzzifyLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">x_train,</span> <span class="pre">init_rules=1,</span> <span class="pre">mf=&lt;function</span> <span class="pre">gaussian2&gt;,</span> <span class="pre">params=['mu',</span> <span class="pre">'sigma'],</span> <span class="pre">init_mode=0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/layers.html#FuzzifyLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.layers.FuzzifyLayer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Fuzzification layer of an Adaptive Neuro-Fuzzy Inference System (ANFIS) model.</p>
+<p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.layers.FuzzifyLayer.input_size">
+<span class="sig-name descname"><span class="pre">input_size</span></span><a class="headerlink" href="#anfis.layers.FuzzifyLayer.input_size" title="Link to this definition"></a></dt>
+<dd><p>The size of the input features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.layers.FuzzifyLayer.dtype">
+<span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#anfis.layers.FuzzifyLayer.dtype" title="Link to this definition"></a></dt>
+<dd><p>The data type of the input data (used to initialize the premises with it)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.dtype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.layers.FuzzifyLayer.mf">
+<span class="sig-name descname"><span class="pre">mf</span></span><a class="headerlink" href="#anfis.layers.FuzzifyLayer.mf" title="Link to this definition"></a></dt>
+<dd><p>Membership function to use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>callable</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p>gaussian2</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.layers.FuzzifyLayer.params">
+<span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#anfis.layers.FuzzifyLayer.params" title="Link to this definition"></a></dt>
+<dd><p>List of parameter names for the membership function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p>[‘mu’, ‘sigma’]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.layers.FuzzifyLayer.premises">
+<span class="sig-name descname"><span class="pre">premises</span></span><a class="headerlink" href="#anfis.layers.FuzzifyLayer.premises" title="Link to this definition"></a></dt>
+<dd><p>Trainable parameters for the fuzzification layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.nn.Parameter</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p><strong>Example Usage:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">input_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fuzzify_layer</span> <span class="o">=</span> <span class="n">FuzzifyLayer</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">init_rules</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">membership_values</span> <span class="o">=</span> <span class="n">fuzzify_layer</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Methods:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="anfis.layers.FuzzifyLayer.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/layers.html#FuzzifyLayer.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.layers.FuzzifyLayer.forward" title="Link to this definition"></a></dt>
+<dd><p>Performs a forward pass through the fuzzification layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>torch.Tensor</em>) – Input tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Output tensor (membership values).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="anfis.layers.FuzzifyLayer.init_premises">
+<span class="sig-name descname"><span class="pre">init_premises</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_rules</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/layers.html#FuzzifyLayer.init_premises"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.layers.FuzzifyLayer.init_premises" title="Link to this definition"></a></dt>
+<dd><p>Initializes the fuzzy premises based on input training data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_train</strong> (<em>torch.Tensor</em>) – Training data for initializing fuzzy premises.</p></li>
+<li><p><strong>init_rules</strong> (<em>int</em>) – The number of initial fuzzy rules.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Initialized fuzzy premises.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="anfis.layers.FuzzifyLayer.premises_structure">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">premises_structure</span></span><a class="headerlink" href="#anfis.layers.FuzzifyLayer.premises_structure" title="Link to this definition"></a></dt>
+<dd><p>Prints the structure of the fuzzy premises.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="anfis.layers.FiringLevelsLayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">anfis.layers.</span></span><span class="sig-name descname"><span class="pre">FiringLevelsLayer</span></span><a class="reference internal" href="_modules/anfis/layers.html#FiringLevelsLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.layers.FiringLevelsLayer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Class for calculating firing levels in an Adaptive Neuro-Fuzzy Inference System (ANFIS) model.</p>
+<p><strong>Example Usage:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">firing_levels_layer</span> <span class="o">=</span> <span class="n">FiringLevelsLayer</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">firing_levels</span> <span class="o">=</span> <span class="n">firing_levels_layer</span><span class="p">(</span><span class="n">membership_values</span><span class="p">)</span> <span class="c1">#assuming &#39;membership_values&#39; is the tensor obtained from the Fuzzification Layer</span>
+</pre></div>
+</div>
+<p><strong>Methods:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="anfis.layers.FiringLevelsLayer.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/layers.html#FiringLevelsLayer.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.layers.FiringLevelsLayer.forward" title="Link to this definition"></a></dt>
+<dd><p>Performs a forward pass through the layer to calculate firing levels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>m</strong> (<em>torch.Tensor</em>) – Input tensor containing the membership values for each rule.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Output tensor (Firing levels).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="anfis.layers.NormalizationLayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">anfis.layers.</span></span><span class="sig-name descname"><span class="pre">NormalizationLayer</span></span><a class="reference internal" href="_modules/anfis/layers.html#NormalizationLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.layers.NormalizationLayer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Class for normalize the firing levels in an Adaptive Neuro-Fuzzy Inference System (ANFIS) model.</p>
+<p><strong>Example Usage:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">normalization_layer</span> <span class="o">=</span> <span class="n">NormalizationLayer</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">norm_firing_levels</span> <span class="o">=</span> <span class="n">normalization_layer</span><span class="p">(</span><span class="n">firing_levels</span><span class="p">)</span> <span class="c1">#assuming &#39;firing_levels&#39; is the tensor obtained from the Firing Levels Layer</span>
+</pre></div>
+</div>
+<p><strong>Methods:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="anfis.layers.NormalizationLayer.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/layers.html#NormalizationLayer.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.layers.NormalizationLayer.forward" title="Link to this definition"></a></dt>
+<dd><p>Performs a forward pass through the layer to normalize the firing levels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>torch.Tensor</em>) – Input tensor containing the firing levels.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Output tensor (Normalized Firing levels).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="anfis.layers.ConsequentLayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">anfis.layers.</span></span><span class="sig-name descname"><span class="pre">ConsequentLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_rules=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function=&lt;function</span> <span class="pre">weighted_linear&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/layers.html#ConsequentLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.layers.ConsequentLayer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Class for representing the fourth layer (consequent layer) of an Adaptive Neuro-Fuzzy Inference System (ANFIS) model.</p>
+<p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.layers.ConsequentLayer.function">
+<span class="sig-name descname"><span class="pre">function</span></span><a class="headerlink" href="#anfis.layers.ConsequentLayer.function" title="Link to this definition"></a></dt>
+<dd><p>Consequent function to use</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>callable</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p>weighted_linear</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.layers.ConsequentLayer.consequents">
+<span class="sig-name descname"><span class="pre">consequents</span></span><a class="headerlink" href="#anfis.layers.ConsequentLayer.consequents" title="Link to this definition"></a></dt>
+<dd><p>Trainable parameters for the consequent layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.nn.Parameter</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p><strong>Example Usage:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">input_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>  <span class="c1"># Assuming input tensor shape (batch_size, num_input_features)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">consequent_layer</span> <span class="o">=</span> <span class="n">ConsequentLayer</span><span class="p">(</span><span class="n">input_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">input_data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">init_rules</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span> <span class="o">=</span> <span class="n">consequent_layer</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span> <span class="c1"># Assuming weight is the tensor obtained from the normalization layer with shape (batch_size, num_rules)</span>
+</pre></div>
+</div>
+<p><strong>Methods:</strong></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="anfis.layers.ConsequentLayer.consequents_structure">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">consequents_structure</span></span><a class="headerlink" href="#anfis.layers.ConsequentLayer.consequents_structure" title="Link to this definition"></a></dt>
+<dd><p>Prints the structure of the consequent parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="anfis.layers.ConsequentLayer.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/layers.html#ConsequentLayer.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.layers.ConsequentLayer.forward" title="Link to this definition"></a></dt>
+<dd><p>Performs a forward pass to calculate the consequent layer output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>torch.Tensor</em>) – Input tensor.</p></li>
+<li><p><strong>w</strong> (<em>torch.Tensor</em>) – Weights tensor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Output tensor (Outputs by rule of the ANFIS model).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="anfis.layers.OutputLayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">anfis.layers.</span></span><span class="sig-name descname"><span class="pre">OutputLayer</span></span><a class="reference internal" href="_modules/anfis/layers.html#OutputLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.layers.OutputLayer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Class for representing the last layer (output layer) of an Adaptive Neuro-Fuzzy Inference System (ANFIS) model.</p>
+<p><strong>Example Usage:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">output_layer</span> <span class="o">=</span> <span class="n">OutputLayer</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span> <span class="o">=</span> <span class="n">output_layer</span><span class="p">(</span><span class="n">rule_outputs</span><span class="p">)</span> <span class="c1"># Assuming rule_outputs is the tensor obtained from the consequent layer with shape (batch_size, rules)</span>
+</pre></div>
+</div>
+<p><strong>Methods:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="anfis.layers.OutputLayer.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/layers.html#OutputLayer.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.layers.OutputLayer.forward" title="Link to this definition"></a></dt>
+<dd><p>Performs a forward pass to calculate the final output by computing the sum along the last dimension of
+the input tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>torch.Tensor</em>) – Input tensor (Rule outputs).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Final output.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-anfis.anfis">
+<span id="anfis-implementation"></span><h2>ANFIS Implementation<a class="headerlink" href="#module-anfis.anfis" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="anfis.anfis.Type3ANFIS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">anfis.anfis.</span></span><span class="sig-name descname"><span class="pre">Type3ANFIS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">x_train,</span> <span class="pre">init_rules=1,</span> <span class="pre">cf=&lt;function</span> <span class="pre">weighted_linear&gt;,</span> <span class="pre">mf=&lt;function</span> <span class="pre">gaussian2&gt;,</span> <span class="pre">mf_params=['mu',</span> <span class="pre">'sigma'],</span> <span class="pre">init_mode=0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/anfis.html#Type3ANFIS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.anfis.Type3ANFIS" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Class for representing a type 3 Adaptive Neuro-Fuzzy Inference System (ANFIS). Its made up of the following layers:</p>
+<p><strong>Layers:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Fuzzification</span> <span class="pre">layer</span> <span class="pre">(FuzzifyLayer(nn.Module))</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Firing</span> <span class="pre">levels</span> <span class="pre">layer</span> <span class="pre">(FiringLevelsLayer(nn.Module))</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Normalization</span> <span class="pre">layer</span> <span class="pre">(NormalizationLayer(nn.Module))</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Consequent</span> <span class="pre">layer</span> <span class="pre">(ConsequentLayer(nn.Module))</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Output</span> <span class="pre">layer</span> <span class="pre">(OutputLayer(nn.Module))</span></span></dt>
+<dd></dd></dl>
+
+<p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.anfis.Type3ANFIS.input_size">
+<span class="sig-name descname"><span class="pre">input_size</span></span><a class="headerlink" href="#anfis.anfis.Type3ANFIS.input_size" title="Link to this definition"></a></dt>
+<dd><p>The size of the input features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.anfis.Type3ANFIS.dtype">
+<span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#anfis.anfis.Type3ANFIS.dtype" title="Link to this definition"></a></dt>
+<dd><p>The data type of the input data (used to initialize the premises with it)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.dtype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.anfis.Type3ANFIS.mf_params">
+<span class="sig-name descname"><span class="pre">mf_params</span></span><a class="headerlink" href="#anfis.anfis.Type3ANFIS.mf_params" title="Link to this definition"></a></dt>
+<dd><p>List of parameter names for the membership function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p>[‘mu’, ‘sigma’]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p><strong>To initialize it:</strong></p>
+<p>The parameters that must be taken into account are the following:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_train</strong> (<em>torch.Tensor</em>) – Input training data set.</p></li>
+<li><p><strong>init_rules</strong> (<em>int</em>) – Number of initial rules (default: 1).</p></li>
+<li><p><strong>cf</strong> (<em>callable</em>) – Consequent function to apply (default: weighted_linear).</p></li>
+<li><p><strong>mf</strong> (<em>callable</em>) – Membership function to apply (default: gaussian2).</p></li>
+<li><p><strong>mf_params</strong> (<em>list</em>) – List of membership function parameters (default: [‘mu’, ‘sigma’]).</p></li>
+<li><p><strong>init_mode</strong> (<em>int</em>) – Numeric flag for initializing the fuzzy premises (default: 0, meaning it will be initialized based on the input data, otherwise it will be initialized randomly).</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Example Usage:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">input_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>  <span class="c1"># Assuming input tensor shape (batch_size, num_input_features)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">anfis_model</span> <span class="o">=</span> <span class="n">Type3ANFIS</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">init_rules</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span> <span class="o">=</span> <span class="n">anfis_model</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Methods:</strong></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="anfis.anfis.Type3ANFIS.consequents">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">consequents</span></span><a class="headerlink" href="#anfis.anfis.Type3ANFIS.consequents" title="Link to this definition"></a></dt>
+<dd><p>Returns the consequents of the consequent layer as a torch.tensor.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="anfis.anfis.Type3ANFIS.consequents_structure">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">consequents_structure</span></span><a class="headerlink" href="#anfis.anfis.Type3ANFIS.consequents_structure" title="Link to this definition"></a></dt>
+<dd><p>Prints the structure of the consequents.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="anfis.anfis.Type3ANFIS.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/anfis.html#Type3ANFIS.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.anfis.Type3ANFIS.forward" title="Link to this definition"></a></dt>
+<dd><p>Performs a forward pass through the ANFIS model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>torch.Tensor</em>) – Input tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Final output.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="anfis.anfis.Type3ANFIS.intermediate_values">
+<span class="sig-name descname"><span class="pre">intermediate_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/anfis.html#Type3ANFIS.intermediate_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.anfis.Type3ANFIS.intermediate_values" title="Link to this definition"></a></dt>
+<dd><p>Computes normalized firing levels based on input data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>torch.Tensor</em>) – Input tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>w (torch.Tensor): Firing levels.</p></li>
+<li><p>w_norm (torch.Tensor): Normalized firing levels.</p></li>
+<li><p>outputs (torch.Tensor): Outputs by rule of the model</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="anfis.anfis.Type3ANFIS.premises">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">premises</span></span><a class="headerlink" href="#anfis.anfis.Type3ANFIS.premises" title="Link to this definition"></a></dt>
+<dd><p>Return the premises parameters of the fuzzify layer as a torch tensor.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="anfis.anfis.Type3ANFIS.premises_structure">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">premises_structure</span></span><a class="headerlink" href="#anfis.anfis.Type3ANFIS.premises_structure" title="Link to this definition"></a></dt>
+<dd><p>Prints the structure of the premises.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="anfis.anfis.Type3ANFIS.rules">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rules</span></span><a class="headerlink" href="#anfis.anfis.Type3ANFIS.rules" title="Link to this definition"></a></dt>
+<dd><p>Returns the number of rules in the system.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="anfis.anfis.Type3ANFIS.set_consequents">
+<span class="sig-name descname"><span class="pre">set_consequents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">consequents</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/anfis.html#Type3ANFIS.set_consequents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.anfis.Type3ANFIS.set_consequents" title="Link to this definition"></a></dt>
+<dd><p>Sets the consequents of the consequent layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>consequents</strong> – New consequents.</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="anfis.anfis.Type3ANFIS.set_premises">
+<span class="sig-name descname"><span class="pre">set_premises</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">premises</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/anfis.html#Type3ANFIS.set_premises"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.anfis.Type3ANFIS.set_premises" title="Link to this definition"></a></dt>
+<dd><p>Sets the premises of the fuzzification layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>premises</strong> – New premises.</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-anfis.train">
+<span id="training-module"></span><h2>Training Module<a class="headerlink" href="#module-anfis.train" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="anfis.train.OLS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">anfis.train.</span></span><span class="sig-name descname"><span class="pre">OLS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y=0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function=&lt;function</span> <span class="pre">mse_loss&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation=0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/train.html#OLS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.train.OLS" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Ordinary Least Squares (OLS) optimizer for training an Adaptive Neuro-Fuzzy Inference System (ANFIS) model.</p>
+<p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.train.OLS.epochs">
+<span class="sig-name descname"><span class="pre">epochs</span></span><a class="headerlink" href="#anfis.train.OLS.epochs" title="Link to this definition"></a></dt>
+<dd><p>Number of training epochs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.train.OLS.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#anfis.train.OLS.y" title="Link to this definition"></a></dt>
+<dd><p>Learning rate for premises update.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p>0.01</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.train.OLS.loss_function">
+<span class="sig-name descname"><span class="pre">loss_function</span></span><a class="headerlink" href="#anfis.train.OLS.loss_function" title="Link to this definition"></a></dt>
+<dd><p>Loss function for training.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p>nn.functional.mse_loss</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.train.OLS.validation">
+<span class="sig-name descname"><span class="pre">validation</span></span><a class="headerlink" href="#anfis.train.OLS.validation" title="Link to this definition"></a></dt>
+<dd><p>Proportion of the training data to use for validation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p>0</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.train.OLS.train_history">
+<span class="sig-name descname"><span class="pre">train_history</span></span><a class="headerlink" href="#anfis.train.OLS.train_history" title="Link to this definition"></a></dt>
+<dd><p>Training loss history.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="anfis.train.OLS.val_history">
+<span class="sig-name descname"><span class="pre">val_history</span></span><a class="headerlink" href="#anfis.train.OLS.val_history" title="Link to this definition"></a></dt>
+<dd><p>Validation loss history.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p><strong>To initialize it:</strong></p>
+<p>The parameters that must be taken into account are the following:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>epochs</strong> (<em>int</em>) – Number of training epochs.</p></li>
+<li><p><strong>y</strong> (<em>float</em>) – Learning rate for premises update (default: 0.01).</p></li>
+<li><p><strong>loss_function</strong> (<em>torch.nn.Module</em>) – Loss function for training (default: nn.functional.mse_loss).</p></li>
+<li><p><strong>validation</strong> (<em>float</em>) – Proportion of the training data to use for validation (default: 0).</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Example Usage:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">input_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">anfis_model</span> <span class="o">=</span> <span class="n">Type3ANFIS</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">init_rules</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">train_loader</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">TensorDataset</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">),</span> <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ols_optimizer</span> <span class="o">=</span> <span class="n">OLS</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ols_optimizer</span><span class="p">(</span><span class="n">anfis_model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Methods:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="anfis.train.OLS.consequentsUpdate">
+<span class="sig-name descname"><span class="pre">consequentsUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ANFISmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freezed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/train.html#OLS.consequentsUpdate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.train.OLS.consequentsUpdate" title="Link to this definition"></a></dt>
+<dd><p>Updates the consequents (linear coefficients) of the ANFIS model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ANFISmodel</strong> (<a class="reference internal" href="#anfis.anfis.Type3ANFIS" title="anfis.anfis.Type3ANFIS"><em>Type3ANFIS</em></a>) – An instance of the Type3ANFIS model.</p></li>
+<li><p><strong>x_train</strong> (<em>torch.Tensor</em>) – Input training data.</p></li>
+<li><p><strong>y_train</strong> (<em>torch.Tensor</em>) – Target training data.</p></li>
+<li><p><strong>freezed</strong> (<em>torch.Tensor</em><em> or </em><em>None</em>) – Binary tensor indicating which premises to freeze (default: None).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updated consequent parameters.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="anfis.train.OLS.premisesUpdate">
+<span class="sig-name descname"><span class="pre">premisesUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ANFISmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y=0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function=&lt;function</span> <span class="pre">mse_loss&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freezed=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anfis/train.html#OLS.premisesUpdate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anfis.train.OLS.premisesUpdate" title="Link to this definition"></a></dt>
+<dd><p>Updates the premises (fuzzy sets) of the ANFIS model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ANFISmodel</strong> (<a class="reference internal" href="#anfis.anfis.Type3ANFIS" title="anfis.anfis.Type3ANFIS"><em>Type3ANFIS</em></a>) – An instance of the Type3ANFIS model.</p></li>
+<li><p><strong>x_train</strong> (<em>torch.Tensor</em>) – Input training data.</p></li>
+<li><p><strong>y_train</strong> (<em>torch.Tensor</em>) – Target training data.</p></li>
+<li><p><strong>y</strong> (<em>float</em>) – Learning rate for premises update (default: 0.01).</p></li>
+<li><p><strong>loss_function</strong> (<em>torch.nn.Module</em>) – Loss function for training (default: nn.functional.mse_loss).</p></li>
+<li><p><strong>freezed</strong> (<em>torch.Tensor</em><em> or </em><em>None</em>) – Binary tensor indicating which premises to freeze (default: None).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updated fuzzy premises.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-anfis">
+<span id="module-contents"></span><h2>Module Contents<a class="headerlink" href="#module-anfis" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="src" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="sonfis.html" class="btn btn-neutral float-right" title="sonfis package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Juan Suárez Aguilera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

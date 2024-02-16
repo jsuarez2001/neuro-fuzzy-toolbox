@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SONFIS Package &mdash; ANFIS-ToolBox 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=8d563738"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="ANFIS Package" href="anfis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ANFIS-ToolBox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="anfis.html">ANFIS Package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SONFIS Package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-sonfis.sonfis">SONFIS Implementation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#sonfis.sonfis.SONFIS"><code class="docutils literal notranslate"><span class="pre">SONFIS</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-sonfis">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ANFIS-ToolBox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+      <li class="breadcrumb-item active">SONFIS Package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/sonfis.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sonfis-package">
+<h1>SONFIS Package<a class="headerlink" href="#sonfis-package" title="Link to this heading"></a></h1>
+<section id="module-sonfis.sonfis">
+<span id="sonfis-implementation"></span><h2>SONFIS Implementation<a class="headerlink" href="#module-sonfis.sonfis" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sonfis.sonfis.</span></span><span class="sig-name descname"><span class="pre">SONFIS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">OLSepochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ngrow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dGrow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nsplit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eSplit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nvanish</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lVanish</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function=&lt;function</span> <span class="pre">mse_loss&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation=0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sonfis/sonfis.html#SONFIS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sonfis.sonfis.SONFIS" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Self-Organizing Algorithm for Neuro-Fuzzy Inference Systems (SONFIS) for online learning and adaptation.</p>
+<p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.max">
+<span class="sig-name descname"><span class="pre">max</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.max" title="Link to this definition"></a></dt>
+<dd><p>Maximum number of iterations for SONFIS learning.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.y" title="Link to this definition"></a></dt>
+<dd><p>Learning rate for OLS (Ordinary Least Squares) optimizer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.OLSepochs">
+<span class="sig-name descname"><span class="pre">OLSepochs</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.OLSepochs" title="Link to this definition"></a></dt>
+<dd><p>Number of epochs for OLS optimizer during each SONFIS iteration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.Ngrow">
+<span class="sig-name descname"><span class="pre">Ngrow</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.Ngrow" title="Link to this definition"></a></dt>
+<dd><p>Threshold for growing a new rule based on firing levels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.dGrow">
+<span class="sig-name descname"><span class="pre">dGrow</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.dGrow" title="Link to this definition"></a></dt>
+<dd><p>Threshold for deciding whether to grow a new rule based on firing level spread.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.Nsplit">
+<span class="sig-name descname"><span class="pre">Nsplit</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.Nsplit" title="Link to this definition"></a></dt>
+<dd><p>Threshold for splitting a sub-network based on rule contribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.eSplit">
+<span class="sig-name descname"><span class="pre">eSplit</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.eSplit" title="Link to this definition"></a></dt>
+<dd><p>Threshold for deciding whether to split a sub-network based on rule error.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.Nvanish">
+<span class="sig-name descname"><span class="pre">Nvanish</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.Nvanish" title="Link to this definition"></a></dt>
+<dd><p>Threshold for deciding whether to vanish a rule based on the number of samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.lVanish">
+<span class="sig-name descname"><span class="pre">lVanish</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.lVanish" title="Link to this definition"></a></dt>
+<dd><p>Threshold for deciding whether to vanish a rule based on its age.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.loss_function">
+<span class="sig-name descname"><span class="pre">loss_function</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.loss_function" title="Link to this definition"></a></dt>
+<dd><p>Loss function for training (specifically, to update the premise parameters).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p>nn.functional.mse_loss</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.validation">
+<span class="sig-name descname"><span class="pre">validation</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.validation" title="Link to this definition"></a></dt>
+<dd><p>Proportion of the training data to use for validation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p>0</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.ols">
+<span class="sig-name descname"><span class="pre">ols</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.ols" title="Link to this definition"></a></dt>
+<dd><p>The OLS instance to be applied while the SONFIS algorithm is running.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="anfis.html#anfis.train.OLS" title="anfis.train.OLS">OLS</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.freezed">
+<span class="sig-name descname"><span class="pre">freezed</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.freezed" title="Link to this definition"></a></dt>
+<dd><p>Tensor indicating which rules are frozen (whose parameters should not be updated).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.ages">
+<span class="sig-name descname"><span class="pre">ages</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.ages" title="Link to this definition"></a></dt>
+<dd><p>Tensor that contains the ages of each of the rules of the ANFIS model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.last_best_rules">
+<span class="sig-name descname"><span class="pre">last_best_rules</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.last_best_rules" title="Link to this definition"></a></dt>
+<dd><p>Tensor containing which rules modeled the most samples in the last iteration (used in the VanishNet operator).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.train_history">
+<span class="sig-name descname"><span class="pre">train_history</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.train_history" title="Link to this definition"></a></dt>
+<dd><p>Training loss history.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.val_history">
+<span class="sig-name descname"><span class="pre">val_history</span></span><a class="headerlink" href="#sonfis.sonfis.SONFIS.val_history" title="Link to this definition"></a></dt>
+<dd><p>Validation loss history.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p><strong>To initialize it:</strong></p>
+<p>The parameters that must be taken into account are the following:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max</strong> (<em>int</em>) – Maximum number of iterations for SONFIS learning.</p></li>
+<li><p><strong>y</strong> (<em>float</em>) – Learning rate for premises update.</p></li>
+<li><p><strong>OLSepochs</strong> (<em>int</em>) – Number of training epochs.</p></li>
+<li><p><strong>Ngrow</strong> (<em>int</em>) – Threshold for growing a new rule based on firing levels.</p></li>
+<li><p><strong>dGrow</strong> (<em>float</em>) – Threshold for deciding whether to grow a new rule based on firing level spread.</p></li>
+<li><p><strong>Nsplit</strong> (<em>int</em>) – Threshold for splitting a sub-network based on rule contribution.</p></li>
+<li><p><strong>eSplit</strong> (<em>float</em>) – Threshold for deciding whether to split a sub-network based on rule error.</p></li>
+<li><p><strong>Nvanish</strong> (<em>int</em>) – Threshold for deciding whether to vanish a rule based on the number of samples.</p></li>
+<li><p><strong>lVanish</strong> (<em>int</em>) – Threshold for deciding whether to vanish a rule based on its age.</p></li>
+<li><p><strong>loss_function</strong> (<em>torch.nn.Module</em>) – Loss function for training (default: nn.functional.mse_loss).</p></li>
+<li><p><strong>validation</strong> (<em>float</em>) – Proportion of the training data to use for validation (default: 0).</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Example Usage:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x_train</span> <span class="o">=</span> <span class="n">train_loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">anfis_model</span> <span class="o">=</span> <span class="n">Type3ANFIS</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">init_rules</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sonfis</span> <span class="o">=</span> <span class="n">SONFIS</span><span class="p">(</span><span class="nb">max</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">OLSepochs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">Ngrow</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">dGrow</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">Nsplit</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">eSplit</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">Nvanish</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">lVanish</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sonfis</span><span class="p">(</span><span class="n">anfis_model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sonfis</span><span class="o">.</span><span class="n">train_history</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Methods:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.GrowNet">
+<span class="sig-name descname"><span class="pre">GrowNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ANFISmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loader</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sonfis/sonfis.html#SONFIS.GrowNet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sonfis.sonfis.SONFIS.GrowNet" title="Link to this definition"></a></dt>
+<dd><p>Create a new rule in the ANFIS model based on the firing levels of each rule, the samples that model best, 
+and the number of these.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ANFISmodel</strong> (<a class="reference internal" href="anfis.html#anfis.anfis.Type3ANFIS" title="anfis.anfis.Type3ANFIS"><em>Type3ANFIS</em></a>) – An instance of the Type3ANFIS model.</p></li>
+<li><p><strong>loader</strong> (<em>torch.utils.data.DataLoader</em>) – Data loader for training.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if ANFISmodel is modified, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.SplitSubNetwork">
+<span class="sig-name descname"><span class="pre">SplitSubNetwork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ANFISmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loader</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sonfis/sonfis.html#SONFIS.SplitSubNetwork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sonfis.sonfis.SONFIS.SplitSubNetwork" title="Link to this definition"></a></dt>
+<dd><p>Splits a sub-network based on rule contribution and error.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ANFISmodel</strong> (<a class="reference internal" href="anfis.html#anfis.anfis.Type3ANFIS" title="anfis.anfis.Type3ANFIS"><em>Type3ANFIS</em></a>) – An instance of the Type3ANFIS model.</p></li>
+<li><p><strong>loader</strong> (<em>torch.utils.data.DataLoader</em>) – Data loader for training.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if ANFISmodel is modified, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.VanishNet">
+<span class="sig-name descname"><span class="pre">VanishNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ANFISmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loader</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sonfis/sonfis.html#SONFIS.VanishNet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sonfis.sonfis.SONFIS.VanishNet" title="Link to this definition"></a></dt>
+<dd><p>Vanishes rules from the ANFIS model based on its ages and sample counts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ANFISmodel</strong> (<a class="reference internal" href="anfis.html#anfis.anfis.Type3ANFIS" title="anfis.anfis.Type3ANFIS"><em>Type3ANFIS</em></a>) – An instance of the Type3ANFIS model.</p></li>
+<li><p><strong>loader</strong> (<em>torch.utils.data.DataLoader</em>) – Data loader for training.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if ANFISmodel is modified, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sonfis.sonfis.SONFIS.callOLS">
+<span class="sig-name descname"><span class="pre">callOLS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ANFISmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loader</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sonfis/sonfis.html#SONFIS.callOLS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sonfis.sonfis.SONFIS.callOLS" title="Link to this definition"></a></dt>
+<dd><p>Calls the OLS optimizer to update the ANFIS model and store the loss history.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ANFISmodel</strong> (<a class="reference internal" href="anfis.html#anfis.anfis.Type3ANFIS" title="anfis.anfis.Type3ANFIS"><em>Type3ANFIS</em></a>) – An instance of the Type3ANFIS model.</p></li>
+<li><p><strong>loader</strong> (<em>torch.utils.data.DataLoader</em>) – Data loader for training.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-sonfis">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sonfis" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="anfis.html" class="btn btn-neutral float-left" title="ANFIS Package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Juan Suárez Aguilera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
