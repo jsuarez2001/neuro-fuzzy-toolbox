@@ -112,7 +112,7 @@ class SONFIS():
     
         Validation loss history.
         
-        :type: torch.Tensor
+        :type: torch.tensor
     
     **To initialize it:**
     

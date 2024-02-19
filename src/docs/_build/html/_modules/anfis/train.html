@@ -114,13 +114,13 @@
 <span class="sd">    </span>
 <span class="sd">        Training loss history.</span>
 <span class="sd">        </span>
-<span class="sd">        :type: torch.Tensor</span>
+<span class="sd">        :type: torch.tensor</span>
 <span class="sd">        </span>
 <span class="sd">    .. attribute:: val_history</span>
 <span class="sd">    </span>
 <span class="sd">        Validation loss history.</span>
 <span class="sd">        </span>
-<span class="sd">        :type: torch.Tensor</span>
+<span class="sd">        :type: torch.tensor</span>
 <span class="sd">        </span>
 <span class="sd">    **To initialize it:**</span>
 <span class="sd">        </span>
@@ -180,7 +180,7 @@
 <span class="sd">        :type loader: torch.utils.data.DataLoader</span>
 <span class="sd">        </span>
 <span class="sd">        :param freezed: Binary tensor indicating which premises to freeze (default: None).</span>
-<span class="sd">        :type freezed: torch.Tensor or None</span>
+<span class="sd">        :type freezed: torch.tensor or None</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x_train</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -216,16 +216,16 @@
 <span class="sd">        :type ANFISmodel: Type3ANFIS</span>
 <span class="sd">        </span>
 <span class="sd">        :param x_train: Input training data.</span>
-<span class="sd">        :type x_train: torch.Tensor</span>
+<span class="sd">        :type x_train: torch.tensor</span>
 <span class="sd">        </span>
 <span class="sd">        :param y_train: Target training data.</span>
-<span class="sd">        :type y_train: torch.Tensor</span>
+<span class="sd">        :type y_train: torch.tensor</span>
 <span class="sd">        </span>
 <span class="sd">        :param freezed: Binary tensor indicating which premises to freeze (default: None).</span>
-<span class="sd">        :type freezed: torch.Tensor or None</span>
+<span class="sd">        :type freezed: torch.tensor or None</span>
 <span class="sd">        </span>
 <span class="sd">        :return: Updated consequent parameters.</span>
-<span class="sd">        :rtype: torch.Tensor</span>
+<span class="sd">        :rtype: torch.tensor</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">current_consequents</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">consequents</span>
@@ -258,10 +258,10 @@
 <span class="sd">        :type ANFISmodel: Type3ANFIS</span>
 <span class="sd">        </span>
 <span class="sd">        :param x_train: Input training data.</span>
-<span class="sd">        :type x_train: torch.Tensor</span>
+<span class="sd">        :type x_train: torch.tensor</span>
 <span class="sd">        </span>
 <span class="sd">        :param y_train: Target training data.</span>
-<span class="sd">        :type y_train: torch.Tensor</span>
+<span class="sd">        :type y_train: torch.tensor</span>
 <span class="sd">        </span>
 <span class="sd">        :param y: Learning rate for premises update (default: 0.01).</span>
 <span class="sd">        :type y: float</span>
@@ -270,10 +270,10 @@
 <span class="sd">        :type loss_function: torch.nn.Module</span>
 <span class="sd">        </span>
 <span class="sd">        :param freezed: Binary tensor indicating which premises to freeze (default: None).</span>
-<span class="sd">        :type freezed: torch.Tensor or None</span>
+<span class="sd">        :type freezed: torch.tensor or None</span>
 <span class="sd">        </span>
 <span class="sd">        :return: Updated fuzzy premises.</span>
-<span class="sd">        :rtype: torch.Tensor</span>
+<span class="sd">        :rtype: torch.tensor</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pred</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>

@@ -121,7 +121,7 @@
 <span class="sd">    The parameters that must be taken into account are the following:</span>
 
 <span class="sd">    :param x_train: Input training data set.</span>
-<span class="sd">    :type x_train: torch.Tensor</span>
+<span class="sd">    :type x_train: torch.tensor</span>
 
 <span class="sd">    :param init_rules: Number of initial rules (default: 1).</span>
 <span class="sd">    :type init_rules: int</span>
@@ -156,7 +156,7 @@
 <span class="sd">        To initialize a new Type3ANFIS instance.</span>
 
 <span class="sd">        :param x_train: Input training data set.</span>
-<span class="sd">        :type x_train: torch.Tensor</span>
+<span class="sd">        :type x_train: torch.tensor</span>
 
 <span class="sd">        :param init_rules: Number of initial rules.</span>
 <span class="sd">        :type init_rules: int</span>
@@ -198,10 +198,10 @@
 <span class="sd">        Performs a forward pass through the ANFIS model.</span>
 <span class="sd">        </span>
 <span class="sd">        :param x: Input tensor.</span>
-<span class="sd">        :type x: torch.Tensor</span>
+<span class="sd">        :type x: torch.tensor</span>
 
 <span class="sd">        :return: Final output.</span>
-<span class="sd">        :rtype: torch.Tensor</span>
+<span class="sd">        :rtype: torch.tensor</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuzzify_layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -218,12 +218,12 @@
 <span class="sd">        Computes normalized firing levels based on input data.</span>
 
 <span class="sd">        :param x: Input tensor.</span>
-<span class="sd">        :type x: torch.Tensor</span>
+<span class="sd">        :type x: torch.tensor</span>
 
 <span class="sd">        :return:</span>
-<span class="sd">            - w (torch.Tensor): Firing levels.</span>
-<span class="sd">            - w_norm (torch.Tensor): Normalized firing levels.</span>
-<span class="sd">            - outputs (torch.Tensor): Outputs by rule of the model</span>
+<span class="sd">            - w (torch.tensor): Firing levels.</span>
+<span class="sd">            - w_norm (torch.tensor): Normalized firing levels.</span>
+<span class="sd">            - outputs (torch.tensor): Outputs by rule of the model</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuzzify_layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -268,7 +268,7 @@
 <span class="sd">        Sets the premises of the fuzzification layer.</span>
 
 <span class="sd">        :param premises: New premises.</span>
-<span class="sd">        :type: torch.Tensor</span>
+<span class="sd">        :type: torch.tensor</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fuzzify_layer</span><span class="o">.</span><span class="n">premises</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="n">premises</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
@@ -300,7 +300,7 @@
 <span class="sd">        Sets the consequents of the consequent layer.</span>
 
 <span class="sd">        :param consequents: New consequents.</span>
-<span class="sd">        :type: torch.Tensor</span>
+<span class="sd">        :type: torch.tensor</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">consequent_layer</span><span class="o">.</span><span class="n">consequents</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="n">consequents</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>

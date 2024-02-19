@@ -39,13 +39,13 @@ class OLS:
     
         Training loss history.
         
-        :type: torch.Tensor
+        :type: torch.tensor
         
     .. attribute:: val_history
     
         Validation loss history.
         
-        :type: torch.Tensor
+        :type: torch.tensor
         
     **To initialize it:**
         
@@ -105,7 +105,7 @@ class OLS:
         :type loader: torch.utils.data.DataLoader
         
         :param freezed: Binary tensor indicating which premises to freeze (default: None).
-        :type freezed: torch.Tensor or None
+        :type freezed: torch.tensor or None
 
         """
         x_train = loader.dataset.tensors[0]
@@ -139,16 +139,16 @@ class OLS:
         :type ANFISmodel: Type3ANFIS
         
         :param x_train: Input training data.
-        :type x_train: torch.Tensor
+        :type x_train: torch.tensor
         
         :param y_train: Target training data.
-        :type y_train: torch.Tensor
+        :type y_train: torch.tensor
         
         :param freezed: Binary tensor indicating which premises to freeze (default: None).
-        :type freezed: torch.Tensor or None
+        :type freezed: torch.tensor or None
         
         :return: Updated consequent parameters.
-        :rtype: torch.Tensor
+        :rtype: torch.tensor
 
         """
         current_consequents = ANFISmodel.consequents
@@ -178,10 +178,10 @@ class OLS:
         :type ANFISmodel: Type3ANFIS
         
         :param x_train: Input training data.
-        :type x_train: torch.Tensor
+        :type x_train: torch.tensor
         
         :param y_train: Target training data.
-        :type y_train: torch.Tensor
+        :type y_train: torch.tensor
         
         :param y: Learning rate for premises update (default: 0.01).
         :type y: float
@@ -190,10 +190,10 @@ class OLS:
         :type loss_function: torch.nn.Module
         
         :param freezed: Binary tensor indicating which premises to freeze (default: None).
-        :type freezed: torch.Tensor or None
+        :type freezed: torch.tensor or None
         
         :return: Updated fuzzy premises.
-        :rtype: torch.Tensor
+        :rtype: torch.tensor
 
         """
         pred = ANFISmodel(x_train)

@@ -46,7 +46,7 @@ class Type3ANFIS(nn.Module):
     The parameters that must be taken into account are the following:
 
     :param x_train: Input training data set.
-    :type x_train: torch.Tensor
+    :type x_train: torch.tensor
 
     :param init_rules: Number of initial rules (default: 1).
     :type init_rules: int
@@ -81,7 +81,7 @@ class Type3ANFIS(nn.Module):
         To initialize a new Type3ANFIS instance.
 
         :param x_train: Input training data set.
-        :type x_train: torch.Tensor
+        :type x_train: torch.tensor
 
         :param init_rules: Number of initial rules.
         :type init_rules: int
@@ -121,10 +121,10 @@ class Type3ANFIS(nn.Module):
         Performs a forward pass through the ANFIS model.
         
         :param x: Input tensor.
-        :type x: torch.Tensor
+        :type x: torch.tensor
 
         :return: Final output.
-        :rtype: torch.Tensor
+        :rtype: torch.tensor
 
         """
         output = self.fuzzify_layer(x)
@@ -138,12 +138,12 @@ class Type3ANFIS(nn.Module):
         Computes normalized firing levels based on input data.
 
         :param x: Input tensor.
-        :type x: torch.Tensor
+        :type x: torch.tensor
 
         :return:
-            - w (torch.Tensor): Firing levels.
-            - w_norm (torch.Tensor): Normalized firing levels.
-            - outputs (torch.Tensor): Outputs by rule of the model
+            - w (torch.tensor): Firing levels.
+            - w_norm (torch.tensor): Normalized firing levels.
+            - outputs (torch.tensor): Outputs by rule of the model
 
         """
         w = self.fuzzify_layer(x)
@@ -185,7 +185,7 @@ class Type3ANFIS(nn.Module):
         Sets the premises of the fuzzification layer.
 
         :param premises: New premises.
-        :type: torch.Tensor
+        :type: torch.tensor
 
         """
         self.fuzzify_layer.premises = Parameter(premises, requires_grad=True)
@@ -214,7 +214,7 @@ class Type3ANFIS(nn.Module):
         Sets the consequents of the consequent layer.
 
         :param consequents: New consequents.
-        :type: torch.Tensor
+        :type: torch.tensor
 
         """
         self.consequent_layer.consequents = Parameter(consequents, requires_grad=True)

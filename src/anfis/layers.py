@@ -8,7 +8,7 @@ class FuzzifyLayer(nn.Module):
     '''
     Fuzzification layer of an Adaptive Neuro-Fuzzy Inference System (ANFIS) model.
 
-    **Attributes:**
+    - **Attributes:**
     
     .. attribute:: input_size
     
@@ -42,7 +42,7 @@ class FuzzifyLayer(nn.Module):
         
         :type: torch.nn.Parameter
 
-    **Example Usage:**
+    - **Example Usage:**
     
     .. code::
     
@@ -50,7 +50,7 @@ class FuzzifyLayer(nn.Module):
         >>> fuzzify_layer = FuzzifyLayer(input_data, init_rules=3)
         >>> membership_values = fuzzify_layer(input_data)
 
-    **Methods:**
+    - **Methods:**
 
     '''
     def __init__(self, x_train, init_rules=1, mf=f.gaussian2, params=['mu', 'sigma'], init_mode=0):
@@ -58,7 +58,7 @@ class FuzzifyLayer(nn.Module):
         Initializes a new FuzzifyLayer instance.
         
         :param x_train: Input training data.
-        :type x_train: torch.Tensor
+        :type x_train: torch.tensor
         
         :param init_rules: The number of initial fuzzy rules.
         :type init_rules: int
@@ -97,13 +97,13 @@ class FuzzifyLayer(nn.Module):
         Initializes the fuzzy premises based on input training data.
         
         :param x_train: Training data for initializing fuzzy premises.
-        :type x_train: torch.Tensor
+        :type x_train: torch.tensor
         
         :param init_rules: The number of initial fuzzy rules.
         :type init_rules: int
         
         :return: Initialized fuzzy premises.
-        :rtype: torch.Tensor
+        :rtype: torch.tensor
 
         """
         premises = torch.zeros(self.input_size, init_rules, len(self.params), dtype=x_train.dtype)
@@ -127,10 +127,10 @@ class FuzzifyLayer(nn.Module):
         Performs a forward pass through the fuzzification layer.
         
         :param x: Input tensor.
-        :type x: torch.Tensor
+        :type x: torch.tensor
         
         :return: Output tensor (membership values).
-        :rtype: torch.Tensor
+        :rtype: torch.tensor
 
         """
         return self.mf(x.unsqueeze(x.dim()), self.premises)
@@ -155,14 +155,14 @@ class FiringLevelsLayer(nn.Module):
     """
     Class for calculating firing levels in an Adaptive Neuro-Fuzzy Inference System (ANFIS) model.
 
-    **Example Usage:**
+    - **Example Usage:**
     
     .. code::
     
         >>> firing_levels_layer = FiringLevelsLayer()
         >>> firing_levels = firing_levels_layer(membership_values) #assuming 'membership_values' is the tensor obtained from the Fuzzification Layer
 
-    **Methods:**
+    - **Methods:**
     
     """
     def __init__(self):
@@ -178,10 +178,10 @@ class FiringLevelsLayer(nn.Module):
         Performs a forward pass through the layer to calculate firing levels.
 
         :param m: Input tensor containing the membership values for each rule.
-        :type m: torch.Tensor
+        :type m: torch.tensor
         
         :return: Output tensor (Firing levels).
-        :rtype: torch.Tensor
+        :rtype: torch.tensor
 
         """
         w = m.prod(dim=m.dim()-2)
@@ -192,14 +192,14 @@ class NormalizationLayer(nn.Module):
     """
     Class for normalize the firing levels in an Adaptive Neuro-Fuzzy Inference System (ANFIS) model.
     
-    **Example Usage:**
+    - **Example Usage:**
     
     .. code::
         
         >>> normalization_layer = NormalizationLayer()
         >>> norm_firing_levels = normalization_layer(firing_levels) #assuming 'firing_levels' is the tensor obtained from the Firing Levels Layer
 
-    **Methods:**
+    - **Methods:**
     
     """
     def __init__(self):
@@ -215,10 +215,10 @@ class NormalizationLayer(nn.Module):
         Performs a forward pass through the layer to normalize the firing levels.
         
         :param x: Input tensor containing the firing levels.
-        :type x: torch.Tensor
+        :type x: torch.tensor
 
         :return: Output tensor (Normalized Firing levels).
-        :rtype: torch.Tensor
+        :rtype: torch.tensor
 
         """
         sum = torch.sum(w, dim=1, keepdim=True)
@@ -231,7 +231,7 @@ class ConsequentLayer(nn.Module):
     """
     Class for representing the fourth layer (consequent layer) of an Adaptive Neuro-Fuzzy Inference System (ANFIS) model.
     
-    **Attributes:**
+    - **Attributes:**
     
     .. attribute:: function
     
@@ -246,7 +246,7 @@ class ConsequentLayer(nn.Module):
         
         :type: torch.nn.Parameter
         
-    **Example Usage:**
+    - **Example Usage:**
     
     .. code::
     
@@ -254,7 +254,7 @@ class ConsequentLayer(nn.Module):
         >>> consequent_layer = ConsequentLayer(input_data.shape[1], input_data.dtype, init_rules=2)
         >>> output = consequent_layer(input_data, weights) # Assuming weight is the tensor obtained from the normalization layer with shape (batch_size, num_rules)
 
-    **Methods:**
+    - **Methods:**
     
     """
     def __init__(self, input_size, dtype, init_rules=1, function=f.weighted_linear):
@@ -278,13 +278,13 @@ class ConsequentLayer(nn.Module):
         Performs a forward pass to calculate the consequent layer output.
 
         :param x: Input tensor.
-        :type x: torch.Tensor
+        :type x: torch.tensor
         
         :param w: Weights tensor.
-        :type w: torch.Tensor
+        :type w: torch.tensor
 
         :return: Output tensor (Outputs by rule of the ANFIS model).
-        :rtype: torch.Tensor
+        :rtype: torch.tensor
 
         """
         outputs = self.function(x, self.consequents, w)
@@ -307,14 +307,14 @@ class OutputLayer(nn.Module):
     """
     Class for representing the last layer (output layer) of an Adaptive Neuro-Fuzzy Inference System (ANFIS) model.
     
-    **Example Usage:**
+    - **Example Usage:**
     
     .. code::
     
         >>> output_layer = OutputLayer()
         >>> output = output_layer(rule_outputs) # Assuming rule_outputs is the tensor obtained from the consequent layer with shape (batch_size, rules)
     
-    **Methods:**
+    - **Methods:**
     
     """
     def __init__(self):
@@ -330,10 +330,10 @@ class OutputLayer(nn.Module):
         the input tensor.
 
         :param x: Input tensor (Rule outputs).
-        :type x: torch.Tensor
+        :type x: torch.tensor
 
         :return: Final output.
-        :rtype: torch.Tensor
+        :rtype: torch.tensor
 
         """
         return torch.sum(x, dim=-1)
