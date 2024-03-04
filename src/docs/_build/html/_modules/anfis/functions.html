@@ -77,7 +77,7 @@
 <a class="viewcode-back" href="../../anfis.html#anfis.functions.gaussian2">[docs]</a>
 <span class="k">def</span> <span class="nf">gaussian2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    It is used as its membership function and calculates gaussian values based on the input data and premise parameters</span>
+<span class="sd">    It is used as a membership function and calculates gaussian values based on the input data and premise parameters</span>
 <span class="sd">    of the ANFIS model (membership degrees). Emulates the following gaussian function:</span>
 <span class="sd">    </span>
 <span class="sd">    .. image:: _build/html/_static/gauss2.png</span>
@@ -121,7 +121,7 @@
 <a class="viewcode-back" href="../../anfis.html#anfis.functions.gaussian3">[docs]</a>
 <span class="k">def</span> <span class="nf">gaussian3</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    It is used as its membership function and calculates gaussian values based on the input data and premise parameters</span>
+<span class="sd">    It is used as a membership function and calculates gaussian values based on the input data and premise parameters</span>
 <span class="sd">    of the ANFIS model (membership degrees). Emulates the following gaussian function:</span>
 <span class="sd">    </span>
 <span class="sd">    .. image:: _build/html/_static/gauss3.png</span>
@@ -130,6 +130,7 @@
 <span class="sd">    </span>
 <span class="sd">    :param x: Tensor of input data.</span>
 <span class="sd">    :type x: torch.tensor</span>
+<span class="sd">    </span>
 <span class="sd">    :param p: 3D parameter tensor containing &#39;mu&#39;, &#39;sigma&#39; and &#39;f&#39; (as scalar) parameters by data dimension and by ANFIS rule.</span>
 <span class="sd">    :type p: torch.tensor</span>
 <span class="sd">    </span>
@@ -181,8 +182,10 @@
 
 <span class="sd">    :param x: Tensor of input data.</span>
 <span class="sd">    :type x: torch.tensor</span>
+<span class="sd">    </span>
 <span class="sd">    :param c: Coefficients tensor for the linear combination (consequent parameters).</span>
 <span class="sd">    :type c: torch.tensor</span>
+<span class="sd">    </span>
 <span class="sd">    :param w: Weights tensor for element-wise multiplication.</span>
 <span class="sd">    :type w: torch.tensor</span>
 

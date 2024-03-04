@@ -73,6 +73,225 @@
   <h1>Source code for anfis.train</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.utils.data</span> <span class="k">as</span> <span class="nn">data</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">accuracy_score</span><span class="p">,</span>
+    <span class="n">precision_score</span><span class="p">,</span>
+    <span class="n">recall_score</span><span class="p">,</span>
+    <span class="n">f1_score</span><span class="p">,</span>
+    <span class="n">mean_absolute_percentage_error</span><span class="p">,</span>
+    <span class="n">mean_squared_error</span><span class="p">,</span>
+    <span class="n">root_mean_squared_error</span><span class="p">,</span>
+    <span class="n">mean_absolute_error</span><span class="p">,</span>
+    <span class="n">r2_score</span>
+<span class="p">)</span>
+
+<div class="viewcode-block" id="obtain_measures">
+<a class="viewcode-back" href="../../anfis.html#anfis.train.obtain_measures">[docs]</a>
+<span class="k">def</span> <span class="nf">obtain_measures</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates various evaluation measures for the ANFIS model&#39;s predictions.</span>
+
+<span class="sd">    :param ANFISmodel: The trained ANFIS model.</span>
+<span class="sd">    :type ANFISmodel: Type3ANFIS</span>
+<span class="sd">    </span>
+<span class="sd">    :param x: Input data tensor.</span>
+<span class="sd">    :type x: torch.Tensor</span>
+<span class="sd">    </span>
+<span class="sd">    :param y: Target output tensor.</span>
+<span class="sd">    :type y: torch.Tensor</span>
+<span class="sd">    </span>
+<span class="sd">    :return: Dictionary containing different evaluation measures.</span>
+<span class="sd">    :rtype: dict</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        If the model its used for a regression problem, the returned measures will be the following:</span>
+<span class="sd">            - mse: mean squared error</span>
+<span class="sd">            - rmse: root mean squared error</span>
+<span class="sd">            - nmse: normalized mean squared error</span>
+<span class="sd">            - mape: mean absolute percentage error</span>
+<span class="sd">            - mae: mean absolute error</span>
+<span class="sd">            - R2: R2 score</span>
+<span class="sd">            - IA: Index of Agreement</span>
+<span class="sd">        If the model its used for a binary classification problem, the returned measures will be the following:</span>
+<span class="sd">            - bce: binary cross entropy</span>
+<span class="sd">            - accuracy</span>
+<span class="sd">            - precision</span>
+<span class="sd">            - recall</span>
+<span class="sd">            - f1 score</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">measures</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">last_layer</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">):</span>
+        <span class="c1">#pytorch calculation for IA measure</span>
+        <span class="n">y_mean</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">pred_mean</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">IA</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">pred</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_mean</span><span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">pred</span> <span class="o">-</span> <span class="n">pred_mean</span><span class="p">),</span> <span class="mi">2</span><span class="p">)))</span>
+
+        <span class="c1">#numpy conversion for sklearn functions</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+        <span class="n">mse</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
+        <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;mse&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mse</span>
+
+        <span class="n">rmse</span> <span class="o">=</span> <span class="n">root_mean_squared_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
+        <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;rmse&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmse</span>
+
+        <span class="n">variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">nmse</span> <span class="o">=</span> <span class="n">mse</span> <span class="o">/</span> <span class="n">variance</span>
+        <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;nmse&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmse</span>
+
+        <span class="c1">#ape = np.mean(np.abs((y - pred) / y)) * 100</span>
+        <span class="c1">#measures[&#39;ape&#39;] = ape</span>
+
+        <span class="n">mape</span> <span class="o">=</span> <span class="n">mean_absolute_percentage_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
+        <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;mape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mape</span>
+
+        <span class="n">mae</span> <span class="o">=</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
+        <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;mae&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mae</span>
+
+        <span class="n">r2</span> <span class="o">=</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
+        <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;R2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r2</span>
+
+        <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;IA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">IA</span>
+
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">last_layer</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">):</span>
+        <span class="c1">#pytorch calculation for bce calculation</span>
+        <span class="n">bce</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">binary_cross_entropy</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+        <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;bce&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bce</span>
+
+        <span class="c1">#numpy conversion for sklearn functions</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+        <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="p">(</span><span class="n">pred</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
+        <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">accuracy</span>
+
+        <span class="n">precision</span> <span class="o">=</span> <span class="n">precision_score</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
+        <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">precision</span>
+
+        <span class="n">recall</span> <span class="o">=</span> <span class="n">recall_score</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
+        <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;recall&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">recall</span>
+
+        <span class="n">f1</span> <span class="o">=</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
+        <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;f1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f1</span>
+
+    <span class="k">return</span> <span class="n">measures</span></div>
+
+
+<div class="viewcode-block" id="EarlyStopping">
+<a class="viewcode-back" href="../../anfis.html#anfis.train.EarlyStopping">[docs]</a>
+<span class="k">class</span> <span class="nc">EarlyStopping</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Early stopping mechanism for training algorithms of an Adaptive Neuro-Fuzzy Inference System (ANFIS) model.</span>
+
+<span class="sd">    **Attributes for initialization:**</span>
+<span class="sd">    </span>
+<span class="sd">    .. attribute:: patience</span>
+<span class="sd">    </span>
+<span class="sd">        Number of epochs with no improvement after which training will be stopped.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: int</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: delta</span>
+<span class="sd">    </span>
+<span class="sd">        Minimum change in the monitored quantity to qualify as an improvement.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: float</span>
+<span class="sd">        :default: 0</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: last_state</span>
+<span class="sd">    </span>
+<span class="sd">        Sets whether early stopping sets the model to its latest state (otherwise sets the model to its best state).</span>
+<span class="sd">        </span>
+<span class="sd">        :type: bool</span>
+<span class="sd">        :default: False</span>
+<span class="sd">        </span>
+<span class="sd">    - **Methods:**</span>
+<span class="sd">        </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">patience</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">last_state</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes an Early Stopping mechanism to monitor the ANFIS training progress.</span>
+
+<span class="sd">        :param patience: Number of epochs with no improvement after which training will be stopped.</span>
+<span class="sd">        :type patience: int</span>
+<span class="sd">        </span>
+<span class="sd">        :param delta: Minimum change in the monitored quantity to qualify as an improvement.</span>
+<span class="sd">        :type delta: float</span>
+<span class="sd">        :default delta: 0</span>
+<span class="sd">        </span>
+<span class="sd">        :param last_state: Sets whether early stopping sets the model to its latest state (otherwise sets the model to its best state).</span>
+<span class="sd">        :type last_state: bool</span>
+<span class="sd">        :default last_state: False</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#Parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patience</span> <span class="o">=</span> <span class="n">patience</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">delta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_state</span> <span class="o">=</span> <span class="n">last_state</span>
+
+        <span class="c1">#For running</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_loss</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_premises</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_consequents</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">early_stop</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Monitors the loss during training and determines whether to stop early.</span>
+
+<span class="sd">        :param loss: Current loss value.</span>
+<span class="sd">        :type loss: float</span>
+<span class="sd">        </span>
+<span class="sd">        :param ANFISmodel: Instance of the ANFIS model being trained.</span>
+<span class="sd">        :type ANFISmodel: Type3ANFIS</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_loss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_loss</span> <span class="o">=</span> <span class="n">loss</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_premises</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">premises</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_consequents</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">consequents</span>
+
+        <span class="k">elif</span> <span class="n">loss</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_loss</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">patience</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">early_stop</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_state</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_premises</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_premises</span><span class="p">)</span>
+                    <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_consequents</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_loss</span> <span class="o">=</span> <span class="n">loss</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_premises</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">premises</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_consequents</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">consequents</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+            
+<div class="viewcode-block" id="EarlyStopping.reset">
+<a class="viewcode-back" href="../../anfis.html#anfis.train.EarlyStopping.reset">[docs]</a>
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets the early stopping instance.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_loss</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_premises</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_consequents</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">early_stop</span> <span class="o">=</span> <span class="kc">False</span></div>
+</div>
+
 
 
 <div class="viewcode-block" id="OLS">
@@ -81,7 +300,7 @@
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Ordinary Least Squares (OLS) optimizer for training an Adaptive Neuro-Fuzzy Inference System (ANFIS) model.</span>
 
-<span class="sd">    **Attributes:**</span>
+<span class="sd">    **Attributes for initialization:**</span>
 <span class="sd">    </span>
 <span class="sd">    .. attribute:: epochs</span>
 <span class="sd">    </span>
@@ -89,7 +308,7 @@
 <span class="sd">        </span>
 <span class="sd">        :type: int</span>
 <span class="sd">        </span>
-<span class="sd">    .. attribute:: y</span>
+<span class="sd">    .. attribute:: gamma</span>
 <span class="sd">    </span>
 <span class="sd">        Learning rate for premises update.</span>
 <span class="sd">        </span>
@@ -98,10 +317,24 @@
 
 <span class="sd">    .. attribute:: loss_function</span>
 <span class="sd">    </span>
-<span class="sd">        Loss function for training.</span>
+<span class="sd">        Loss function for premise parameters training.</span>
 <span class="sd">        </span>
 <span class="sd">        :type: torch.nn.Module</span>
 <span class="sd">        :default: nn.functional.mse_loss</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: optimizer</span>
+<span class="sd">    </span>
+<span class="sd">        Optimizer to use for updating premise parameters.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: torch.optim.Optimizer</span>
+<span class="sd">        :default: None</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: optim_params </span>
+<span class="sd">    </span>
+<span class="sd">        User preference parameters for the optimizer.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: dict</span>
+<span class="sd">        :default: None</span>
 
 <span class="sd">    .. attribute:: validation</span>
 <span class="sd">    </span>
@@ -109,49 +342,44 @@
 <span class="sd">        </span>
 <span class="sd">        :type: float</span>
 <span class="sd">        :default: 0</span>
+<span class="sd">        </span>
+<span class="sd">    .. attribute:: early_stopping</span>
+<span class="sd">    </span>
+<span class="sd">        An early stopping instance for the OLS algorithm.</span>
+<span class="sd">        </span>
+<span class="sd">        :type: EarlyStopping</span>
+<span class="sd">        :default: None</span>
+<span class="sd">        </span>
+<span class="sd">    **Other attributes**</span>
 
 <span class="sd">    .. attribute:: train_history</span>
 <span class="sd">    </span>
-<span class="sd">        Training loss history.</span>
+<span class="sd">        Training loss and various measures history.</span>
 <span class="sd">        </span>
 <span class="sd">        :type: torch.tensor</span>
 <span class="sd">        </span>
 <span class="sd">    .. attribute:: val_history</span>
 <span class="sd">    </span>
-<span class="sd">        Validation loss history.</span>
+<span class="sd">        Validation loss and various measures history.</span>
 <span class="sd">        </span>
 <span class="sd">        :type: torch.tensor</span>
-<span class="sd">        </span>
-<span class="sd">    **To initialize it:**</span>
-<span class="sd">        </span>
-<span class="sd">    The parameters that must be taken into account are the following:</span>
-
-<span class="sd">    :param epochs: Number of training epochs.</span>
-<span class="sd">    :type epochs: int</span>
-
-<span class="sd">    :param y: Learning rate for premises update (default: 0.01).</span>
-<span class="sd">    :type y: float</span>
-<span class="sd">        </span>
-<span class="sd">    :param loss_function: Loss function for training (default: nn.functional.mse_loss).</span>
-<span class="sd">    :type loss_function: torch.nn.Module</span>
-<span class="sd">        </span>
-<span class="sd">    :param validation: Proportion of the training data to use for validation (default: 0).</span>
-<span class="sd">    :type validation: float</span>
 <span class="sd">    </span>
 <span class="sd">    **Example Usage:**</span>
 <span class="sd">    </span>
 <span class="sd">    .. code::</span>
 <span class="sd">    </span>
-<span class="sd">        &gt;&gt;&gt; input_data = torch.rand(100,2)</span>
-<span class="sd">        &gt;&gt;&gt; anfis_model = Type3ANFIS(input_data, init_rules=3)</span>
 <span class="sd">        &gt;&gt;&gt; train_loader = data.DataLoader(data.TensorDataset(x_train, y_train), batch_size = 8)</span>
-<span class="sd">        &gt;&gt;&gt; ols_optimizer = OLS(20, y=0.001)</span>
-<span class="sd">        &gt;&gt;&gt; ols_optimizer(anfis_model, train_loader)</span>
+<span class="sd">        &gt;&gt;&gt; input_data = loader.dataset.tensors[0] #x_train from loader</span>
+<span class="sd">        &gt;&gt;&gt; anfis_model = Type3ANFIS(input_data, init_rules=3)</span>
+<span class="sd">        &gt;&gt;&gt; optimizer = torch.optim.AdamW</span>
+<span class="sd">        &gt;&gt;&gt; optim_params = {&#39;lr&#39;: 0.001, &#39;weight_decay&#39;: 0.001}</span>
+<span class="sd">        &gt;&gt;&gt; ols = OLS(epochs=20, optimizer=optimizer, optim_params=optim_params)</span>
+<span class="sd">        &gt;&gt;&gt; ols(anfis_model, train_loader)</span>
 
 <span class="sd">    **Methods:**</span>
 <span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">loss_function</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">,</span> <span class="n">validation</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">loss_function</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">optim_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">validation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">early_stopping</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a new OLS instance.</span>
 
@@ -159,15 +387,28 @@
 <span class="sd">        - epochs (int): Number of training epochs (default: 1).</span>
 <span class="sd">        - y (float): Learning rate for premises update (default: 0.01).</span>
 <span class="sd">        - loss_function (torch.nn.Module): Loss function for training (default: nn.functional.mse_loss).</span>
+<span class="sd">        - optimizer (torch.optim.Optimizer): Optimizer to use for updating parameters (default: None).</span>
+<span class="sd">        - optim_params (dict): Additional parameters for the optimizer (default: None).</span>
 <span class="sd">        - validation (float): Proportion of the training data to use for validation (default: 0).</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#Hyperparameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span> <span class="o">=</span> <span class="n">epochs</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="n">gamma</span>
+
+        <span class="c1">#Premises Update</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span> <span class="o">=</span> <span class="n">loss_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optim_params</span> <span class="o">=</span> <span class="n">optim_params</span>
+
+        <span class="c1">#History</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;loss&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_history</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;loss&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])}</span>
+
+        <span class="c1">#EarlyStopping</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">=</span> <span class="n">validation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">train_history</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">val_history</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span> <span class="o">=</span> <span class="n">early_stopping</span>
+
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">freezed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -179,55 +420,49 @@
 <span class="sd">        :param loader: Data loader for training.</span>
 <span class="sd">        :type loader: torch.utils.data.DataLoader</span>
 <span class="sd">        </span>
-<span class="sd">        :param freezed: Binary tensor indicating which premises to freeze (default: None).</span>
+<span class="sd">        :param freezed: Binary tensor indicating which rules are freezed (default: None).</span>
 <span class="sd">        :type freezed: torch.tensor or None</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">x_train</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">y_train</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_partition</span><span class="p">(</span><span class="n">loader</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="n">split_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span><span class="p">)</span>
-            <span class="n">x_train</span><span class="p">,</span> <span class="n">x_val</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="p">[</span><span class="n">split_index</span><span class="p">,</span> <span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">split_index</span><span class="p">])</span>
-            <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="p">[</span><span class="n">split_index</span><span class="p">,</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">split_index</span><span class="p">])</span>
-
-        <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">consequentsUpdate</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">freezed</span><span class="p">))</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obtain_metrics</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">)</span>
         <span class="n">ep</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="p">(</span><span class="n">ep</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">):</span>
-            <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_premises</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">premisesUpdate</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">,</span> <span class="n">freezed</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">consequentsUpdate</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">freezed</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">premisesUpdate</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">freezed</span><span class="p">)</span>
+
+            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obtain_metrics</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">early_stop</span><span class="p">:</span>
+                    <span class="k">break</span><span class="p">;</span>
+
             <span class="n">ep</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">consequentsUpdate</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">freezed</span><span class="p">))</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obtain_metrics</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">)</span>
 
-        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
-                <span class="n">val_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">(</span><span class="n">x_val</span><span class="p">),</span> <span class="n">y_val</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">val_history</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">val_history</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">val_loss</span><span class="p">])])</span>
-
-            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">(</span><span class="n">x_train</span><span class="p">),</span> <span class="n">y_train</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">train_history</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">train_history</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">loss</span><span class="p">])])</span>
 
 <div class="viewcode-block" id="OLS.consequentsUpdate">
 <a class="viewcode-back" href="../../anfis.html#anfis.train.OLS.consequentsUpdate">[docs]</a>
-    <span class="k">def</span> <span class="nf">consequentsUpdate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">freezed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">consequentsUpdate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">freezed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Updates the consequents (linear coefficients) of the ANFIS model.</span>
+<span class="sd">        Updates the consequent parameters of the ANFIS model using OLS method.</span>
 <span class="sd">        </span>
 <span class="sd">        :param ANFISmodel: An instance of the Type3ANFIS model.</span>
 <span class="sd">        :type ANFISmodel: Type3ANFIS</span>
 <span class="sd">        </span>
-<span class="sd">        :param x_train: Input training data.</span>
-<span class="sd">        :type x_train: torch.tensor</span>
+<span class="sd">        :param loader: Data loader for training.</span>
+<span class="sd">        :type loader: torch.utils.data.DataLoader</span>
 <span class="sd">        </span>
-<span class="sd">        :param y_train: Target training data.</span>
-<span class="sd">        :type y_train: torch.tensor</span>
-<span class="sd">        </span>
-<span class="sd">        :param freezed: Binary tensor indicating which premises to freeze (default: None).</span>
+<span class="sd">        :param freezed: Binary tensor indicating which rules are freezed (default: None).</span>
 <span class="sd">        :type freezed: torch.tensor or None</span>
-<span class="sd">        </span>
-<span class="sd">        :return: Updated consequent parameters.</span>
-<span class="sd">        :rtype: torch.tensor</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x_train</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y_train</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+        <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
         <span class="n">current_consequents</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">consequents</span>
         <span class="n">new_consequents</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">consequents</span><span class="p">)</span>
 
@@ -245,76 +480,203 @@
 
         <span class="n">current_consequents</span><span class="p">[</span><span class="n">freezed</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_consequents</span><span class="p">[</span><span class="n">freezed</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">new_consequents</span><span class="p">;</span></div>
+        <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="n">current_consequents</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="OLS.premisesUpdate">
 <a class="viewcode-back" href="../../anfis.html#anfis.train.OLS.premisesUpdate">[docs]</a>
-    <span class="k">def</span> <span class="nf">premisesUpdate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">loss_function</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">,</span> <span class="n">freezed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">premisesUpdate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">freezed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Updates the premises (fuzzy sets) of the ANFIS model.</span>
+<span class="sd">        Updates the premise parameters of the ANFIS model using OLS method or a user preference gradient descent algorithm.</span>
 <span class="sd">        </span>
 <span class="sd">        :param ANFISmodel: An instance of the Type3ANFIS model.</span>
 <span class="sd">        :type ANFISmodel: Type3ANFIS</span>
 <span class="sd">        </span>
-<span class="sd">        :param x_train: Input training data.</span>
-<span class="sd">        :type x_train: torch.tensor</span>
+<span class="sd">        :param loader: DataLoader containing training data.</span>
+<span class="sd">        :type loader: torch.utils.data.DataLoader</span>
 <span class="sd">        </span>
-<span class="sd">        :param y_train: Target training data.</span>
-<span class="sd">        :type y_train: torch.tensor</span>
-<span class="sd">        </span>
-<span class="sd">        :param y: Learning rate for premises update (default: 0.01).</span>
-<span class="sd">        :type y: float</span>
-<span class="sd">        </span>
-<span class="sd">        :param loss_function: Loss function for training (default: nn.functional.mse_loss).</span>
-<span class="sd">        :type loss_function: torch.nn.Module</span>
-<span class="sd">        </span>
-<span class="sd">        :param freezed: Binary tensor indicating which premises to freeze (default: None).</span>
+<span class="sd">        :param freezed: Binary tensor indicating which rules are freezed (default: None).</span>
 <span class="sd">        :type freezed: torch.tensor or None</span>
-<span class="sd">        </span>
-<span class="sd">        :return: Updated fuzzy premises.</span>
-<span class="sd">        :rtype: torch.tensor</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">pred</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
-
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-
-        <span class="n">alpha</span> <span class="o">=</span> <span class="n">y</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">fuzzify_layer</span><span class="o">.</span><span class="n">premises</span><span class="o">.</span><span class="n">grad</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
-
         <span class="k">if</span> <span class="n">freezed</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">consequents</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-        <span class="n">new_premises</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">premises</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">optim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">([</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">fuzzify_layer</span><span class="o">.</span><span class="n">premises</span><span class="p">])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_params</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">apply_optimizer_parameters</span><span class="p">(</span><span class="n">optim</span><span class="p">)</span>
+            <span class="n">current_premises</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">premises</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
 
-        <span class="n">vs</span> <span class="o">=</span> <span class="n">new_premises</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
-        <span class="n">sigmas</span> <span class="o">=</span> <span class="n">new_premises</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">batch_x</span><span class="p">,</span> <span class="n">batch_y</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>
+                <span class="n">batch_y_copy</span> <span class="o">=</span> <span class="n">batch_y</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+                <span class="n">batch_y_copy</span> <span class="o">=</span> <span class="n">batch_y_copy</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">batch_x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
-        <span class="n">new_vs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span>
-        <span class="n">new_sigmas</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sigmas</span><span class="p">)</span>
+                <span class="n">optim</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+                <span class="n">pred</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="p">(</span><span class="n">batch_x</span><span class="p">)</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">batch_y_copy</span><span class="p">)</span>
+                <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                <span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
-        <span class="n">_</span><span class="p">,</span> <span class="n">w_norm</span><span class="p">,</span> <span class="n">outputs_by_rule</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">intermediate_values</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+            <span class="n">new_premises</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">premises</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+            <span class="n">current_premises</span><span class="p">[:,</span><span class="n">freezed</span><span class="o">==</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">new_premises</span><span class="p">[:,</span><span class="n">freezed</span><span class="o">==</span><span class="mi">0</span><span class="p">,:]</span>
 
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">freezed</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">A</span> <span class="o">=</span> <span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">sigmas</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">x_train</span> <span class="o">-</span> <span class="n">vs</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
-                <span class="n">B</span> <span class="o">=</span> <span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">sigmas</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="mi">3</span><span class="p">))</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="n">x_train</span> <span class="o">-</span> <span class="n">vs</span><span class="p">[</span><span class="n">k</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
-                <span class="n">wk</span> <span class="o">=</span> <span class="n">w_norm</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
-                <span class="n">fk</span> <span class="o">=</span> <span class="n">outputs_by_rule</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span>
-                <span class="n">zk</span> <span class="o">=</span> <span class="p">((</span><span class="n">fk</span><span class="o">-</span><span class="n">pred</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">y_train</span><span class="o">-</span><span class="n">pred</span><span class="p">))</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+            <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_premises</span><span class="p">(</span><span class="n">current_premises</span><span class="p">)</span>
 
-                <span class="n">new_vs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">A</span><span class="o">*</span><span class="n">wk</span><span class="o">*</span><span class="n">zk</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                <span class="n">new_sigmas</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">B</span><span class="o">*</span><span class="n">wk</span><span class="o">*</span><span class="n">zk</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_premises</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">premises</span>
 
-        <span class="n">new_premises</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">new_vs</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
-        <span class="n">new_premises</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">new_sigmas</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">batch_x</span><span class="p">,</span> <span class="n">batch_y</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>
+                <span class="n">batch_y_copy</span> <span class="o">=</span> <span class="n">batch_y</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+                <span class="n">batch_y_copy</span> <span class="o">=</span> <span class="n">batch_y_copy</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">batch_x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">fuzzify_layer</span><span class="o">.</span><span class="n">premises</span><span class="o">.</span><span class="n">grad</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">fuzzify_layer</span><span class="o">.</span><span class="n">premises</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">fuzzify_layer</span><span class="o">.</span><span class="n">premises</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                    <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">consequent_layer</span><span class="o">.</span><span class="n">consequents</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">consequent_layer</span><span class="o">.</span><span class="n">consequents</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">pred</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="p">(</span><span class="n">batch_x</span><span class="p">)</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">batch_y_copy</span><span class="p">)</span>
+                <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="n">new_premises</span><span class="p">;</span></div>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">fuzzify_layer</span><span class="o">.</span><span class="n">premises</span><span class="o">.</span><span class="n">grad</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+                <span class="n">vs</span> <span class="o">=</span> <span class="n">new_premises</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+                <span class="n">sigmas</span> <span class="o">=</span> <span class="n">new_premises</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+
+                <span class="n">new_vs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span>
+                <span class="n">new_sigmas</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sigmas</span><span class="p">)</span>
+
+                <span class="n">_</span><span class="p">,</span> <span class="n">w_norm</span><span class="p">,</span> <span class="n">outputs_by_rule</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">intermediate_values</span><span class="p">(</span><span class="n">batch_x</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">freezed</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">A</span> <span class="o">=</span> <span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">sigmas</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">batch_x</span> <span class="o">-</span> <span class="n">vs</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+                        <span class="n">B</span> <span class="o">=</span> <span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">sigmas</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="mi">3</span><span class="p">))</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="n">batch_x</span> <span class="o">-</span> <span class="n">vs</span><span class="p">[</span><span class="n">k</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
+                        <span class="n">wk</span> <span class="o">=</span> <span class="n">w_norm</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+                        <span class="n">fk</span> <span class="o">=</span> <span class="n">outputs_by_rule</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span>
+                        <span class="n">zk</span> <span class="o">=</span> <span class="p">((</span><span class="n">fk</span><span class="o">-</span><span class="n">pred</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">batch_y</span><span class="o">-</span><span class="n">pred</span><span class="p">))</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+
+                        <span class="n">new_vs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">A</span><span class="o">*</span><span class="n">wk</span><span class="o">*</span><span class="n">zk</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                        <span class="n">new_sigmas</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">B</span><span class="o">*</span><span class="n">wk</span><span class="o">*</span><span class="n">zk</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="n">new_premises</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">new_vs</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+                <span class="n">new_premises</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">new_sigmas</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+
+            <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_premises</span><span class="p">(</span><span class="n">new_premises</span><span class="p">)</span></div>
+
+            
+            
+<div class="viewcode-block" id="OLS.apply_optimizer_parameters">
+<a class="viewcode-back" href="../../anfis.html#anfis.train.OLS.apply_optimizer_parameters">[docs]</a>
+    <span class="k">def</span> <span class="nf">apply_optimizer_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply custom optimizer parameters to the provided optimizer.</span>
+
+<span class="sd">        :param optimizer: The optimizer to which parameters are applied.</span>
+<span class="sd">        :type optimizer: torch.optim.Optimizer</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">param_group</span> <span class="ow">in</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">new_value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">param_group</span><span class="p">:</span>
+                    <span class="n">param_group</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_value</span></div>
+
+                    
+    
+<div class="viewcode-block" id="OLS.val_partition">
+<a class="viewcode-back" href="../../anfis.html#anfis.train.OLS.val_partition">[docs]</a>
+    <span class="k">def</span> <span class="nf">val_partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create separate training and validation dataloaders based on the validation split ratio.</span>
+
+<span class="sd">        :param loader: The original dataloader.</span>
+<span class="sd">        :type loader: torch.utils.data.DataLoader</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">            - train_loader (torch.utils.data.DataLoader): Dataloader for training.</span>
+<span class="sd">            - val_loader (torch.utils.data.DataLoader): Dataloader for validation.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+            <span class="n">x_train</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+            <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+
+            <span class="n">split_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span><span class="p">)</span>
+
+            <span class="n">x_val</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[:</span><span class="n">split_index</span><span class="p">]</span>
+            <span class="n">y_val</span> <span class="o">=</span> <span class="n">y_train</span><span class="p">[:</span><span class="n">split_index</span><span class="p">]</span>
+            <span class="n">x_train</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="n">split_index</span><span class="p">:]</span>
+            <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="p">[</span><span class="n">split_index</span><span class="p">:]</span>
+
+            <span class="n">train_loader</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">TensorDataset</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">),</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">loader</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">val_loader</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">TensorDataset</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">),</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">loader</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">train_loader</span> <span class="o">=</span> <span class="n">loader</span>
+            <span class="n">val_loader</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span></div>
+
+    
+<div class="viewcode-block" id="OLS.obtain_metrics">
+<a class="viewcode-back" href="../../anfis.html#anfis.train.OLS.obtain_metrics">[docs]</a>
+    <span class="k">def</span> <span class="nf">obtain_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Obtain and record various metrics such as loss and performance measures for training and validation sets.</span>
+
+<span class="sd">        :param ANFISmodel: The ANFIS model.</span>
+<span class="sd">        :type ANFISmodel: Type3ANFIS</span>
+<span class="sd">        </span>
+<span class="sd">        :param train_loader: Dataloader for training set.</span>
+<span class="sd">        :type train_loader: torch.utils.data.DataLoader</span>
+<span class="sd">        </span>
+<span class="sd">        :param val_loader: Dataloader for validation set.</span>
+<span class="sd">        :type val_loader: torch.utils.data.DataLoader</span>
+
+<span class="sd">        :return loss: The calculated loss.</span>
+<span class="sd">        :rtype loss: torch.tensor</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#Validation set</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">val_loader</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">x_val</span> <span class="o">=</span> <span class="n">val_loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">y_val</span> <span class="o">=</span> <span class="n">val_loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                <span class="n">pred</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="p">(</span><span class="n">x_val</span><span class="p">)</span>
+
+            <span class="n">val_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">y_val</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val_history</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">val_history</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">val_loss</span><span class="p">])])</span>
+
+            <span class="n">measures</span> <span class="o">=</span> <span class="n">obtain_measures</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">x_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">measure</span> <span class="ow">in</span> <span class="n">measures</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">measure</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_history</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">val_history</span><span class="p">[</span><span class="n">measure</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">val_history</span><span class="p">[</span><span class="n">measure</span><span class="p">]</span> <span class="o">=</span>  <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">val_history</span><span class="p">[</span><span class="n">measure</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">measures</span><span class="p">[</span><span class="n">measure</span><span class="p">]])])</span>
+
+        <span class="c1">#Training set</span>
+        <span class="n">x_train</span> <span class="o">=</span> <span class="n">train_loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y_train</span> <span class="o">=</span> <span class="n">train_loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">pred</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">y_train</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">loss</span><span class="p">])])</span>
+
+        <span class="n">measures</span> <span class="o">=</span> <span class="n">obtain_measures</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">measure</span> <span class="ow">in</span> <span class="n">measures</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">measure</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="n">measure</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="n">measure</span><span class="p">]</span> <span class="o">=</span>  <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="n">measure</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">measures</span><span class="p">[</span><span class="n">measure</span><span class="p">]])])</span>
+
+        <span class="k">if</span> <span class="n">val_loader</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">val_loss</span>
+        <span class="k">return</span> <span class="n">loss</span></div>
 </div>
-
-
-
 
 </pre></div>
 

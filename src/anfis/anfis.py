@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 from torch.nn.parameter import Parameter
 
@@ -10,17 +11,22 @@ class Type3ANFIS(nn.Module):
     
     **Layers:**
     
-    .. attribute:: Fuzzification layer (FuzzifyLayer(nn.Module))
+    .. attribute:: fuzzification_layer (FuzzifyLayer(nn.Module))
         
-    .. attribute:: Firing levels layer (FiringLevelsLayer(nn.Module))
+    .. attribute:: firing_levels_layer (FiringLevelsLayer(nn.Module))
         
-    .. attribute:: Normalization layer (NormalizationLayer(nn.Module))
+    .. attribute:: normalization_layer (NormalizationLayer(nn.Module))
     
-    .. attribute:: Consequent layer (ConsequentLayer(nn.Module))
+    .. attribute:: consequent_layer (ConsequentLayer(nn.Module))
     
-    .. attribute:: Output layer (OutputLayer(nn.Module))
+    .. attribute:: output_layer (OutputLayer(nn.Module))
     
-    **Attributes:**
+    .. attribute:: last_layer (nn.Identity() or nn.Sigmoid())
+        
+        This last layer is what determines whether the output of the model is binary or not.
+        
+    
+    **Other attributes:**
     
     .. attribute:: input_size
     
@@ -40,6 +46,12 @@ class Type3ANFIS(nn.Module):
         
         :type: list
         :default: ['mu', 'sigma']
+        
+    .. attribute:: init_state
+    
+        Dictionary with the initial values of both premises and consequents.
+        
+        :type: dict
         
     **To initialize it:**
         
@@ -63,6 +75,9 @@ class Type3ANFIS(nn.Module):
     :param init_mode: Numeric flag for initializing the fuzzy premises (default: 0, meaning it will be initialized based on the input data, otherwise it will be initialized randomly).
     :type init_mode: int
     
+    :param binary_output: Boolean flag for using a sigmoid layer after the output layer for establish binary outputs for the model. (default: False, meaning that the last layer of the output will be an identity layer)
+    :type binary_output: boolean
+    
     **Example Usage:**
     
     .. code::
@@ -76,7 +91,7 @@ class Type3ANFIS(nn.Module):
     """
 
 
-    def __init__(self, x_train, init_rules=1, cf=f.weighted_linear, mf=f.gaussian2, mf_params=['mu', 'sigma'], init_mode=0):
+    def __init__(self, x_train, init_rules=1, cf=f.weighted_linear, mf=f.gaussian2, mf_params=['mu', 'sigma'], init_mode=0, binary_output=False):
         """
         To initialize a new Type3ANFIS instance.
 
@@ -102,6 +117,10 @@ class Type3ANFIS(nn.Module):
         :param init_mode: Numeric flag for initializing the fuzzy premises (default: 0, meaning it will be initialized based on the input data, otherwise it will be initialized randomly).
         :type init_mode: int
         :deafult init_mode: 0
+        
+        :param binary_output: Boolean flag for using a sigmoid layer after the output layer for establish binary outputs for the model.
+        :type binary_output: boolean
+        :default binary_output: False
 
         """
         super(Type3ANFIS, self).__init__()
@@ -114,6 +133,14 @@ class Type3ANFIS(nn.Module):
         self.normalization_layer = l.NormalizationLayer()
         self.consequent_layer = l.ConsequentLayer(self.input_size, self.dtype, init_rules, cf)
         self.output_layer = l.OutputLayer()
+
+        if (binary_output == False):
+            self.last_layer = nn.Identity()
+        else:
+            self.last_layer = nn.Sigmoid()
+
+        self.init_state = {'premises': self.fuzzify_layer.premises.data.clone(),
+                           'consequents': self.consequent_layer.consequents.data.clone()}
 
 
     def forward(self, x):
@@ -130,12 +157,14 @@ class Type3ANFIS(nn.Module):
         output = self.fuzzify_layer(x)
         output = self.consequent_layer(x, self.normalization_layer(self.firing_levels_layer(output)))
         output = self.output_layer(output)
+        output = self.last_layer(output)
         return output
 
 
     def intermediate_values(self, x):
         """
-        Computes normalized firing levels based on input data.
+        It emulates a forward pass to obtain the intermediate values of the ANFIS, specifically the outputs of each rule
+        and the firing levels (both their original and normalized values).
 
         :param x: Input tensor.
         :type x: torch.tensor
@@ -146,10 +175,11 @@ class Type3ANFIS(nn.Module):
             - outputs (torch.tensor): Outputs by rule of the model
 
         """
-        w = self.fuzzify_layer(x)
-        w = self.firing_levels_layer(w)
-        w_norm = self.normalization_layer(w)
-        outputs = self.consequent_layer(x, w_norm)
+        with torch.no_grad():
+            w = self.fuzzify_layer(x)
+            w = self.firing_levels_layer(w)
+            w_norm = self.normalization_layer(w)
+            outputs = self.consequent_layer(x, w_norm)
         return w, w_norm, outputs
 
 

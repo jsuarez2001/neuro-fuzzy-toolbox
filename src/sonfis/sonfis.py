@@ -1,4 +1,5 @@
 import torch
+import torch.utils.data as data
 import torch.nn as nn
 
 import anfis.train as train
@@ -8,25 +9,13 @@ class SONFIS():
     '''
     Self-Organizing Algorithm for Neuro-Fuzzy Inference Systems (SONFIS) for online learning and adaptation.
 
-    **Attributes:**
-    
-    .. attribute:: max
-    
-        Maximum number of iterations for SONFIS learning.
+    **Attributes for initialization:**
         
-        :type: int
+    .. attribute:: OLSinstance
     
-    .. attribute:: y
-    
-        Learning rate for OLS (Ordinary Least Squares) optimizer.
+        The OLS instance to be applied while the SONFIS algorithm is running.
         
-        :type: float
-        
-    .. attribute:: OLSepochs
-    
-        Number of epochs for OLS optimizer during each SONFIS iteration.
-        
-        :type: int
+        :type: OLS
     
     .. attribute:: Ngrow
     
@@ -64,12 +53,12 @@ class SONFIS():
         
         :type: int
         
-    .. attribute:: loss_function
+    .. attribute:: max
     
-        Loss function for training (specifically, to update the premise parameters).
+        Maximum number of iterations for SONFIS learning.
         
-        :type: torch.nn.Module
-        :default: nn.functional.mse_loss
+        :type: int
+
         
     .. attribute:: validation
     
@@ -78,11 +67,28 @@ class SONFIS():
         :type: float
         :default: 0
         
-    .. attribute:: ols
+    .. attribute:: early_stopping
     
-        The OLS instance to be applied while the SONFIS algorithm is running.
+        EarlyStopping instance for the SONFIS algorithm. For default works with the validation split, but if the validation portion is not entered, it will work with the entire training dataset.
+        
+        :type: EarlyStopping
+        :default: None
+        
+    .. attribute:: last_ols
+    
+        Boolean flag for apply a last OLS iteration with all the rules unfreezed after SONFIS execution finishes.
+        
+        :type: boolean
+        :default: True
+        
+    .. attribute:: reset_ols_early_stopping
+    
+        Boolean flag for apply a last OLS iteration with all the rules unfreezed after SONFIS execution finishes.
+        
+        :type: boolean
+        :default: True
 
-        :type: OLS
+    **Other attributes:**
         
     .. attribute:: freezed
     
@@ -102,70 +108,48 @@ class SONFIS():
         
         :type: torch.tensor
         
+    .. attribute:: loss_function
+    
+        Loss function (obtained from the OLS instance).
+        
+        :type: torch.nn.functional
+        :default: nn.functional.mse_loss
+        
     .. attribute:: train_history
 
-        Training loss history.
+        Training loss and various measures history.
         
         :type: torch.tensor
         
     .. attribute:: val_history
     
-        Validation loss history.
+        Validation loss and various measures history.
         
         :type: torch.tensor
-    
-    **To initialize it:**
-    
-    The parameters that must be taken into account are the following:
-    
-    :param max: Maximum number of iterations for SONFIS learning.
-    :type max: int
-    
-    :param y: Learning rate for premises update.
-    :type y: float
-    
-    :param OLSepochs: Number of training epochs.
-    :type OLSepochs: int
-    
-    :param Ngrow: Threshold for growing a new rule based on firing levels.
-    :type Ngrow: int
-    
-    :param dGrow: Threshold for deciding whether to grow a new rule based on firing level spread.
-    :type dGrow: float
-    
-    :param Nsplit: Threshold for splitting a sub-network based on rule contribution.
-    :type Nsplit: int
-    
-    :param eSplit: Threshold for deciding whether to split a sub-network based on rule error.
-    :type eSplit: float
-    
-    :param Nvanish: Threshold for deciding whether to vanish a rule based on the number of samples.
-    :type Nvanish: int
-    
-    :param lVanish: Threshold for deciding whether to vanish a rule based on its age.
-    :type lVanish: int
-        
-    :param loss_function: Loss function for training (default: nn.functional.mse_loss).
-    :type loss_function: torch.nn.Module
-        
-    :param validation: Proportion of the training data to use for validation (default: 0).
-    :type validation: float
 
     **Example Usage:**
     
     .. code::
     
-        >>> train_loader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True)
-        >>> x_train = train_loader.dataset.tensors[0]
-        >>> anfis_model = Type3ANFIS(x_train, init_rules=1)
-        >>> sonfis = SONFIS(max=50, y=0.01, OLSepochs=5, Ngrow=20, dGrow=1.5, Nsplit=30, eSplit=0.2, Nvanish=2, lVanish=15)
-        >>> sonfis(anfis_model, train_loader)
-        >>> print(sonfis.train_history)
+        >>> #dataloader and ANFIS model
+        >>> loader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True)
+        >>> input_data = loader.dataset.tensors[0]
+        >>> anfis_model = Type3ANFIS(input_data, init_rules=1)
+        >>> #OLS
+        >>> optimizer = torch.optim.AdamW
+        >>> optim_params = {'lr': 0.001, 'weight_decay': 0.001}
+        >>> ols_early_stopping = EarlyStopping(patience=5)
+        >>> ols = OLS(epochs=15, optimizer=optimizer, optim_params=optim_params, validation=0.2, early_stopping=ols_early_stopping)
+        >>> #SONFIS
+        >>> SONFISearly_stopping = EarlyStopping(patience=10, delta=0.01)
+        >>> sonfis = SONFIS(ols, Ngrow=30, dGrow=0.8, Nsplit=20, eSplit=0.7, Nvanish=8, lVanish=4, max=50, validation=0.25, early_stopping=SONFISearly_stopping, last_ols=False)
+        >>> sonfis(anfis_model, loader)
+        >>> print(sonfis.history['loss'])
     
     **Methods:**
 
     '''
-    def __init__(self, max, y, OLSepochs, Ngrow, dGrow, Nsplit, eSplit, Nvanish, lVanish, loss_function=nn.functional.mse_loss, validation=0):
+    def __init__(self, OLS_instance, Ngrow, dGrow, Nsplit, eSplit, Nvanish, lVanish, max, validation=0, early_stopping=None, last_ols=False, reset_ols_early_stopping=True):
         """
         Initializes a new SONFIS instance.
 
@@ -185,27 +169,32 @@ class SONFIS():
         """
         # Hyperparameters
         self.max = max
-        self.y = y
-        self.OLSepochs = OLSepochs
         self.Ngrow = Ngrow
         self.dGrow = dGrow
         self.Nsplit = Nsplit
         self.eSplit = eSplit
         self.Nvanish = Nvanish
         self.lVanish = lVanish
-        self.validation = validation
 
         #OLS
-        self.ols = train.OLS(OLSepochs, y, loss_function, validation)
+        self.ols = OLS_instance
+        self.reset_ols_early_stopping = reset_ols_early_stopping
 
         #Other attributes
+        self.last_ols = last_ols
         self.freezed = torch.tensor([], dtype=torch.int)
         self.ages = torch.tensor([], dtype=torch.int)
         self.last_best_rules = torch.tensor([-1], dtype=torch.int)
 
         #history
-        self.train_history = torch.tensor([])
-        self.val_history = torch.tensor([])
+        self.loss_function = OLS_instance.loss_function
+
+        self.history = {'loss': torch.tensor([])}
+        self.val_history = {'loss': torch.tensor([])}
+        
+        #early stopping
+        self.validation = validation
+        self.early_stopping = early_stopping
 
 
     def __call__(self, ANFISmodel, loader):
@@ -219,8 +208,11 @@ class SONFIS():
         :type loader: torch.utils.data.DataLoader
 
         """
-        self.ages = torch.zeros(ANFISmodel.rules)
-        self.freezed = torch.zeros(ANFISmodel.rules)
+        train_loader, val_loader = self.val_partition(loader)
+        _ = self.obtain_metrics(ANFISmodel, train_loader, val_loader)
+
+        self.ages = torch.zeros(ANFISmodel.rules, dtype=torch.int)
+        self.freezed = torch.zeros(ANFISmodel.rules, dtype=torch.int)
 
         model_updated = True
         i = 0
@@ -228,35 +220,60 @@ class SONFIS():
         self.callOLS(ANFISmodel, loader)
         while(model_updated & (i < self.max)):
             print("\n *******ITERATION:", i+1, " ******* ")
-            self.freezed = torch.ones(ANFISmodel.rules)
+            self.freeze_rules()
 
             #GrowNet
-            did_Grow = self.GrowNet(ANFISmodel, loader)
+            did_Grow = self.GrowNet(ANFISmodel, train_loader)
 
             #Split Sub-network
             if not did_Grow:
-                did_Split = self.SplitSubNetwork(ANFISmodel, loader)
+                did_Split = self.SplitSubNetwork(ANFISmodel, train_loader)
             else:
                 did_Split = False
 
             #VanishNet
-            did_Vanish = self.VanishNet(ANFISmodel, loader)
+            did_Vanish = self.VanishNet(ANFISmodel, train_loader)
 
             print("\nRules amount:", ANFISmodel.rules, "\n\n")
-
+            #Check update
             model_updated = did_Grow | did_Split | did_Vanish
             if model_updated:
                 self.callOLS(ANFISmodel, loader)
+            else:
+                print("NO MORE UPDATES")
+
+            loss = self.obtain_metrics(ANFISmodel, train_loader, val_loader)
+            if self.callEarlyStopping(ANFISmodel, loss):
+                break;
 
             i += 1
 
-        self.freezed = torch.zeros(ANFISmodel.rules)
-        self.callOLS(ANFISmodel, loader)
+        self.unfreeze_rules()
+        if self.last_ols:
+            self.ols.last = True
+            self.callOLS(ANFISmodel, loader)
+        _ = self.obtain_metrics(ANFISmodel, train_loader, val_loader)
+        
+        
+    def freeze_rules(self):
+        """
+        Freeze all rules in the ANFIS model.
+
+        """
+        self.freezed = torch.ones_like(self.freezed)
+        
+        
+    def unfreeze_rules(self):
+        """
+        Unfreeze all rules in the ANFIS model.
+
+        """
+        self.freezed = torch.zeros_like(self.freezed)
 
 
     def callOLS(self, ANFISmodel, loader):
         """
-        Calls the OLS optimizer to update the ANFIS model and store the loss history.
+        Calls the OLS optimizer to update the ANFIS model parameters.
 
         :param ANFISmodel: An instance of the Type3ANFIS model.
         :type ANFISmodel: Type3ANFIS
@@ -265,8 +282,130 @@ class SONFIS():
         :type loader: torch.utils.data.DataLoader
 
         """
+        # Call OLS training routine
         self.ols(ANFISmodel, loader, self.freezed)
-        self.train_history = torch.cat([self.train_history, self.ols.train_history])
+
+        # Reset OLS training history metrics
+        for metric in self.ols.history:
+            self.ols.history[metric] = torch.tensor([])
+
+        # Reset OLS EarlyStopping if applicable
+        if self.ols.early_stopping is not None and self.reset_ols_early_stopping:
+            self.ols.early_stopping.reset()
+            
+    def callEarlyStopping(self, ANFISmodel, loss):
+        """
+        Calls the EarlyStopping mechanism and handles early stopping for the SONFIS model.
+
+        :param ANFISmodel: An instance of the Type3ANFIS model.
+        :type ANFISmodel: Type3ANFIS
+        
+        :param loader: Data loader for training.
+        :type loader: torch.utils.data.DataLoader
+
+        :return bool: True if early stopping criterion do establish and early stopping for the execution of the SONFIS algorithm, False otherwise (If there is none early stopping mechanism for the SONFIS execution, then just returns False).
+
+    """
+        if self.early_stopping != None:
+            self.early_stopping(loss, ANFISmodel)
+            if self.early_stopping.early_stop:
+                print("EARLY STOPPING")
+                self.freezed = self.freezed[:ANFISmodel.rules]
+                self.ages = self.ages[:ANFISmodel.rules]
+                return True
+            return False
+        return False
+    
+    
+    def val_partition(self, loader):
+        """
+        Splits the provided DataLoader into training and validation sets based on the specified validation ratio.
+
+        :param loader: DataLoader containing input data and labels.
+        :type loader: torch.utils.data.DataLoader
+
+        :return:
+            - train_loader (torch.utils.data.DataLoader): DataLoader for training set.
+            - val_loader (torch.utils.data.DataLoader): DataLoader for validation set.
+
+        """
+        if self.validation != 0:
+            x_train, y_train = loader.dataset.tensors
+            indices = torch.randperm(x_train.size(0))
+            x_train = x_train[indices]
+            y_train = y_train[indices]
+
+            split_index = int(x_train.shape[0] * self.validation)
+
+            x_val = x_train[:split_index]
+            y_val = y_train[:split_index]
+            x_train = x_train[split_index:]
+            y_train = y_train[split_index:]
+
+            train_loader = data.DataLoader(data.TensorDataset(x_train, y_train), batch_size=loader.batch_size, shuffle=True)
+            val_loader = data.DataLoader(data.TensorDataset(x_val, y_val), batch_size=loader.batch_size, shuffle=False)
+        else:
+            train_loader = loader
+            val_loader = None
+
+        return train_loader, val_loader
+    
+    
+    def obtain_metrics(self, ANFISmodel, train_loader, val_loader):
+        """
+        Computes and records evaluation metrics for the provided ANFISmodel on training and validation sets.
+        
+        :param ANFISmodel: An instance of the Type3ANFIS model.
+        :type ANFISmodel: Type3ANFIS
+        
+        :param train_loader: DataLoader for training set.
+        :type train_loader: torch.utils.data.DataLoader
+        
+        :param val_loader: DataLoader for validation set.
+        :type val_loader: torch.utils.data.DataLoader
+
+        :return loss: Loss value on the validation set (if available, else training set).
+        :rtype: torch.tensor
+
+        """
+        #Validation set
+        if (val_loader != None):
+            x_val = val_loader.dataset.tensors[0]
+            y_val = val_loader.dataset.tensors[1]
+
+            with torch.no_grad():
+                pred = ANFISmodel(x_val)
+
+            val_loss = self.loss_function(pred, y_val.to(pred.dtype))
+            self.val_history['loss'] = torch.cat([self.val_history['loss'], torch.tensor([val_loss])])
+
+            measures = train.obtain_measures(ANFISmodel, x_val, y_val)
+
+            for measure in measures:
+                if measure not in self.val_history:
+                    self.val_history[measure] = torch.tensor([])
+                self.val_history[measure] =  torch.cat([self.val_history[measure], torch.tensor([measures[measure]])])
+
+        #Training set
+        x_train = train_loader.dataset.tensors[0]
+        y_train = train_loader.dataset.tensors[1]
+
+        with torch.no_grad():
+            pred = ANFISmodel(x_train)
+
+        loss = self.loss_function(pred, y_train.to(pred.dtype))
+        self.history['loss'] = torch.cat([self.history['loss'], torch.tensor([loss])])
+
+        measures = train.obtain_measures(ANFISmodel, x_train, y_train)
+
+        for measure in measures:
+            if measure not in self.history:
+                self.history[measure] = torch.tensor([])
+            self.history[measure] =  torch.cat([self.history[measure], torch.tensor([measures[measure]])])
+
+        if val_loader != None:
+            loss = val_loss
+        return loss
 
 
     def GrowNet(self, ANFISmodel, loader):
@@ -331,8 +470,8 @@ class SONFIS():
         ANFISmodel.set_consequents(torch.cat([ANFISmodel.consequents, new_consequents]))
 
         #ages and freezed rules tensors updated
-        self.freezed = torch.cat([self.freezed, torch.zeros(new_premises.shape[1])])
-        self.ages = torch.cat([self.ages, torch.zeros(new_premises.shape[1], dtype=torch.bool)])
+        self.freezed = torch.cat([self.freezed, torch.zeros(new_premises.shape[1], dtype=torch.int)])
+        self.ages = torch.cat([self.ages, torch.zeros(new_premises.shape[1], dtype=torch.int)])
 
         #return True if ANFISmodel is modified
         return True
@@ -376,6 +515,10 @@ class SONFIS():
 
         indices_to_keep = torch.isin(best_rules, unique_rules[Nsplit_mask]).nonzero().squeeze()
 
+        #return Flase if ANFISmodel is not modified
+        if ((indices_to_keep.shape[0] == 0)):
+            return False
+
         samples = samples[indices_to_keep]
         samples_output = samples_output[indices_to_keep]
         best_rules = best_rules[indices_to_keep]
@@ -417,8 +560,8 @@ class SONFIS():
             #same with ages and freezed rules tensor
             self.ages = torch.cat([self.ages[:rule], self.ages[rule+1:]]) #the corresponding rule is taken away
             self.freezed = torch.cat([self.freezed[:rule], self.freezed[rule+1:]])
-            self.ages = torch.cat([self.ages, torch.zeros(2, dtype=torch.bool)]) #the new ones are added
-            self.freezed = torch.cat([self.freezed, torch.zeros(2)])
+            self.ages = torch.cat([self.ages, torch.zeros(2, dtype=torch.int)]) #the new ones are added
+            self.freezed = torch.cat([self.freezed, torch.zeros(2, dtype=torch.int)])
 
         #after the loop, the new parameters are set
         ANFISmodel.set_premises(new_premises)

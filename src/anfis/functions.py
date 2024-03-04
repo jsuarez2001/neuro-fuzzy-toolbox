@@ -2,7 +2,7 @@ import torch
 
 def gaussian2(x, p):
     '''
-    It is used as its membership function and calculates gaussian values based on the input data and premise parameters
+    It is used as a membership function and calculates gaussian values based on the input data and premise parameters
     of the ANFIS model (membership degrees). Emulates the following gaussian function:
     
     .. image:: _build/html/_static/gauss2.png
@@ -43,7 +43,7 @@ def gaussian2(x, p):
 
 def gaussian3(x, p):
     '''
-    It is used as its membership function and calculates gaussian values based on the input data and premise parameters
+    It is used as a membership function and calculates gaussian values based on the input data and premise parameters
     of the ANFIS model (membership degrees). Emulates the following gaussian function:
     
     .. image:: _build/html/_static/gauss3.png
@@ -52,6 +52,7 @@ def gaussian3(x, p):
     
     :param x: Tensor of input data.
     :type x: torch.tensor
+    
     :param p: 3D parameter tensor containing 'mu', 'sigma' and 'f' (as scalar) parameters by data dimension and by ANFIS rule.
     :type p: torch.tensor
     
@@ -100,8 +101,10 @@ def weighted_linear(x, c, w):
 
     :param x: Tensor of input data.
     :type x: torch.tensor
+    
     :param c: Coefficients tensor for the linear combination (consequent parameters).
     :type c: torch.tensor
+    
     :param w: Weights tensor for element-wise multiplication.
     :type w: torch.tensor
 
