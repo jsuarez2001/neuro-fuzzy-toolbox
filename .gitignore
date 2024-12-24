@@ -1,0 +1,9 @@
+__pycache__/
+*.ipynb_checkpoints/
+.vscode/
+env/
+neurofuzzy_toolbox_esp/
+requirements.txt
+initwork.txt
+algo.txt
+tests/
