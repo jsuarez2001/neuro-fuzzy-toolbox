@@ -3,14 +3,13 @@ import torch.nn as nn
 import numpy as np
 from torch.nn import Parameter
 
-from membership_functions import GeneralizedBell_MF
-from consequent_functions import Linear_CF
-from layers import FuzzifyLayer, FiringLevelsLayer, NormalizationLayer, ConsequentLayer, OutputLayer
+from neuro_fuzzy_toolbox.func import GeneralizedBell_MF, Linear_CF
+from neuro_fuzzy_toolbox.layers import FuzzificationLayer, FiringLevelsLayer, NormalizationLayer, ConsequentLayer, OutputLayer
 
-class ANFIS(nn.Module):
+class ANFISmodel(nn.Module):
 
     def __init__(self, x_train, init_fuzzy_rules=1, outputs=1, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, premises_init_mode=0, output_type=None, restricted=False):
-        super(ANFIS, self).__init__()
+        super(ANFISmodel, self).__init__()
         
         # Input data info
         self._input_size = x_train.shape[1]
@@ -23,7 +22,7 @@ class ANFIS(nn.Module):
         
         
         # Layers
-        self._fuzzify_layer = FuzzifyLayer(x_train=x_train,
+        self._fuzzify_layer = FuzzificationLayer(x_train=x_train,
                                            init_fuzzy_rules=init_fuzzy_rules, 
                                            membership_function=membership_function, 
                                            init_mode=premises_init_mode)

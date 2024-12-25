@@ -1,9 +1,19 @@
 import torch
+import torch.nn as nn
 
-from consequent_functions import ConsequentFunction
+from abc import abstractmethod
+
+class ConsequentFunction(nn.Module):
+    @abstractmethod
+    def forward(self, x, consequents, weights):
+        pass
+    
+    @abstractmethod
+    def initialize_consequents(self, outputs, consequents_rules, input_size, input_dtype):
+        pass
+
 
 class Linear_CF(ConsequentFunction):
-
     def forward(self, x, consequents, weights):
         return (torch.bmm(x.unsqueeze(0).expand(consequents[:, :, :-1].size(0), -1, -1), torch.transpose(consequents[:, :, :-1], 1, 2)) + consequents[:, :, -1].unsqueeze(1)).mul(weights.unsqueeze(0))
 

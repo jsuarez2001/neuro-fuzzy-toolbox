@@ -6,8 +6,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from membership_functions import GeneralizedBell_MF
-
+from neuro_fuzzy_toolbox.func import GeneralizedBell_MF
 
 class FuzzificationLayer(nn.Module):
     

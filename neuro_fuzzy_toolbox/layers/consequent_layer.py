@@ -1,9 +1,8 @@
-import torch
 import torch.nn as nn
 from torch.nn import Parameter
 import pandas as pd
 
-from consequent_functions import Linear_CF
+from neuro_fuzzy_toolbox.func import Linear_CF
 
 class ConsequentLayer(nn.Module):
     
