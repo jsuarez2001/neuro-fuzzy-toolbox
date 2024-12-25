@@ -6,13 +6,13 @@ from neuro_fuzzy_toolbox.func import Linear_CF
 
 class ConsequentLayer(nn.Module):
     
-    def __init__(self, input_size, input_dtype, init_fuzzy_rules, consequent_function=Linear_CF, outputs=1, restricted=False):
+    def __init__(self, input_size, dtype, init_fuzzy_rules, consequent_function=Linear_CF, outputs=1, rule_reduced=False):
         super(ConsequentLayer, self).__init__()
         # Initialize consequent function
         self._consequent_function = consequent_function()
         
         # Initialize consequent parameters
-        if restricted:
+        if rule_reduced:
             init_consequents_rules = init_fuzzy_rules
         else:
             init_consequents_rules = init_fuzzy_rules**input_size
@@ -20,7 +20,7 @@ class ConsequentLayer(nn.Module):
         self._consequents = Parameter(self._consequent_function.initialize_consequents(outputs=outputs,
                                                                                        consequents_rules=init_consequents_rules, 
                                                                                        input_size=input_size, 
-                                                                                       input_dtype=input_dtype), requires_grad=True)
+                                                                                       dtype=dtype), requires_grad=True)
         
     
     def forward(self, x, weights):

@@ -6,10 +6,10 @@ from torch.nn import Parameter
 from neuro_fuzzy_toolbox.func import GeneralizedBell_MF, Linear_CF
 from neuro_fuzzy_toolbox.layers import FuzzificationLayer, FiringLevelsLayer, NormalizationLayer, ConsequentLayer, OutputLayer
 
-class ANFISmodel(nn.Module):
+class ANFIS(nn.Module):
 
-    def __init__(self, x_train, init_fuzzy_rules=1, outputs=1, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, premises_init_mode=0, output_type=None, restricted=False):
-        super(ANFISmodel, self).__init__()
+    def __init__(self, x_train, init_fuzzy_rules=1, outputs=1, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, premises_init_mode=0, output_type=None, rule_reduced=False):
+        super(ANFIS, self).__init__()
         
         # Input data info
         self._input_size = x_train.shape[1]
@@ -17,33 +17,33 @@ class ANFISmodel(nn.Module):
         
         
         # ANFIS info
-        self._restricted = restricted
+        self._rule_reduced = rule_reduced
         self._outputs = outputs
         
         
         # Layers
-        self._fuzzify_layer = FuzzificationLayer(x_train=x_train,
+        self._fuzzification_layer = FuzzificationLayer(x_train=x_train,
                                            init_fuzzy_rules=init_fuzzy_rules, 
                                            membership_function=membership_function, 
                                            init_mode=premises_init_mode)
         
-        self._firing_levels_layer = FiringLevelsLayer(restricted=restricted)
+        self._firing_levels_layer = FiringLevelsLayer(rule_reduced=rule_reduced)
         
         self._normalization_layer = NormalizationLayer()
         
         self._consequent_layer = ConsequentLayer(input_size=self._input_size, 
-                                                 input_dtype=self._input_dtype, 
+                                                 dtype=self._input_dtype, 
                                                  init_fuzzy_rules=init_fuzzy_rules, 
                                                  consequent_function=consequent_function, 
                                                  outputs=outputs,
-                                                 restricted=restricted)
+                                                 rule_reduced=rule_reduced)
         
         self._output_layer = OutputLayer(output_type=output_type)    
     
 
     # ---- Forward pass ----
     def forward(self, x):
-        output = self._fuzzify_layer(x)
+        output = self._fuzzification_layer(x)
         output = self._consequent_layer(x, self._normalization_layer(self._firing_levels_layer(output)))
         output = self._output_layer(output)
         return output
@@ -66,7 +66,7 @@ class ANFISmodel(nn.Module):
     # ---- Intermediate values ----
     def intermediate_values(self, x):
         with torch.no_grad():
-            w = self._fuzzify_layer(x)
+            w = self._fuzzification_layer(x)
             w = self._firing_levels_layer(w)
             w_norm = self._normalization_layer(w)
         return w, w_norm
@@ -74,19 +74,19 @@ class ANFISmodel(nn.Module):
     
     # ----- Parameter seters and getters -----
     def set_premises(self, premises):
-        self._fuzzify_layer._premises = Parameter(premises, requires_grad=True)
+        self._fuzzification_layer._premises = Parameter(premises, requires_grad=True)
         
     def set_consequents(self, consequents):
         self._consequent_layer._consequents = Parameter(consequents, requires_grad=True)
         
     def get_premises(self):
-        return self._fuzzify_layer._premises.data
+        return self._fuzzification_layer._premises.data
     
     def get_consequents(self):
         return self._consequent_layer._consequents.data
     
     
-    # ---- ANFIS rules info ----
+    # ---- ANFIS parameters info ----
     @property
     def fuzzy_rules(self):
         return self.get_premises().shape[1]
@@ -99,14 +99,25 @@ class ANFISmodel(nn.Module):
     # ----- Parameters dataframes -----
     @property
     def premises_structure(self):
-        return self._fuzzify_layer.premises_structure
+        return self._fuzzification_layer.premises_structure
     
     @property
     def consequents_structure(self):
         return self._consequent_layer.consequents_structure
     
+    def show_premises_structure(self):
+        print(self.premises_structure)
+        
+    def show_consequents_structure(self):
+        output = 1
+        for df in self.consequents_structure:
+            print(f'- Output {output}:')
+            print(df)
+            print('\n')
+            output += 1
+    
     
     # ----- Plot premises -----
     @property
     def plot_premises(self):
-        self._fuzzify_layer.plot_premises
+        self._fuzzification_layer.plot_premises

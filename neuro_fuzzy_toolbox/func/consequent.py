@@ -9,7 +9,7 @@ class ConsequentFunction(nn.Module):
         pass
     
     @abstractmethod
-    def initialize_consequents(self, outputs, consequents_rules, input_size, input_dtype):
+    def initialize_consequents(self, outputs, consequents_rules, input_size, dtype):
         pass
 
 

@@ -3,12 +3,12 @@ import torch.nn as nn
 
 
 class FiringLevelsLayer(nn.Module):
-    def __init__(self, restricted=False):
+    def __init__(self, rule_reduced=False):
         super(FiringLevelsLayer, self).__init__()
-        self._restricted = restricted
+        self._rule_reduced = rule_reduced
 
     def forward(self, membership_values):
-        if self._restricted:
+        if self._rule_reduced:
             w = membership_values.prod(dim=membership_values.dim()-2)
         else:
             w = torch.cat([torch.cartesian_prod(*torch.unbind(t, dim=0)).prod(dim=-1) for t in membership_values]).reshape(-1, membership_values.shape[-1]**membership_values.shape[-2])
