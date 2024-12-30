@@ -16,9 +16,25 @@ class FiringLevelsLayer(nn.Module):
 
 
 
+class rule_reduced_FiringLevelsLayer(nn.Module):
+    def forward(self, membership_values):
+        w = membership_values.prod(dim=membership_values.dim()-2)
+        return w
+
+
+
+
+class complete_FiringLevelsLayer(nn.Module):
+    def forward(self, membership_values):
+        w = torch.cat([torch.cartesian_prod(*torch.unbind(t, dim=0)).prod(dim=-1) for t in membership_values]).reshape(-1, membership_values.shape[-1]**membership_values.shape[-2])
+        return w
+
+
+
+
 class NormalizationLayer(nn.Module):
     def forward(self, w):
         sum = torch.sum(w, dim=-1, keepdim=True)
-        sum[sum == 0] = 1
+        sum[sum == 0] += 1
         w = w/sum
         return w

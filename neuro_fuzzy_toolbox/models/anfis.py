@@ -5,41 +5,28 @@ from torch.nn import Parameter
 
 from neuro_fuzzy_toolbox.func import GeneralizedBell_MF, Linear_CF
 from neuro_fuzzy_toolbox.layers import FuzzificationLayer, FiringLevelsLayer, NormalizationLayer, ConsequentLayer, OutputLayer
+from neuro_fuzzy_toolbox.layers import rule_reduced_FiringLevelsLayer, complete_FiringLevelsLayer
+from neuro_fuzzy_toolbox.layers import rule_reduced_ConsequentLayer, complete_ConsequentLayer
 
-class ANFIS(nn.Module):
-
-    def __init__(self, x_train, init_fuzzy_rules=1, outputs=1, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, premises_init_mode=0, output_type=None, rule_reduced=False):
-        super(ANFIS, self).__init__()
+class baseANFIS(nn.Module):
+    def __init__(self):
+        super(baseANFIS, self).__init__()
         
         # Input data info
-        self._input_size = x_train.shape[1]
-        self._input_dtype = x_train.dtype
-        
+        self._input_size = None
+        self._input_dtype = None
         
         # ANFIS info
-        self._rule_reduced = rule_reduced
-        self._outputs = outputs
-        
+        self._rule_reduced = None
+        self._outputs = None
         
         # Layers
-        self._fuzzification_layer = FuzzificationLayer(x_train=x_train,
-                                           init_fuzzy_rules=init_fuzzy_rules, 
-                                           membership_function=membership_function, 
-                                           init_mode=premises_init_mode)
-        
-        self._firing_levels_layer = FiringLevelsLayer(rule_reduced=rule_reduced)
-        
-        self._normalization_layer = NormalizationLayer()
-        
-        self._consequent_layer = ConsequentLayer(input_size=self._input_size, 
-                                                 dtype=self._input_dtype, 
-                                                 init_fuzzy_rules=init_fuzzy_rules, 
-                                                 consequent_function=consequent_function, 
-                                                 outputs=outputs,
-                                                 rule_reduced=rule_reduced)
-        
-        self._output_layer = OutputLayer(output_type=output_type)    
-    
+        self._fuzzification_layer = None
+        self._firing_levels_layer = None
+        self._normalization_layer = None
+        self._consequent_layer = None
+        self._output_layer = None
+
 
     # ---- Forward pass ----
     def forward(self, x):
@@ -121,3 +108,110 @@ class ANFIS(nn.Module):
     @property
     def plot_premises(self):
         self._fuzzification_layer.plot_premises
+
+
+
+class ANFIS(baseANFIS):
+
+    def __init__(self, x_train, init_fuzzy_rules=1, outputs=1, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, premises_init_mode=0, output_type=None, rule_reduced=False):
+        super(ANFIS, self).__init__()
+        
+        # Input data info
+        self._input_size = x_train.shape[1]
+        self._input_dtype = x_train.dtype
+        
+        
+        # ANFIS info
+        self._rule_reduced = rule_reduced
+        self._outputs = outputs
+        
+        
+        # Layers
+        self._fuzzification_layer = FuzzificationLayer(x_train=x_train,
+                                           init_fuzzy_rules=init_fuzzy_rules, 
+                                           membership_function=membership_function, 
+                                           init_mode=premises_init_mode)
+        
+        self._firing_levels_layer = FiringLevelsLayer(rule_reduced=rule_reduced)
+        
+        self._normalization_layer = NormalizationLayer()
+        
+        self._consequent_layer = ConsequentLayer(input_size=self._input_size, 
+                                                 dtype=self._input_dtype, 
+                                                 init_fuzzy_rules=init_fuzzy_rules, 
+                                                 consequent_function=consequent_function, 
+                                                 outputs=outputs,
+                                                 rule_reduced=rule_reduced)
+        
+        self._output_layer = OutputLayer(output_type=output_type)
+
+
+
+class rule_reduced_ANFIS(baseANFIS):
+    
+    def __init__(self, x_train, init_fuzzy_rules=1, outputs=1, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, premises_init_mode=0, output_type=None):
+        super(rule_reduced_ANFIS, self).__init__()
+        
+        # Input data info
+        self._input_size = x_train.shape[1]
+        self._input_dtype = x_train.dtype
+        
+        
+        # ANFIS info
+        self._outputs = outputs
+        
+        
+        # Layers
+        self._fuzzification_layer = FuzzificationLayer(x_train=x_train,
+                                           init_fuzzy_rules=init_fuzzy_rules, 
+                                           membership_function=membership_function, 
+                                           init_mode=premises_init_mode)
+        
+        self._firing_levels_layer = rule_reduced_FiringLevelsLayer()
+        
+        self._normalization_layer = NormalizationLayer()
+        
+        self._consequent_layer = rule_reduced_ConsequentLayer(input_size=self._input_size, 
+                                                 dtype=self._input_dtype, 
+                                                 init_fuzzy_rules=init_fuzzy_rules, 
+                                                 consequent_function=consequent_function, 
+                                                 outputs=outputs)
+        
+        self._output_layer = OutputLayer(output_type=output_type)
+
+
+
+class complete_ANFIS(baseANFIS):
+    
+    def __init__(self, x_train, init_fuzzy_rules=1, outputs=1, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, premises_init_mode=0, output_type=None):
+        super(complete_ANFIS, self).__init__()
+        
+        # Input data info
+        self._input_size = x_train.shape[1]
+        self._input_dtype = x_train.dtype
+        
+        
+        # ANFIS info
+        self._outputs = outputs
+        
+        
+        # Layers
+        self._fuzzification_layer = FuzzificationLayer(x_train=x_train,
+                                           init_fuzzy_rules=init_fuzzy_rules, 
+                                           membership_function=membership_function, 
+                                           init_mode=premises_init_mode)
+        
+        self._firing_levels_layer = complete_FiringLevelsLayer()
+        
+        self._normalization_layer = NormalizationLayer()
+        
+        self._consequent_layer = complete_ConsequentLayer(input_size=self._input_size, 
+                                                 dtype=self._input_dtype, 
+                                                 init_fuzzy_rules=init_fuzzy_rules, 
+                                                 consequent_function=consequent_function, 
+                                                 outputs=outputs)
+        
+        self._output_layer = OutputLayer(output_type=output_type)
+
+
+
