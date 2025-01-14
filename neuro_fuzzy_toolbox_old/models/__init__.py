@@ -1,1 +1,0 @@
-from .anfis import Type3ANFIS
