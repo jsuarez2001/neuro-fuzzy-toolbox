@@ -10,27 +10,44 @@ from neuro_fuzzy_toolbox.func import GeneralizedBell_MF
 
 class FuzzificationLayer(nn.Module):
     
-    def __init__(self, x_train, init_fuzzy_rules=1, membership_function=GeneralizedBell_MF, init_mode=0):
+    def __init__(self, fuzzy_rules=1, membership_function=GeneralizedBell_MF, **kwargs):
         super(FuzzificationLayer, self).__init__()
-        # Input data info
-        self._input_size = x_train.shape[1]
-        self._dtype = x_train.dtype
-        self._max_val = (torch.sign(torch.max(x_train)) * torch.ceil(torch.abs(torch.max(x_train)))).item()
-        self._min_val = (torch.sign(torch.min(x_train)) * torch.ceil(torch.abs(torch.min(x_train)))).item()
         
-        # Initialize membership function
+        x_train = kwargs.get('x_train', None)
+        input_size = kwargs.get('input_size', None)
+        dtype = kwargs.get('dtype', torch.float32)
+        
+        if x_train is not None:
+            input_size = x_train.shape[1]
+            dtype = x_train.dtype
+            premises = Parameter(membership_function().initialize_premises(x_train=x_train, fuzzy_rules=fuzzy_rules), requires_grad=True)
+        elif input_size is None:
+            raise ValueError("Must provide 'x_train' or 'input_size' to initialize the layer.")
+        else:
+            premises = Parameter(membership_function().random_premises(input_size, fuzzy_rules, dtype), requires_grad=True)
+            
+        
+        # Input data info
+        self._input_size = input_size
+        self._dtype = dtype
+        
+        # Membership function
         self._membership_function = membership_function()
 
         # Initialize premise parameters
-        if init_mode == 0: # Based on data
-            self._premises = Parameter(self._membership_function.initialize_premises(x_train=x_train, fuzzy_rules=init_fuzzy_rules), requires_grad=True)
-        else: # Random initialization
-            self._premises = Parameter(2 * torch.rand(self._input_size, init_fuzzy_rules, len(self._membership_function._params), dtype=self._dtype) - 1, requires_grad=True)
+        self._premises = premises
 
 
 
     def forward(self, x):
         return self._membership_function(x, self._premises)
+    
+    
+    
+    def init_premises(self, x_train):
+        self._dtype = x_train.dtype
+        self._premises = Parameter(self._membership_function.initialize_premises(x_train=x_train, fuzzy_rules=self._premises.data.shape[1]), requires_grad=True)
+        return
 
 
 
@@ -53,9 +70,8 @@ class FuzzificationLayer(nn.Module):
         variables = [f'x{i}' for i in range(self._input_size)]
         dataframe = self.premises_structure
 
-        sep = round((0.1 * (self._max_val - self._min_val))) + 1
-        x = np.linspace(self._min_val - sep, self._max_val + sep, 500)
-
+        x = np.linspace(self._membership_function._max_val_plot, self._membership_function._min_val_plot, 500)
+        
         fig, axes = plt.subplots(nrows=self._premises.data.shape[1], ncols=len(variables), figsize=(15, 8), sharex=False, sharey=False)
 
         if not isinstance(axes, np.ndarray):

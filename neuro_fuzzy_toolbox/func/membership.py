@@ -10,12 +10,19 @@ class MembershipFunction(nn.Module):
         self._params = None
         self._simple_implementation = None # Simple numpy implementation needed for plotting
         
+        self._max_val_plot = None # For plotting
+        self._min_val_plot = None # For plotting
+        
     @abstractmethod
     def forward(self, x, premises):
         pass
     
     @abstractmethod
     def initialize_premises(self):
+        pass
+    
+    @abstractmethod
+    def random_premises(self):
         pass
 
 
@@ -24,6 +31,9 @@ class Gaussian_MF(MembershipFunction):
         super(Gaussian_MF, self).__init__()
         self._params = ["mu", "sigma"]
         self._simple_implementation = lambda x, mu, sigma: np.exp(-0.5 * np.power((x - mu)/sigma, 2))
+        
+        self._min_val_plot = -2
+        self._max_val_plot = 2
 
     def forward(self, x, premises):
         return torch.exp(-0.5 * torch.pow((x.unsqueeze(x.dim()) - premises[:, :, 0])/torch.where(premises[:, :, 1] == 0, torch.tensor(1e-6), premises[:, :, 1]), 2))
@@ -46,6 +56,11 @@ class Gaussian_MF(MembershipFunction):
                 premises[i, :, 1] = torch.std(x_train[:, i])
                 
         return premises
+    
+    def random_premises(self, input_size, fuzzy_rules, dtype):
+        random_premises = 2 * torch.rand(input_size, fuzzy_rules, len(self._params), dtype=dtype) - 1
+        random_premises[:, :, 1] = torch.abs(random_premises[:, :, 1])
+        return random_premises
 
 
 class GeneralizedBell_MF(MembershipFunction):
@@ -53,7 +68,11 @@ class GeneralizedBell_MF(MembershipFunction):
         super(GeneralizedBell_MF, self).__init__()
         self._params = ["a", "b", "c"] # ["width", "slope", "center"]
         self._simple_implementation = lambda x, a, b, c: 1/(1 + np.power(np.abs((x - c)/a), 2*b))
+        
+        self._min_val_plot = -2
 
+        self._max_val_plot = 2
+        
     def forward(self, x, premises):
         return 1/(1 + torch.pow(torch.abs((x.unsqueeze(x.dim()) - premises[:, :, 2])/torch.where(premises[:, :, 0] == 0, torch.tensor(1e-6), premises[:, :, 0])), 2*premises[:, :, 1]))
 
@@ -69,11 +88,17 @@ class GeneralizedBell_MF(MembershipFunction):
                 h = torch.arange(min[i], max[i] + stp[i], stp[i])
                 premises[i, :, 2] = h[:fuzzy_rules]
                 premises[i, :, 0] = stp[i]/2
-                premises[i, :, 1] = 8
+                premises[i, :, 1] = 8.
         else:
             for i in range(input_size):
                 premises[i, :, 2] = torch.mean(x_train[:, i])
                 premises[i, :, 0] = torch.std(x_train[:, i])
-                premises[i, :, 1] = 8
+                premises[i, :, 1] = 8.
                 
         return premises
+    
+    def random_premises(self, input_size, fuzzy_rules, dtype):
+        random_premises = 2 * torch.rand(input_size, fuzzy_rules, len(self._params), dtype=dtype) - 1
+        random_premises[:, :, :2] = torch.abs(random_premises[:, :, :2])
+        random_premises[:, :, 1] *= 2.5
+        return random_premises

@@ -1,4 +1,4 @@
 from .fuzzification_layer import FuzzificationLayer
-from .firing_levels_layers import FiringLevelsLayer, NormalizationLayer, complete_FiringLevelsLayer, rule_reduced_FiringLevelsLayer
-from .consequent_layer import ConsequentLayer, rule_reduced_ConsequentLayer, complete_ConsequentLayer
+from .firing_levels_layers import FiringLevelsLayer, NormalizationLayer
+from .consequent_layer import ConsequentLayer
 from .output_layer import OutputLayer
