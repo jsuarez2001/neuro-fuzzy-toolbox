@@ -1,9 +1,7 @@
 import torch
 
 from neuro_fuzzy_toolbox.training import (
-    Hybrid_learning_algorithm,
-    classical_consequents_estimation_with_OLS,
-    premises_update_with_gradient_descent
+    Hybrid_learning_algorithm
 )
 
 class SONFIS(Hybrid_learning_algorithm):
@@ -56,10 +54,16 @@ class SONFIS(Hybrid_learning_algorithm):
         self._freezed = torch.zeros(ANFISmodel.fuzzy_rules, dtype=torch.int).bool()
         self._construct_premises_consequents_relation(ANFISmodel)
         
+        self._parameters_update(ANFISmodel, train_loader, val_loader)
+        if verbose:
+            iter_width = len(str(self.max_iterations))
+            if self.validation > 0:
+                print(f'Iteration: {0:{iter_width}}/{self.max_iterations} - loss: {self.history["loss"][-1]:.6f} - validation loss: {self.val_history["loss"][-1]:.6f}')
+            else:
+                print(f'Iteration: {0:{iter_width}}/{self.max_iterations} - loss: {self.history["loss"][-1]:.6f}')
+        
         model_updated = True
         i = 0
-        
-        self._parameters_update(ANFISmodel, train_loader, val_loader)
         while(model_updated and i < self.max_iterations):
             
             self._freeze_rules()
@@ -376,21 +380,30 @@ class rule_reduced_SONFIS(SONFIS):
     
     
     def __call__(self, ANFISmodel, loader, verbose=True):
+        if ANFISmodel._rule_reduced == False:
+            raise ValueError('The ANFIS model must be rule reduced')
+            
         train_loader, val_loader = self._train_val_split(loader)
         self._register_loss(ANFISmodel, train_loader, val_loader)
         
         self._ages = torch.zeros(ANFISmodel.fuzzy_rules, dtype=torch.int)
         self._freezed = torch.zeros(ANFISmodel.fuzzy_rules, dtype=torch.int).bool()
         
+        self._parameters_update(ANFISmodel, train_loader, val_loader)
+        if verbose:
+            iter_width = len(str(self.max_iterations))
+            if self.validation > 0:
+                print(f'Iteration: {0:{iter_width}}/{self.max_iterations} - loss: {self.history["loss"][-1]:.6f} - validation loss: {self.val_history["loss"][-1]:.6f}')
+            else:
+                print(f'Iteration: {0:{iter_width}}/{self.max_iterations} - loss: {self.history["loss"][-1]:.6f}')
+        
+        
         model_updated = True
         i = 0
-        
-        self._parameters_update(ANFISmodel, train_loader, val_loader)
         while(model_updated and i < self.max_iterations):
             
             self._freeze_rules()
             
-            # ANFIS structure updates (SONFIS operations)
             model_updated = self._structure_updates(ANFISmodel, train_loader)
             
             if verbose:
@@ -502,7 +515,7 @@ class rule_reduced_SONFIS(SONFIS):
             return False
         
         else:
-            fuzzy_rules = [best_bs_rules == rule for rule in range(ANFISmodel.fuzzy_rules)]
+            fuzzy_rules = [best_bs_rules == rule for rule in torch.unique(best_bs_rules)]
             
             means = torch.stack([bad_samples[fuzzy_rule].mean(dim=0) for fuzzy_rule in fuzzy_rules])
             stds = torch.stack([bad_samples[fuzzy_rule].std(dim=0) for fuzzy_rule in fuzzy_rules])
@@ -622,4 +635,18 @@ class rule_reduced_SONFIS(SONFIS):
                 
                 self._ages = torch.cat((self._ages[:rule], self._ages[rule+1:]))
                 self._freezed = torch.cat((self._freezed[:rule], self._freezed[rule+1:]))
+            
+            ANFISmodel.set_premises(new_premises)
+            ANFISmodel.set_consequents(new_consequents)
+            
+            self._last_best_rules = best_rules
             return True
+        
+
+class alt_SONFIS(SONFIS):
+    def __init__(self, Ngrow, dGrow, Nsplit, eSplit, Nvanish, lVanish, max_iterations, ANFIStrainer, validation=0, early_stopping=None, last_training_iteration=False):
+        super().__init__(Ngrow, dGrow, Nsplit, eSplit, Nvanish, lVanish, max_iterations, ANFIStrainer, validation, early_stopping, last_training_iteration)
+        self._last_best_rules = torch.tensor([-1])
+        
+    def _GrowNet(self, ANFISmodel, train_loader):
+        pass

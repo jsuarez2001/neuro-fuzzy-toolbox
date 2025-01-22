@@ -2,8 +2,8 @@
 Repository for the development of an Adaptive Neuro Fuzzy Inference System Toolbox
 
 ## Requirements
-- matplotlib
-- numpy
-- pandas
-- scikit-learn
-- torch
+ - matplotlib 3.10.0
+ - numpy 2.2.1
+ - pandas 2.2.3
+ - scikit-learn 1.6.1
+ - torch 2.5.1

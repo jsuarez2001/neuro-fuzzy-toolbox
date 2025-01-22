@@ -5,7 +5,6 @@ env/
 neurofuzzy_toolbox_esp/
 neuro_fuzzy_toolbox_old/
 test_notebooks_old/
-requirements.txt
 pendiente.txt
 papers.md
 tests/
@@ -15,3 +14,4 @@ old/
 util.txt
 dev_notebooks/
 test_notebooks/
+test_env/

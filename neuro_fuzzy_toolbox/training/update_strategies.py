@@ -16,7 +16,7 @@ def classical_consequents_estimation_with_OLS(ANFISmodel, loader):
     if y.dtype != X.dtype:
         y = y.to(X.dtype)
     '''preliminary fix for the dtype issue'''
-        
+    
     # Solve least squares problem using QR decomposition with pivoting
     C, _, _, _ = torch.linalg.lstsq(X * fs, y)
     new_consequents = C.t().reshape(ANFISmodel._outputs, ANFISmodel.rules, xe.shape[1])
