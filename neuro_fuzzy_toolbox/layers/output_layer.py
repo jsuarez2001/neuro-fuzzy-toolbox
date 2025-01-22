@@ -4,13 +4,15 @@ import torch.nn as nn
 class OutputLayer(nn.Module):
     def __init__(self, output_type):
         super(OutputLayer, self).__init__()
-        _output_type = output_type.lower()
+        self._output_type = output_type.lower()
         
-        if (_output_type == 'regression' or _output_type == 'multiclass'):
+        if (self._output_type == 'regression' or self._output_type == 'multiclass'):
             self._last_layer = nn.Identity()
-        elif (_output_type == 'binary'):
+        elif (self._output_type == 'binary'):
             self._last_layer = nn.Sigmoid()
 
-    def forward(self, x):
+    def forward(self, x, return_probabilities=False):
         x = torch.sum(x, dim=-1).t().squeeze(1)
+        if return_probabilities and self._output_type == 'multiclass':
+            x = nn.functional.softmax(x, dim=1)
         return self._last_layer(x)

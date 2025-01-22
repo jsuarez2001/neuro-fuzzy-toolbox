@@ -35,7 +35,7 @@ class Hybrid_learning_algorithm():
         ep = 0
         while ep < self.epochs:
             
-            self._consequents_update(ANFISmodel, train_loader)
+            ANFISmodel.set_consequents(self._consequents_update(ANFISmodel, train_loader))
             self._premises_update(ANFISmodel, train_loader)
             
             self._register_loss(ANFISmodel, train_loader, val_loader)
@@ -46,10 +46,11 @@ class Hybrid_learning_algorithm():
                 break
                 
             if verbose:
+                epoch_width = len(str(self.epochs))
                 if self.validation > 0:
-                    print(f'Epoch: {ep+1}/{self.epochs} - loss: {loss} - validation loss: {val_loss}')
+                    print(f'Epoch: {ep+1:{epoch_width}}/{self.epochs} - loss: {loss:.6f} - validation loss: {val_loss:.6f}')
                 else:
-                    print(f'Epoch: {ep+1}/{self.epochs} - loss: {loss}')
+                    print(f'Epoch: {ep+1:{epoch_width}}/{self.epochs} - loss: {loss:.6f}')
                     
             ep += 1
         
@@ -57,14 +58,14 @@ class Hybrid_learning_algorithm():
             print('Training finished')
             
         
-    def _consequents_update(self, ANFISmodel, loader): 
-        ANFISmodel.set_consequents(classical_consequents_estimation_with_OLS(ANFISmodel, loader))
+    def _consequents_update(self, ANFISmodel, loader):
+        return classical_consequents_estimation_with_OLS(ANFISmodel, loader)
     
     
     def _premises_update(self, ANFISmodel, loader):
         # Optimizer
         optimizer = self.optimizer([ANFISmodel._fuzzification_layer._premises])
-        self.apply_optimizer_parameters(optimizer)
+        self._apply_optimizer_parameters(optimizer)
         
         premises_update_with_gradient_descent(ANFISmodel, loader, optimizer, self.loss_function)
     
@@ -72,14 +73,16 @@ class Hybrid_learning_algorithm():
         '''preliminary fix for the dtype issue'''
         if y.dtype != pred.dtype:
             y = y.to(pred.dtype)
+        '''preliminary fix for the dtype issue'''
         
         '''torch cross_entropy function only accepts torch.long (torch.int64) dtype for target indices'''
-        if self.loss_function != torch.nn.functional.cross_entropy:
+        if self.loss_function == torch.nn.functional.cross_entropy:
             y = y.type(torch.int64)
+        '''torch cross_entropy function only accepts torch.long (torch.int64) dtype for target indices'''
             
         return self.loss_function(pred, y)
     
-    def apply_optimizer_parameters(self, optimizer):
+    def _apply_optimizer_parameters(self, optimizer):
         if self.optimizer_params != {}:
             for param_group in optimizer.param_groups:
                 for key, new_value in self.optimizer_params.items():

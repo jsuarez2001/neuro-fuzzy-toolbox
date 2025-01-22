@@ -26,7 +26,6 @@ def classical_consequents_estimation_with_OLS(ANFISmodel, loader):
 
 
 def premises_update_with_gradient_descent(ANFISmodel, loader, optimizer, loss_function):
-        
     for batch_x, batch_y in loader:
         batch_y_copy = batch_y.clone().detach()
         '''preliminary fix for the dtype issue'''
@@ -35,7 +34,7 @@ def premises_update_with_gradient_descent(ANFISmodel, loader, optimizer, loss_fu
         '''preliminary fix for the dtype issue'''
         
         '''cross_entropy function only accepts torch.long (torch.int64) dtype for target indices'''
-        if loss_function != torch.nn.functional.cross_entropy:
+        if loss_function == torch.nn.functional.cross_entropy:
             batch_y_copy = batch_y_copy.type(torch.int64)
         '''cross_entropy function only accepts torch.long (torch.int64) dtype for target indices'''
         

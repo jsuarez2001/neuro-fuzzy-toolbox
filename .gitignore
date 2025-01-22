@@ -6,10 +6,12 @@ neurofuzzy_toolbox_esp/
 neuro_fuzzy_toolbox_old/
 test_notebooks_old/
 requirements.txt
-initwork.txt
 pendiente.txt
 papers.md
 tests/
 docs/
 consideraciones.md
 old/
+util.txt
+dev_notebooks/
+test_notebooks/

@@ -14,8 +14,10 @@ class baseANFIS(nn.Module):
         self._input_size = None
         self._dtype = None
         
-        # ANFIS info
+        # ANFIS structure info
         self._rule_reduced = None
+        
+        # Output info
         self._outputs = None
         self._output_type = None
         
@@ -28,14 +30,14 @@ class baseANFIS(nn.Module):
 
 
     # ---- Forward pass ----
-    def forward(self, x):
+    def forward(self, x, return_probabilities=False):
         output = self._fuzzification_layer(x)
         output = self._consequent_layer(x, self._normalization_layer(self._firing_levels_layer(output)))
-        output = self._output_layer(output)
+        output = self._output_layer(output, return_probabilities)
         return output
     
     
-    
+    # ---- Initialize premises ----
     def init_premises(self, x_train):
         self._dtype = x_train.dtype
         self._consequent_layer._to_dtype(x_train.dtype) # Set dtype to consequents
@@ -49,7 +51,7 @@ class baseANFIS(nn.Module):
         output = self.forward(x).detach().numpy()
         
         if self._output_type == 'multiclass':
-            output = nn.Softmax(dim=1)(self.forward(x)).detach().numpy()
+            output = self.forward(x, return_probabilities=True).detach().numpy()
             output = np.argmax(output, axis=1, keepdims=True)
             
         elif self._output_type == 'binary':
@@ -114,8 +116,8 @@ class baseANFIS(nn.Module):
     
     
     # ----- Plot premises -----
-    def plot_premises(self):
-        self._fuzzification_layer.plot_premises
+    def plot_premises(self, fuzzy_rule=None, input_dim=None):
+        self._fuzzification_layer.plot_premises(fuzzy_rule, input_dim)
 
 
 
@@ -142,8 +144,11 @@ class ANFIS(baseANFIS):
         self._dtype = dtype
         
         
-        # ANFIS info
+        # ANFIS structure info
         self._rule_reduced = rule_reduced
+        
+        
+        # Output info
         self._output_type = output_type
         self._outputs = outputs
         
