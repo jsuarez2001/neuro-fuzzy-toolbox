@@ -1,4 +1,4 @@
 from .early_stopping import EarlyStopping
-from .update_strategies import classical_consequents_estimation_with_OLS, premises_update_with_gradient_descent
-from .training_algorithms import Hybrid_learning_algorithm
-from .sonfis import SONFIS, exp_SONFIS, alt_SONFIS
+from .update_strategies import optimizer_training_epoch, classical_consequents_estimation_with_OLS
+from .training_algorithms import Hybrid_learning_algorithm, Optimizer_training, base_model_trainer
+from .sonfis import SONFIS, alt_SONFIS

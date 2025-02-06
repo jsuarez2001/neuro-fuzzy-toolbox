@@ -1,0 +1,473 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ANFIS homogéneo &mdash; Neuro-Fuzzy Toolbox 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="rule-reduced ANFIS" href="rule_reduced_anfis.html" />
+    <link rel="prev" title="Models" href="../models.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Neuro-Fuzzy Toolbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/func.html">Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/func/membership.html">Membership Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/func/membership.html#neuro_fuzzy_toolbox.func.membership.MembershipFunction"><code class="docutils literal notranslate"><span class="pre">MembershipFunction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/func/membership.html#neuro_fuzzy_toolbox.func.membership.Gaussian_MF"><code class="docutils literal notranslate"><span class="pre">Gaussian_MF</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/func/membership.html#neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF"><code class="docutils literal notranslate"><span class="pre">GeneralizedBell_MF</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/func/consequent.html">Consequent Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/func/consequent.html#neuro_fuzzy_toolbox.func.consequent.ConsequentFunction"><code class="docutils literal notranslate"><span class="pre">ConsequentFunction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/func/consequent.html#neuro_fuzzy_toolbox.func.consequent.Linear_CF"><code class="docutils literal notranslate"><span class="pre">Linear_CF</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/layers.html">Layers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/layers/fuzzification.html">Fuzzification Layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">FuzzificationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">h_FuzzificationLayer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/layers/firing_levels.html">Firing Levels Layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.FiringLevelsLayer"><code class="docutils literal notranslate"><span class="pre">FiringLevelsLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.NormalizationLayer"><code class="docutils literal notranslate"><span class="pre">NormalizationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.h_FiringLevelsLayer"><code class="docutils literal notranslate"><span class="pre">h_FiringLevelsLayer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/layers/consequent.html">Consequent Layer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">ConsequentLayer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/layers/output.html">Output Layer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/layers/output.html#neuro_fuzzy_toolbox.layers.output_layer.OutputLayer"><code class="docutils literal notranslate"><span class="pre">OutputLayer</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/models/anfis.html">ANFIS models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS"><code class="docutils literal notranslate"><span class="pre">ANFIS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS"><code class="docutils literal notranslate"><span class="pre">base_ANFIS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.h_ANFIS"><code class="docutils literal notranslate"><span class="pre">h_ANFIS</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/training.html">Training</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/training/early_stopping.html">Early Stopping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/early_stopping.html#neuro_fuzzy_toolbox.training.early_stopping.EarlyStopping"><code class="docutils literal notranslate"><span class="pre">EarlyStopping</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/training/update_strategies.html">Update Strategies</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/update_strategies.html#neuro_fuzzy_toolbox.training.update_strategies.classical_consequents_estimation_with_OLS"><code class="docutils literal notranslate"><span class="pre">classical_consequents_estimation_with_OLS()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/update_strategies.html#neuro_fuzzy_toolbox.training.update_strategies.optimizer_training_epoch"><code class="docutils literal notranslate"><span class="pre">optimizer_training_epoch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/training/training_algorithms.html">Training Algorithms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Hybrid_learning_algorithm"><code class="docutils literal notranslate"><span class="pre">Hybrid_learning_algorithm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Optimizer_training"><code class="docutils literal notranslate"><span class="pre">Optimizer_training</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer"><code class="docutils literal notranslate"><span class="pre">base_model_trainer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/training/sonfis.html">SONFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/sonfis.html#neuro_fuzzy_toolbox.training.sonfis.SONFIS"><code class="docutils literal notranslate"><span class="pre">SONFIS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/sonfis.html#neuro_fuzzy_toolbox.training.sonfis.alt_SONFIS"><code class="docutils literal notranslate"><span class="pre">alt_SONFIS</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/evaluation.html">Evaluation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/evaluation.html#neuro_fuzzy_toolbox.evaluation.evaluator.get_measures"><code class="docutils literal notranslate"><span class="pre">get_measures()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../usage.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../introduccion.html">Introducción</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../models.html">Models</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ANFIS homogéneo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#inicializacion-de-parametros">Inicialización de parámetros</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metodo-predict-vs-forward">Método predict vs forward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiples-salidas">Múltiples salidas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#problemas-multiclase">Problemas multiclase</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rule_reduced_anfis.html">rule-reduced ANFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rule_reduced_anfis.html#instanciacion">Instanciación</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="anfis.html">ANFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="anfis.html#parametros-de-los-antecedentes">Parámetros de los antecedentes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../training.html">Training</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../training/hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../training/sonfis.html">SONFIS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Neuro-Fuzzy Toolbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../usage.html">Usage</a></li>
+          <li class="breadcrumb-item"><a href="../models.html">Models</a></li>
+      <li class="breadcrumb-item active">ANFIS homogéneo</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/usage/models/h_anfis.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="anfis-homogeneo">
+<span id="h-anfis-usage"></span><h1>ANFIS homogéneo<a class="headerlink" href="#anfis-homogeneo" title="Link to this heading"></a></h1>
+<p>Modelo ANFIS cuyo número de funciones de membresía es igual para todos los features de los datos de entrada.</p>
+<section id="importacion">
+<h2>Importación<a class="headerlink" href="#importacion" title="Link to this heading"></a></h2>
+<p>Se importará la clase <strong>h_ANFIS</strong> y la función de membresía <strong>Gaussian_MF</strong> para los ejemplos a continuación.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">neuro_fuzzy_toolbox</span><span class="w"> </span><span class="kn">import</span> <span class="n">h_ANFIS</span><span class="p">,</span> <span class="n">Gaussian_MF</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Se simulará un conjunto de datos de entrada con 3 features</span>
+<span class="n">x_train</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</section>
+<section id="instanciacion">
+<h2>Instanciación<a class="headerlink" href="#instanciacion" title="Link to this heading"></a></h2>
+<p>A continuación se instancia un modelo h_ANFIS con 3 funciones de membresía para cada feature de los datos de entrada y con una salida. Se mostrarán todos los parámetros relevantes para instanciar la clase.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">h_ANFIS</span><span class="p">(</span>
+    <span class="n">input_size</span><span class="o">=</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="c1"># 3 features</span>
+    <span class="n">num_mfs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="c1"># 3 funciones de membresía</span>
+    <span class="n">outputs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="c1"># 1 salida</span>
+    <span class="n">membership_function</span><span class="o">=</span><span class="n">Gaussian_MF</span><span class="p">,</span> <span class="c1"># Función de membresía gaussiana</span>
+    <span class="n">output_type</span><span class="o">=</span><span class="s1">&#39;regression&#39;</span><span class="p">,</span> <span class="c1"># Tipo de salida: regresión</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Por defecto, la función de membresía es GeneralizedBell_MF, pero se trabajará con Gaussian_MF en este ejemplo. para más detalles sobre las funciones de membresía, ver <a class="reference internal" href="../../modules/func/membership.html#membership-functions"><span class="std std-ref">Membership Functions</span></a>.</p>
+</div>
+<p>El método <em>plot_premises()</em> permite visualizar las funciones de membresía de los antecedentes del modelo.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">plot_premises</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../_images/h_anfis_plot_premises.png" class="align-center" src="../../_images/h_anfis_plot_premises.png" />
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">plot_premises</span><span class="p">(</span><span class="n">group_by_dim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../_images/h_anfis_plot_premises_grouped.png" class="align-center" src="../../_images/h_anfis_plot_premises_grouped.png" />
+</section>
+<section id="inicializacion-de-parametros">
+<h2>Inicialización de parámetros<a class="headerlink" href="#inicializacion-de-parametros" title="Link to this heading"></a></h2>
+<p>Ahora mismo el modelo se encuentra con todos sus parámetros inicializados aleatoriamente.
+En caso de que se estime conveniente, es posible inicializar los parámetros de los antecedentes en base a los datos con los que se trabajará:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">init_premises</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">plot_premises</span><span class="p">(</span><span class="n">group_by_dim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../_images/h_anfis_plot_init_premises_grouped.png" class="align-center" src="../../_images/h_anfis_plot_init_premises_grouped.png" />
+<p>Para visualizar los parámetros en cuestión se puede utilizar el método <strong>show_premises_structure()</strong>, el cual imprime por pantalla un dataframe con los valores de los parámetros de las funciones de membresía:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">show_premises_structure</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>       <span class="n">mu</span> <span class="p">(</span><span class="n">x0</span><span class="p">)</span>  <span class="n">sigma</span> <span class="p">(</span><span class="n">x0</span><span class="p">)</span>   <span class="n">mu</span> <span class="p">(</span><span class="n">x1</span><span class="p">)</span>  <span class="n">sigma</span> <span class="p">(</span><span class="n">x1</span><span class="p">)</span>   <span class="n">mu</span> <span class="p">(</span><span class="n">x2</span><span class="p">)</span>  <span class="n">sigma</span> <span class="p">(</span><span class="n">x2</span><span class="p">)</span>
+<span class="n">MF</span> <span class="mi">0</span> <span class="o">-</span><span class="mf">0.990143</span>    <span class="mf">0.497452</span> <span class="o">-</span><span class="mf">0.986824</span>    <span class="mf">0.494897</span> <span class="o">-</span><span class="mf">0.983210</span>    <span class="mf">0.494364</span>
+<span class="n">MF</span> <span class="mi">1</span>  <span class="mf">0.004761</span>    <span class="mf">0.497452</span>  <span class="mf">0.002970</span>    <span class="mf">0.494897</span>  <span class="mf">0.005518</span>    <span class="mf">0.494364</span>
+<span class="n">MF</span> <span class="mi">2</span>  <span class="mf">0.999665</span>    <span class="mf">0.497452</span>  <span class="mf">0.992764</span>    <span class="mf">0.494897</span>  <span class="mf">0.994247</span>    <span class="mf">0.494364</span>
+</pre></div>
+</div>
+<p>El método <strong>model.premises_structure</strong> retorna el dataframe correspondiente, mientras que el método <strong>model.get_premises()</strong> retorna un tensor con los valores correspondientes.</p>
+<p>En cuanto a los consecuentes, hay métodos análogos a los de los antecedentes: <strong>show_consequents_structure()</strong>, <strong>model.consequents_structure</strong> y <strong>get_consequents()</strong>.</p>
+<p>La única diferencia es que, en el caso del método <strong>model.consequents_structure</strong>, se retorna una lista con los dataframe correspondientes a cada una de las salidas del modelo. En este caso, como solo hay una salida, se retorna una lista con un solo dataframe.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">show_consequents_structure</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">Output</span> <span class="mi">1</span><span class="p">:</span>
+          <span class="n">c0</span> <span class="p">(</span><span class="n">x0</span><span class="p">)</span>   <span class="n">c1</span> <span class="p">(</span><span class="n">x1</span><span class="p">)</span>   <span class="n">c2</span> <span class="p">(</span><span class="n">x2</span><span class="p">)</span>        <span class="n">c3</span>
+<span class="n">rule</span> <span class="mi">1</span>  <span class="o">-</span><span class="mf">0.402982</span>  <span class="mf">0.913287</span> <span class="o">-</span><span class="mf">0.147453</span> <span class="o">-</span><span class="mf">0.570277</span>
+<span class="n">rule</span> <span class="mi">2</span>  <span class="o">-</span><span class="mf">0.558947</span> <span class="o">-</span><span class="mf">0.600798</span> <span class="o">-</span><span class="mf">0.186016</span> <span class="o">-</span><span class="mf">0.840755</span>
+<span class="n">rule</span> <span class="mi">3</span>   <span class="mf">0.168397</span> <span class="o">-</span><span class="mf">0.883966</span>  <span class="mf">0.474520</span>  <span class="mf">0.312040</span>
+<span class="n">rule</span> <span class="mi">4</span>  <span class="o">-</span><span class="mf">0.122751</span>  <span class="mf">0.630311</span> <span class="o">-</span><span class="mf">0.797790</span>  <span class="mf">0.563108</span>
+<span class="n">rule</span> <span class="mi">5</span>   <span class="mf">0.361740</span> <span class="o">-</span><span class="mf">0.286652</span> <span class="o">-</span><span class="mf">0.325836</span>  <span class="mf">0.847129</span>
+<span class="n">rule</span> <span class="mi">6</span>  <span class="o">-</span><span class="mf">0.456639</span> <span class="o">-</span><span class="mf">0.769045</span> <span class="o">-</span><span class="mf">0.617894</span>  <span class="mf">0.075701</span>
+<span class="n">rule</span> <span class="mi">7</span>  <span class="o">-</span><span class="mf">0.118061</span> <span class="o">-</span><span class="mf">0.842846</span> <span class="o">-</span><span class="mf">0.196719</span> <span class="o">-</span><span class="mf">0.067862</span>
+<span class="n">rule</span> <span class="mi">8</span>  <span class="o">-</span><span class="mf">0.775172</span>  <span class="mf">0.827982</span> <span class="o">-</span><span class="mf">0.956070</span>  <span class="mf">0.850902</span>
+<span class="n">rule</span> <span class="mi">9</span>  <span class="o">-</span><span class="mf">0.781440</span> <span class="o">-</span><span class="mf">0.009967</span>  <span class="mf">0.381071</span>  <span class="mf">0.127973</span>
+<span class="n">rule</span> <span class="mi">10</span>  <span class="mf">0.578195</span>  <span class="mf">0.767374</span>  <span class="mf">0.944861</span>  <span class="mf">0.173381</span>
+<span class="n">rule</span> <span class="mi">11</span> <span class="o">-</span><span class="mf">0.579265</span>  <span class="mf">0.665136</span> <span class="o">-</span><span class="mf">0.931385</span>  <span class="mf">0.141964</span>
+<span class="n">rule</span> <span class="mi">12</span> <span class="o">-</span><span class="mf">0.677500</span> <span class="o">-</span><span class="mf">0.522054</span> <span class="o">-</span><span class="mf">0.871355</span> <span class="o">-</span><span class="mf">0.329690</span>
+<span class="n">rule</span> <span class="mi">13</span> <span class="o">-</span><span class="mf">0.931001</span> <span class="o">-</span><span class="mf">0.564158</span>  <span class="mf">0.425146</span> <span class="o">-</span><span class="mf">0.055656</span>
+<span class="n">rule</span> <span class="mi">14</span> <span class="o">-</span><span class="mf">0.163182</span>  <span class="mf">0.894706</span>  <span class="mf">0.172442</span>  <span class="mf">0.128253</span>
+<span class="n">rule</span> <span class="mi">15</span> <span class="o">-</span><span class="mf">0.343025</span>  <span class="mf">0.517860</span>  <span class="mf">0.329148</span>  <span class="mf">0.808215</span>
+<span class="n">rule</span> <span class="mi">16</span>  <span class="mf">0.975743</span>  <span class="mf">0.005502</span> <span class="o">-</span><span class="mf">0.814048</span>  <span class="mf">0.887746</span>
+<span class="n">rule</span> <span class="mi">17</span> <span class="o">-</span><span class="mf">0.015661</span> <span class="o">-</span><span class="mf">0.065317</span> <span class="o">-</span><span class="mf">0.171591</span>  <span class="mf">0.917433</span>
+<span class="n">rule</span> <span class="mi">18</span> <span class="o">-</span><span class="mf">0.682314</span>  <span class="mf">0.237104</span>  <span class="mf">0.514205</span>  <span class="mf">0.443589</span>
+<span class="n">rule</span> <span class="mi">19</span> <span class="o">-</span><span class="mf">0.061958</span> <span class="o">-</span><span class="mf">0.398458</span>  <span class="mf">0.066680</span>  <span class="mf">0.805317</span>
+<span class="n">rule</span> <span class="mi">20</span> <span class="o">-</span><span class="mf">0.109509</span>  <span class="mf">0.672676</span>  <span class="mf">0.771990</span>  <span class="mf">0.259475</span>
+<span class="n">rule</span> <span class="mi">21</span> <span class="o">-</span><span class="mf">0.887838</span>  <span class="mf">0.148851</span> <span class="o">-</span><span class="mf">0.494752</span>  <span class="mf">0.740001</span>
+<span class="n">rule</span> <span class="mi">22</span> <span class="o">-</span><span class="mf">0.506924</span>  <span class="mf">0.124466</span> <span class="o">-</span><span class="mf">0.304620</span>  <span class="mf">0.406688</span>
+<span class="n">rule</span> <span class="mi">23</span>  <span class="mf">0.096541</span>  <span class="mf">0.600472</span>  <span class="mf">0.615980</span> <span class="o">-</span><span class="mf">0.438880</span>
+<span class="n">rule</span> <span class="mi">24</span>  <span class="mf">0.421969</span>  <span class="mf">0.594888</span> <span class="o">-</span><span class="mf">0.104359</span>  <span class="mf">0.558902</span>
+<span class="n">rule</span> <span class="mi">25</span>  <span class="mf">0.454787</span>  <span class="mf">0.143593</span> <span class="o">-</span><span class="mf">0.386165</span> <span class="o">-</span><span class="mf">0.442262</span>
+<span class="n">rule</span> <span class="mi">26</span> <span class="o">-</span><span class="mf">0.872414</span>  <span class="mf">0.364831</span>  <span class="mf">0.624177</span>  <span class="mf">0.791676</span>
+<span class="n">rule</span> <span class="mi">27</span>  <span class="mf">0.880137</span> <span class="o">-</span><span class="mf">0.213823</span> <span class="o">-</span><span class="mf">0.404114</span> <span class="o">-</span><span class="mf">0.578382</span>
+</pre></div>
+</div>
+</section>
+<section id="metodo-predict-vs-forward">
+<h2>Método predict vs forward<a class="headerlink" href="#metodo-predict-vs-forward" title="Link to this heading"></a></h2>
+<p>El método <strong>forward</strong> permite obtener la salida del modelo para un conjunto de datos de entrada en forma de un tensor de PyTorch. Este método genera el grafo de cómputo de PyTorch, lo que permite realizar backpropagation y entrenar el modelo.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="p">(</span><span class="n">x_train</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span><span class="p">([</span> <span class="mf">0.3339</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0306</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1787</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.3885</span><span class="p">,</span>  <span class="mf">0.7853</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.6146</span><span class="p">,</span>  <span class="mf">0.0076</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4021</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1976</span><span class="p">,</span>  <span class="mf">0.3151</span><span class="p">],</span> <span class="n">grad_fn</span><span class="o">=&lt;</span><span class="n">SqueezeBackward1</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Para evitar generar el grafo de cómputo de PyTorch, se puede utilizar el método <strong>no_grad</strong> de PyTorch.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x_train</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span><span class="p">([</span> <span class="mf">0.3339</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0306</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1787</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.3885</span><span class="p">,</span>  <span class="mf">0.7853</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.6146</span><span class="p">,</span>  <span class="mf">0.0076</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4021</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1976</span><span class="p">,</span>  <span class="mf">0.3151</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>El método <strong>predict</strong> retorna la predicción del modelo para un conjunto de datos de entrada en forma de un array de numpy sin generar el grafo de cómputo de PyTorch (como lo hace el método forward). Dependiendo del tipo de salida del modelo se realizan ciertas operaciones para entregar el resultado.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Si el modelo es de tipo:</p>
+<ul class="simple">
+<li><p>Regresión: Se retorna el valor de la salida directamente.</p></li>
+<li><p>Clasificación binaria: Se retorna 1 si la probabilidad de la clase positiva es mayor a 0.5, 0 en caso contrario. (La salida pasa por una función sigmoide).</p></li>
+<li><p>Clasificación multiclase: Se retorna el índice de la clase con mayor probabilidad. (La salida pasa por una función softmax y posteriormente se elige la clase con mayor probabilidad).</p></li>
+</ul>
+</section>
+<section id="multiples-salidas">
+<h2>Múltiples salidas<a class="headerlink" href="#multiples-salidas" title="Link to this heading"></a></h2>
+<p>La única diferencia en la arquitectura del modelo al trabajar con múltiples salidas es la cantidad de parámetros consecuentes generados.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x_train</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># ejemplo de datos de entrenamiento con 2 features</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">h_ANFIS</span><span class="p">(</span>
+    <span class="n">input_size</span><span class="o">=</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="c1"># 3 features</span>
+    <span class="n">num_mfs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="c1"># 3 funciones de membresía</span>
+    <span class="n">outputs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="c1"># 2 salidas</span>
+    <span class="n">membership_function</span><span class="o">=</span><span class="n">Gaussian_MF</span><span class="p">,</span> <span class="c1"># Función de membresía gaussiana</span>
+    <span class="n">output_type</span><span class="o">=</span><span class="s1">&#39;regression&#39;</span><span class="p">,</span> <span class="c1"># Tipo de salida: regresión</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">show_consequents_structure</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">Output</span> <span class="mi">1</span><span class="p">:</span>
+         <span class="n">c0</span> <span class="p">(</span><span class="n">x0</span><span class="p">)</span>   <span class="n">c1</span> <span class="p">(</span><span class="n">x1</span><span class="p">)</span>        <span class="n">c2</span>
+<span class="n">rule</span> <span class="mi">1</span>  <span class="mf">0.412696</span>  <span class="mf">0.522680</span>  <span class="mf">0.090145</span>
+<span class="n">rule</span> <span class="mi">2</span> <span class="o">-</span><span class="mf">0.976030</span> <span class="o">-</span><span class="mf">0.419625</span>  <span class="mf">0.283456</span>
+<span class="n">rule</span> <span class="mi">3</span>  <span class="mf">0.254746</span>  <span class="mf">0.443201</span> <span class="o">-</span><span class="mf">0.872905</span>
+<span class="n">rule</span> <span class="mi">4</span>  <span class="mf">0.790756</span>  <span class="mf">0.528562</span>  <span class="mf">0.858889</span>
+<span class="n">rule</span> <span class="mi">5</span>  <span class="mf">0.651066</span> <span class="o">-</span><span class="mf">0.942244</span> <span class="o">-</span><span class="mf">0.114714</span>
+<span class="n">rule</span> <span class="mi">6</span> <span class="o">-</span><span class="mf">0.897736</span>  <span class="mf">0.491714</span> <span class="o">-</span><span class="mf">0.059783</span>
+<span class="n">rule</span> <span class="mi">7</span> <span class="o">-</span><span class="mf">0.075024</span>  <span class="mf">0.502939</span> <span class="o">-</span><span class="mf">0.868872</span>
+<span class="n">rule</span> <span class="mi">8</span> <span class="o">-</span><span class="mf">0.819807</span> <span class="o">-</span><span class="mf">0.380666</span>  <span class="mf">0.491858</span>
+<span class="n">rule</span> <span class="mi">9</span>  <span class="mf">0.367133</span> <span class="o">-</span><span class="mf">0.824872</span>  <span class="mf">0.538071</span>
+
+
+<span class="o">-</span> <span class="n">Output</span> <span class="mi">2</span><span class="p">:</span>
+         <span class="n">c0</span> <span class="p">(</span><span class="n">x0</span><span class="p">)</span>   <span class="n">c1</span> <span class="p">(</span><span class="n">x1</span><span class="p">)</span>        <span class="n">c2</span>
+<span class="n">rule</span> <span class="mi">1</span> <span class="o">-</span><span class="mf">0.682649</span>  <span class="mf">0.267264</span>  <span class="mf">0.636341</span>
+<span class="n">rule</span> <span class="mi">2</span>  <span class="mf">0.402898</span> <span class="o">-</span><span class="mf">0.281733</span> <span class="o">-</span><span class="mf">0.870279</span>
+<span class="n">rule</span> <span class="mi">3</span>  <span class="mf">0.929400</span>  <span class="mf">0.168972</span>  <span class="mf">0.334629</span>
+<span class="n">rule</span> <span class="mi">4</span> <span class="o">-</span><span class="mf">0.860564</span>  <span class="mf">0.804722</span>  <span class="mf">0.599917</span>
+<span class="n">rule</span> <span class="mi">5</span>  <span class="mf">0.660574</span>  <span class="mf">0.454537</span>  <span class="mf">0.582051</span>
+<span class="n">rule</span> <span class="mi">6</span>  <span class="mf">0.882556</span>  <span class="mf">0.788579</span>  <span class="mf">0.761563</span>
+<span class="n">rule</span> <span class="mi">7</span> <span class="o">-</span><span class="mf">0.752488</span> <span class="o">-</span><span class="mf">0.172638</span>  <span class="mf">0.551565</span>
+<span class="n">rule</span> <span class="mi">8</span> <span class="o">-</span><span class="mf">0.063006</span> <span class="o">-</span><span class="mf">0.112478</span> <span class="o">-</span><span class="mf">0.040473</span>
+<span class="n">rule</span> <span class="mi">9</span>  <span class="mf">0.690270</span>  <span class="mf">0.598800</span> <span class="o">-</span><span class="mf">0.420998</span>
+</pre></div>
+</div>
+<p>Ahora la salida del modelo se vería de la siguiente manera:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="p">(</span><span class="n">x_train</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.2550</span><span class="p">,</span>  <span class="mf">0.4605</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.2885</span><span class="p">,</span>  <span class="mf">0.1500</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.3057</span><span class="p">,</span>  <span class="mf">0.2601</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.5863</span><span class="p">,</span>  <span class="mf">0.2624</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.1534</span><span class="p">,</span>  <span class="mf">0.4544</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.4603</span><span class="p">,</span>  <span class="mf">0.4648</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.4690</span><span class="p">,</span>  <span class="mf">0.4441</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.1083</span><span class="p">,</span>  <span class="mf">0.2348</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.0827</span><span class="p">,</span>  <span class="mf">0.1670</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.2726</span><span class="p">,</span>  <span class="mf">0.4799</span><span class="p">]],</span> <span class="n">grad_fn</span><span class="o">=&lt;</span><span class="n">SqueezeBackward1</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="problemas-multiclase">
+<h2>Problemas multiclase<a class="headerlink" href="#problemas-multiclase" title="Link to this heading"></a></h2>
+<p>Para trabajar con clasificación multiclase, se debe instanciar el modelo con el parámetro <em>output_type=’multiclass’</em> y el número de clases correspondientes al problema se deben especificar en el parámetro <em>outputs</em>.</p>
+<p>Suponiendo que se cuenta con un problema de 3 clases, la instanciación del modelo sería la siguiente:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x_train</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># ejemplo de datos de entrenamiento con 2 features</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">h_ANFIS</span><span class="p">(</span>
+    <span class="n">input_size</span><span class="o">=</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="c1"># 3 features</span>
+    <span class="n">num_mfs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="c1"># 2 funciones de membresía</span>
+    <span class="n">outputs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="c1"># 3 salidas</span>
+    <span class="n">membership_function</span><span class="o">=</span><span class="n">Gaussian_MF</span><span class="p">,</span> <span class="c1"># Función de membresía gaussiana</span>
+    <span class="n">output_type</span><span class="o">=</span><span class="s1">&#39;multiclass&#39;</span><span class="p">,</span> <span class="c1"># Tipo de salida: clasificación multiclase</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Una comparación de las posibles salidas del método forward y el método predict se puede ver a continuación:</p>
+<ul class="simple">
+<li><p><strong>forward</strong>: Retorna los logits sin normalizar de las clases.</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="p">(</span><span class="n">x_train</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.5759</span><span class="p">,</span>  <span class="mf">0.9541</span><span class="p">,</span>  <span class="mf">0.2970</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.2917</span><span class="p">,</span>  <span class="mf">0.4547</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.9439</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.5124</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.6826</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.3454</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.8390</span><span class="p">,</span>  <span class="mf">0.9174</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.9471</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.9870</span><span class="p">,</span>  <span class="mf">1.0792</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.8661</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">1.7170</span><span class="p">,</span>  <span class="mf">1.9342</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.3654</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.0322</span><span class="p">,</span>  <span class="mf">0.5905</span><span class="p">,</span>  <span class="mf">0.7484</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.1828</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0688</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.1221</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.4592</span><span class="p">,</span>  <span class="mf">0.7823</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2416</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.3206</span><span class="p">,</span>  <span class="mf">0.5607</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.6278</span><span class="p">]],</span> <span class="n">grad_fn</span><span class="o">=&lt;</span><span class="n">SqueezeBackward1</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>forward con return_probabilities=True</strong>: Retorna las probabilidades de las clases (los logits son pasados por una función softmax).</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="p">(</span><span class="n">x_train</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="n">return_probabilities</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span><span class="p">([[</span><span class="mf">0.1248</span><span class="p">,</span> <span class="mf">0.5764</span><span class="p">,</span> <span class="mf">0.2988</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.2755</span><span class="p">,</span> <span class="mf">0.5811</span><span class="p">,</span> <span class="mf">0.1435</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.5791</span><span class="p">,</span> <span class="mf">0.1753</span><span class="p">,</span> <span class="mf">0.2456</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.1301</span><span class="p">,</span> <span class="mf">0.7532</span><span class="p">,</span> <span class="mf">0.1167</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.0998</span><span class="p">,</span> <span class="mf">0.7876</span><span class="p">,</span> <span class="mf">0.1126</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.0231</span><span class="p">,</span> <span class="mf">0.8879</span><span class="p">,</span> <span class="mf">0.0891</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.1981</span><span class="p">,</span> <span class="mf">0.3693</span><span class="p">,</span> <span class="mf">0.4325</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.4881</span><span class="p">,</span> <span class="mf">0.3795</span><span class="p">,</span> <span class="mf">0.1324</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.1753</span><span class="p">,</span> <span class="mf">0.6067</span><span class="p">,</span> <span class="mf">0.2179</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.2410</span><span class="p">,</span> <span class="mf">0.5817</span><span class="p">,</span> <span class="mf">0.1772</span><span class="p">]],</span> <span class="n">grad_fn</span><span class="o">=&lt;</span><span class="n">SoftmaxBackward0</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>predict</strong>: Retorna la predicción del modelo en forma de array de numpy (los índices correspondientes a la clase con mayor probabilidad)</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_train</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../models.html" class="btn btn-neutral float-left" title="Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rule_reduced_anfis.html" class="btn btn-neutral float-right" title="rule-reduced ANFIS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Juan Suárez.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

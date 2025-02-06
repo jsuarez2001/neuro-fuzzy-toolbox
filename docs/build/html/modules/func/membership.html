@@ -1,0 +1,467 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Membership Functions &mdash; Neuro-Fuzzy Toolbox 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Consequent Functions" href="consequent.html" />
+    <link rel="prev" title="Functions" href="../func.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Neuro-Fuzzy Toolbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../func.html">Functions</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Membership Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#neuro_fuzzy_toolbox.func.membership.MembershipFunction"><code class="docutils literal notranslate"><span class="pre">MembershipFunction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#neuro_fuzzy_toolbox.func.membership.Gaussian_MF"><code class="docutils literal notranslate"><span class="pre">Gaussian_MF</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF"><code class="docutils literal notranslate"><span class="pre">GeneralizedBell_MF</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="consequent.html">Consequent Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="consequent.html#neuro_fuzzy_toolbox.func.consequent.ConsequentFunction"><code class="docutils literal notranslate"><span class="pre">ConsequentFunction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="consequent.html#neuro_fuzzy_toolbox.func.consequent.Linear_CF"><code class="docutils literal notranslate"><span class="pre">Linear_CF</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../layers.html">Layers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../layers/fuzzification.html">Fuzzification Layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">FuzzificationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">h_FuzzificationLayer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../layers/firing_levels.html">Firing Levels Layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.FiringLevelsLayer"><code class="docutils literal notranslate"><span class="pre">FiringLevelsLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.NormalizationLayer"><code class="docutils literal notranslate"><span class="pre">NormalizationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.h_FiringLevelsLayer"><code class="docutils literal notranslate"><span class="pre">h_FiringLevelsLayer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../layers/consequent.html">Consequent Layer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">ConsequentLayer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../layers/output.html">Output Layer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../layers/output.html#neuro_fuzzy_toolbox.layers.output_layer.OutputLayer"><code class="docutils literal notranslate"><span class="pre">OutputLayer</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../models/anfis.html">ANFIS models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS"><code class="docutils literal notranslate"><span class="pre">ANFIS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS"><code class="docutils literal notranslate"><span class="pre">base_ANFIS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../models/anfis.html#neuro_fuzzy_toolbox.models.anfis.h_ANFIS"><code class="docutils literal notranslate"><span class="pre">h_ANFIS</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../training.html">Training</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../training/early_stopping.html">Early Stopping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../training/early_stopping.html#neuro_fuzzy_toolbox.training.early_stopping.EarlyStopping"><code class="docutils literal notranslate"><span class="pre">EarlyStopping</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../training/update_strategies.html">Update Strategies</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../training/update_strategies.html#neuro_fuzzy_toolbox.training.update_strategies.classical_consequents_estimation_with_OLS"><code class="docutils literal notranslate"><span class="pre">classical_consequents_estimation_with_OLS()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../training/update_strategies.html#neuro_fuzzy_toolbox.training.update_strategies.optimizer_training_epoch"><code class="docutils literal notranslate"><span class="pre">optimizer_training_epoch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../training/training_algorithms.html">Training Algorithms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Hybrid_learning_algorithm"><code class="docutils literal notranslate"><span class="pre">Hybrid_learning_algorithm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Optimizer_training"><code class="docutils literal notranslate"><span class="pre">Optimizer_training</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer"><code class="docutils literal notranslate"><span class="pre">base_model_trainer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../training/sonfis.html">SONFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../training/sonfis.html#neuro_fuzzy_toolbox.training.sonfis.SONFIS"><code class="docutils literal notranslate"><span class="pre">SONFIS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../training/sonfis.html#neuro_fuzzy_toolbox.training.sonfis.alt_SONFIS"><code class="docutils literal notranslate"><span class="pre">alt_SONFIS</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../evaluation.html">Evaluation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../evaluation.html#neuro_fuzzy_toolbox.evaluation.evaluator.get_measures"><code class="docutils literal notranslate"><span class="pre">get_measures()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../usage/introduccion.html">Introducción</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../usage/models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/models/h_anfis.html">ANFIS homogéneo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#inicializacion-de-parametros">Inicialización de parámetros</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#metodo-predict-vs-forward">Método predict vs forward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#problemas-multiclase">Problemas multiclase</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/models/rule_reduced_anfis.html">rule-reduced ANFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/rule_reduced_anfis.html#instanciacion">Instanciación</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/models/anfis.html">ANFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#parametros-de-los-antecedentes">Parámetros de los antecedentes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../usage/training.html">Training</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/training/hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/training/sonfis.html">SONFIS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Neuro-Fuzzy Toolbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../func.html">Functions</a></li>
+      <li class="breadcrumb-item active">Membership Functions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/modules/func/membership.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="membership-functions">
+<span id="id1"></span><h1>Membership Functions<a class="headerlink" href="#membership-functions" title="Link to this heading"></a></h1>
+<p>Aquí están definidas las funciones de membresía utilizadas en el Toolbox. Estas funciones son utilizadas para definir los conjuntos difusos en las variables de entrada de los modelos neurodifusos.
+Conocidos también como variables lingüísticas, los conjuntos difusos son una forma de representar la incertidumbre en los sistemas de inferencia difusa.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.membership.MembershipFunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neuro_fuzzy_toolbox.func.membership.</span></span><span class="sig-name descname"><span class="pre">MembershipFunction</span></span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/membership.html#MembershipFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.membership.MembershipFunction" title="Link to this definition"></a></dt>
+<dd><p>Clase abstracta para funciones de membresía, solo define la estructura necesaria para diseñarlas en el toolbox. Sirve de guía para futuras implementaciones.</p>
+</dd></dl>
+
+<dl class="py class" id="gaussian-mf">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.membership.Gaussian_MF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neuro_fuzzy_toolbox.func.membership.</span></span><span class="sig-name descname"><span class="pre">Gaussian_MF</span></span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/membership.html#Gaussian_MF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.membership.Gaussian_MF" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#neuro_fuzzy_toolbox.func.membership.MembershipFunction" title="neuro_fuzzy_toolbox.func.membership.MembershipFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">MembershipFunction</span></code></a></p>
+<p>Función de membresía Gaussiana.</p>
+<p>Esta función está definida como:</p>
+<div class="math notranslate nohighlight">
+\[gaussian(x) = e^{-\frac{(x - \mu)^2}{2\sigma^2}}\]</div>
+<dl class="simple">
+<dt>donde:</dt><dd><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(x\)</span> es la variable de entrada.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\mu\)</span> es el centro de la función Gaussiana.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\sigma\)</span> es la desviación estándar, que controla la anchura de la curva.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.membership.Gaussian_MF.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">premises</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/membership.html#Gaussian_MF.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.membership.Gaussian_MF.forward" title="Link to this definition"></a></dt>
+<dd><p>Paso hacia adelante de la función de membresía Gaussiana.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>torch.tensor</em>) – Tensor de entrada. Debe tener la forma (batch_size, input_size).</p></li>
+<li><p><strong>premises</strong> (<em>torch.tensor</em>) – Parámetros de las premisas. Debe tener la forma (input_size, num_mfs, len(self._params)).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Salida de la función de membresía Gaussiana (valores de membresía). La forma de salida es (batch_size, input_size, num_mfs).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.membership.Gaussian_MF.general_initialize_premises">
+<span class="sig-name descname"><span class="pre">general_initialize_premises</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mf_distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/membership.html#Gaussian_MF.general_initialize_premises"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.membership.Gaussian_MF.general_initialize_premises" title="Link to this definition"></a></dt>
+<dd><p>Inicializa los parámetros de la función de membresía gaussiana basándose en los datos de entrada. Este método considera que cada característica de entrada puede tener un número distinto de funciones de membresía.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_train</strong> (<em>torch.tensor</em>) – Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).</p></li>
+<li><p><strong>mf_distribution</strong> (<em>list</em>) – Número de funciones de membresía por característica de entrada.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Lista de tensores con los parámetros de las funciones de membresía asociadas a cada feature de los datos de entrada. La forma del tensor i de la lista es (input_size, mf_distribution[i], len(self._params)).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.membership.Gaussian_MF.initialize_premises">
+<span class="sig-name descname"><span class="pre">initialize_premises</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_mfs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/membership.html#Gaussian_MF.initialize_premises"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.membership.Gaussian_MF.initialize_premises" title="Link to this definition"></a></dt>
+<dd><p>Inicializa los parámetros de la función de membresía gaussiana basándose en los datos de entrada. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_train</strong> (<em>torch.tensor</em>) – Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).</p></li>
+<li><p><strong>num_mfs</strong> (<em>int</em>) – Número de funciones de membresía por característica de entrada.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parámetros de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.membership.Gaussian_MF.random_premises">
+<span class="sig-name descname"><span class="pre">random_premises</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_mfs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/membership.html#Gaussian_MF.random_premises"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.membership.Gaussian_MF.random_premises" title="Link to this definition"></a></dt>
+<dd><p>Genera parámetros aleatorios para las premisas en el rango [-1, 1], con la excepción del parámetro <span class="math notranslate nohighlight">\(\sigma\)</span> que siempre es positivo.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_size</strong> (<em>int</em>) – Número de características de entrada.</p></li>
+<li><p><strong>num_mfs</strong> (<em>int</em>) – Número de funciones de membresía por característica de entrada.</p></li>
+<li><p><strong>dtype</strong> (<em>torch.dtype</em>) – Tipo de dato de las premisas.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parámetros aleatorios de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.membership.Gaussian_MF.random_single_feature_mfs">
+<span class="sig-name descname"><span class="pre">random_single_feature_mfs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_mfs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/membership.html#Gaussian_MF.random_single_feature_mfs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.membership.Gaussian_MF.random_single_feature_mfs" title="Link to this definition"></a></dt>
+<dd><p>Genera parámetros aleatorios para una sola función de membresía Gaussiana en el rango [-1, 1], con la excepción del parámetro <span class="math notranslate nohighlight">\(\sigma\)</span> que siempre es positivo.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_mfs</strong> (<em>int</em>) – Número de funciones de membresía.</p></li>
+<li><p><strong>dtype</strong> (<em>torch.dtype</em>) – Tipo de dato de las premisas.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parámetros aleatorios de las premisas. La forma de salida es (n_mfs, len(self._params)).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class" id="generalizedbell-mf">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neuro_fuzzy_toolbox.func.membership.</span></span><span class="sig-name descname"><span class="pre">GeneralizedBell_MF</span></span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/membership.html#GeneralizedBell_MF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#neuro_fuzzy_toolbox.func.membership.MembershipFunction" title="neuro_fuzzy_toolbox.func.membership.MembershipFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">MembershipFunction</span></code></a></p>
+<p>Función de membresía de tipo generalized bell-shaped.</p>
+<p>Esta función está definida como:</p>
+<div class="math notranslate nohighlight">
+\[generalized\_bell(x) = \frac{1}{1 + \left(\frac{|x - c|}{a}\right)^{2b}}\]</div>
+<dl class="simple">
+<dt>donde:</dt><dd><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(x\)</span> es la variable de entrada.</p></li>
+<li><p><span class="math notranslate nohighlight">\(a\)</span> es el parámetro de ancho.</p></li>
+<li><p><span class="math notranslate nohighlight">\(b\)</span> es el parámetro de pendiente.</p></li>
+<li><p><span class="math notranslate nohighlight">\(c\)</span> es el parámetro de centro.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">premises</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/membership.html#GeneralizedBell_MF.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF.forward" title="Link to this definition"></a></dt>
+<dd><p>Paso hacia adelante de la función de membresía Generalized Bell.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>torch.tensor</em>) – Tensor de entrada. Debe tener la forma (batch_size, input_size).</p></li>
+<li><p><strong>premises</strong> (<em>torch.tensor</em>) – Parámetros de las premisas. Debe tener la forma (input_size, num_mfs, len(self._params)).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Salida de la función de membresía Generalized Bell (valores de membresía). La forma de salida es (batch_size, input_size, num_mfs).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF.general_initialize_premises">
+<span class="sig-name descname"><span class="pre">general_initialize_premises</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mf_distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/membership.html#GeneralizedBell_MF.general_initialize_premises"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF.general_initialize_premises" title="Link to this definition"></a></dt>
+<dd><p>Inicializa los parámetros de la función de membresía Generalized Bell basándose en los datos de entrada. Este método considera que cada característica de entrada puede tener un número distinto de funciones de membresía.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_train</strong> (<em>torch.tensor</em>) – Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).</p></li>
+<li><p><strong>mf_distribution</strong> (<em>list</em>) – Número de funciones de membresía por característica de entrada.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Lista de tensores con los parámetros de las funciones de membresía asociadas a cada feature de los datos de entrada. La forma del tensor i de la lista es (input_size, mf_distribution[i], len(self._params)).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF.initialize_premises">
+<span class="sig-name descname"><span class="pre">initialize_premises</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_mfs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/membership.html#GeneralizedBell_MF.initialize_premises"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF.initialize_premises" title="Link to this definition"></a></dt>
+<dd><p>Inicializa los parámetros de la función de membresía Generalized Bell basándose en los datos de entrada. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_train</strong> (<em>torch.tensor</em>) – Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).</p></li>
+<li><p><strong>num_mfs</strong> (<em>int</em>) – Número de funciones de membresía por característica de entrada.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parámetros de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF.random_premises">
+<span class="sig-name descname"><span class="pre">random_premises</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_mfs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/membership.html#GeneralizedBell_MF.random_premises"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF.random_premises" title="Link to this definition"></a></dt>
+<dd><p>Genera parámetros aleatorios para las premisas en el rango [-1, 1], con la excepción de los parámetros de ancho y pendiente que siempre son positivos. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_size</strong> (<em>int</em>) – Número de características de entrada.</p></li>
+<li><p><strong>num_mfs</strong> (<em>int</em>) – Número de funciones de membresía por característica de entrada.</p></li>
+<li><p><strong>dtype</strong> (<em>torch.dtype</em>) – Tipo de dato de las premisas.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parámetros aleatorios de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF.random_single_feature_mfs">
+<span class="sig-name descname"><span class="pre">random_single_feature_mfs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_mfs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/membership.html#GeneralizedBell_MF.random_single_feature_mfs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF.random_single_feature_mfs" title="Link to this definition"></a></dt>
+<dd><p>Genera parámetros aleatorios para una sola función de membresía Generalized Bell en el rango [-1, 1], con la excepción de los parámetros de ancho y pendiente que siempre son positivos.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_mfs</strong> (<em>int</em>) – Número de funciones de membresía.</p></li>
+<li><p><strong>dtype</strong> (<em>torch.dtype</em>) – Tipo de dato de las premisas.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parámetros aleatorios de las premisas. La forma de salida es (n_mfs, len(self._params)).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../func.html" class="btn btn-neutral float-left" title="Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="consequent.html" class="btn btn-neutral float-right" title="Consequent Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Juan Suárez.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

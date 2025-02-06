@@ -1,6 +1,16 @@
 import torch
 
 def classical_consequents_estimation_with_OLS(ANFISmodel, loader):
+    """
+    Estima los parámetros consecuentes de un modelo ANFIS utilizando mínimos cuadrados ordinarios.
+    
+    Args:
+        ANFISmodel (ANFIS | h_ANFIS): Modelo ANFIS a entrenar.
+        loader (DataLoader): DataLoader con los datos de entrenamiento.
+        
+    Returns:
+        torch.tensor: Tensor con los nuevos parámetros consecuentes.
+    """
     x = loader.dataset.tensors[0]
     y = loader.dataset.tensors[1]
         
@@ -25,7 +35,17 @@ def classical_consequents_estimation_with_OLS(ANFISmodel, loader):
     return new_consequents
 
 
-def premises_update_with_gradient_descent(ANFISmodel, loader, optimizer, loss_function):
+def optimizer_training_epoch(model, loader, optimizer, loss_function):
+    """
+    Actualiza los parámetros de un modelo utilizando un optimizador y una función de pérdida dados como parámetros. Los parámetros a actualizar son indicados por el optimizador (ya instanciado).
+    
+    Args:
+        model (nn.Module): Modelo ANFIS a entrenar.
+        loader (DataLoader): DataLoader con los datos de entrenamiento.
+        optimizer (torch.optim.Optimizer): Optimizador instanciado a utilizar.
+        loss_function (callable): Función de pérdida a utilizar.
+    
+    """
     for batch_x, batch_y in loader:
         batch_y_copy = batch_y.clone().detach()
         '''preliminary fix for the dtype issue'''
@@ -39,7 +59,8 @@ def premises_update_with_gradient_descent(ANFISmodel, loader, optimizer, loss_fu
         '''cross_entropy function only accepts torch.long (torch.int64) dtype for target indices'''
         
         optimizer.zero_grad()
-        pred = ANFISmodel(batch_x)
+        pred = model(batch_x)
         loss = loss_function(pred, batch_y_copy)
         loss.backward()
         optimizer.step()
+        

@@ -2,7 +2,23 @@ import torch
 import torch.nn as nn
 
 class OutputLayer(nn.Module):
+    """
+    Clase para representar la capa de salida de un modelo de Sistema de Inferencia Neuro-Difuso Adaptativo (ANFIS).
+    Esta capa se encarga de calcular la salida final del modelo ANFIS a partir las salidas de cada regla.
+    
+    Tiene naturaleza dependiente del tipo de salida del modelo ANFIS, por lo que se debe especificar el tipo de salida al inicializar la capa. Los tipos de salida soportados son:
+        - 'regression': Para problemas de regresión.
+        - 'binary': Para problemas de clasificación binaria.
+        - 'multiclass': Para problemas de clasificación multiclase.
+        
+    """
     def __init__(self, output_type):
+        """
+        Inicializa una nueva instancia de la clase OutputLayer.
+        
+        Args:
+            output_type (str): Tipo de salida del modelo ANFIS. Puede ser 'regression', 'binary' o 'multiclass'.
+        """
         super(OutputLayer, self).__init__()
         self._output_type = output_type.lower()
         
@@ -11,8 +27,15 @@ class OutputLayer(nn.Module):
         elif (self._output_type == 'binary'):
             self._last_layer = nn.Sigmoid()
 
-    def forward(self, x, return_probabilities=False):
-        x = torch.sum(x, dim=-1).t().squeeze(1)
+    def forward(self, rules_outputs, return_probabilities=False):
+        """
+        Realiza un paso hacia adelante para calcular la salida de la capa de salida.
+        
+        Args:
+            rules_outputs (torch.Tensor): Tensor de tamaño (batch_size, rules) que contiene las salidas de cada regla.
+            return_probabilities (bool): Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es 'multiclass', en caso contrario, se ignora (Default: False).
+        """
+        rules_outputs = torch.sum(rules_outputs, dim=-1).t().squeeze(1)
         if return_probabilities and self._output_type == 'multiclass':
-            x = nn.functional.softmax(x, dim=1)
-        return self._last_layer(x)
+            rules_outputs = nn.functional.softmax(rules_outputs, dim=1)
+        return self._last_layer(rules_outputs)

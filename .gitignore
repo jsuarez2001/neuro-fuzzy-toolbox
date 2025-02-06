@@ -3,12 +3,10 @@ __pycache__/
 .vscode/
 env/
 neurofuzzy_toolbox_esp/
-neuro_fuzzy_toolbox_old/
+EXP_neuro_fuzzy_toolbox/
 test_notebooks_old/
 pendiente.txt
-papers.md
 tests/
-docs/
 consideraciones.md
 old/
 dev_notebooks/

@@ -12,6 +12,17 @@ from sklearn.metrics import (
 )
 
 def get_measures(ANFISmodel, x, y):
+    """
+    Genera un diccionario con distintas medidas de evaluación de un modelo ANFIS dependiendo de su tipo de salida.
+
+    Args:
+        ANFISmodel (ANFIS | h_ANFIS): Modelo ANFIS a evaluar.
+        x (torch.Tensor): Datos de entrada.
+        y (torch.Tensor): Datos de salida.
+
+    Returns:
+        dict: Diccionario con las métricas de evaluación del modelo.
+    """
     measures = {}
     y = y.numpy()
     pred = ANFISmodel.predict(x)

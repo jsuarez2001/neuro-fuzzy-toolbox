@@ -1,0 +1,293 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consequent Functions &mdash; Neuro-Fuzzy Toolbox 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Layers" href="../layers.html" />
+    <link rel="prev" title="Membership Functions" href="membership.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Neuro-Fuzzy Toolbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../func.html">Functions</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="membership.html">Membership Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="membership.html#neuro_fuzzy_toolbox.func.membership.MembershipFunction"><code class="docutils literal notranslate"><span class="pre">MembershipFunction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="membership.html#neuro_fuzzy_toolbox.func.membership.Gaussian_MF"><code class="docutils literal notranslate"><span class="pre">Gaussian_MF</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="membership.html#neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF"><code class="docutils literal notranslate"><span class="pre">GeneralizedBell_MF</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Consequent Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#neuro_fuzzy_toolbox.func.consequent.ConsequentFunction"><code class="docutils literal notranslate"><span class="pre">ConsequentFunction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#neuro_fuzzy_toolbox.func.consequent.Linear_CF"><code class="docutils literal notranslate"><span class="pre">Linear_CF</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../layers.html">Layers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../layers/fuzzification.html">Fuzzification Layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">FuzzificationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">h_FuzzificationLayer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../layers/firing_levels.html">Firing Levels Layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.FiringLevelsLayer"><code class="docutils literal notranslate"><span class="pre">FiringLevelsLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.NormalizationLayer"><code class="docutils literal notranslate"><span class="pre">NormalizationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.h_FiringLevelsLayer"><code class="docutils literal notranslate"><span class="pre">h_FiringLevelsLayer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../layers/consequent.html">Consequent Layer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">ConsequentLayer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../layers/output.html">Output Layer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../layers/output.html#neuro_fuzzy_toolbox.layers.output_layer.OutputLayer"><code class="docutils literal notranslate"><span class="pre">OutputLayer</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../models/anfis.html">ANFIS models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS"><code class="docutils literal notranslate"><span class="pre">ANFIS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS"><code class="docutils literal notranslate"><span class="pre">base_ANFIS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../models/anfis.html#neuro_fuzzy_toolbox.models.anfis.h_ANFIS"><code class="docutils literal notranslate"><span class="pre">h_ANFIS</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../training.html">Training</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../training/early_stopping.html">Early Stopping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../training/early_stopping.html#neuro_fuzzy_toolbox.training.early_stopping.EarlyStopping"><code class="docutils literal notranslate"><span class="pre">EarlyStopping</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../training/update_strategies.html">Update Strategies</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../training/update_strategies.html#neuro_fuzzy_toolbox.training.update_strategies.classical_consequents_estimation_with_OLS"><code class="docutils literal notranslate"><span class="pre">classical_consequents_estimation_with_OLS()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../training/update_strategies.html#neuro_fuzzy_toolbox.training.update_strategies.optimizer_training_epoch"><code class="docutils literal notranslate"><span class="pre">optimizer_training_epoch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../training/training_algorithms.html">Training Algorithms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Hybrid_learning_algorithm"><code class="docutils literal notranslate"><span class="pre">Hybrid_learning_algorithm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Optimizer_training"><code class="docutils literal notranslate"><span class="pre">Optimizer_training</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer"><code class="docutils literal notranslate"><span class="pre">base_model_trainer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../training/sonfis.html">SONFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../training/sonfis.html#neuro_fuzzy_toolbox.training.sonfis.SONFIS"><code class="docutils literal notranslate"><span class="pre">SONFIS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../training/sonfis.html#neuro_fuzzy_toolbox.training.sonfis.alt_SONFIS"><code class="docutils literal notranslate"><span class="pre">alt_SONFIS</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../evaluation.html">Evaluation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../evaluation.html#neuro_fuzzy_toolbox.evaluation.evaluator.get_measures"><code class="docutils literal notranslate"><span class="pre">get_measures()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../usage/introduccion.html">Introducción</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../usage/models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/models/h_anfis.html">ANFIS homogéneo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#inicializacion-de-parametros">Inicialización de parámetros</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#metodo-predict-vs-forward">Método predict vs forward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#problemas-multiclase">Problemas multiclase</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/models/rule_reduced_anfis.html">rule-reduced ANFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/rule_reduced_anfis.html#instanciacion">Instanciación</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/models/anfis.html">ANFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#parametros-de-los-antecedentes">Parámetros de los antecedentes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../usage/training.html">Training</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/training/hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/training/sonfis.html">SONFIS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Neuro-Fuzzy Toolbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../func.html">Functions</a></li>
+      <li class="breadcrumb-item active">Consequent Functions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/modules/func/consequent.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="consequent-functions">
+<span id="id1"></span><h1>Consequent Functions<a class="headerlink" href="#consequent-functions" title="Link to this heading"></a></h1>
+<p>Aquí están definidas las funciones de consecuente utilizadas en el Toolbox. Estas funciones son utilizadas para definir las salidas de los modelos neurodifusos.
+De momento solo esta implementado el modelo de hiperplano.</p>
+<dl class="py class" id="module-neuro_fuzzy_toolbox.func.consequent">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.consequent.ConsequentFunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neuro_fuzzy_toolbox.func.consequent.</span></span><span class="sig-name descname"><span class="pre">ConsequentFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/consequent.html#ConsequentFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.consequent.ConsequentFunction" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Clase abstracta para funciones consecuentes, solo define la estructura necesaria para diseñarlas en el toolbox. Sirve de guía para futuras implementaciones.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.consequent.ConsequentFunction.forward">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consequents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/consequent.html#ConsequentFunction.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.consequent.ConsequentFunction.forward" title="Link to this definition"></a></dt>
+<dd><p>Define the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.consequent.ConsequentFunction.initialize_consequents">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initialize_consequents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rules</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/consequent.html#ConsequentFunction.initialize_consequents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.consequent.ConsequentFunction.initialize_consequents" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.consequent.Linear_CF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neuro_fuzzy_toolbox.func.consequent.</span></span><span class="sig-name descname"><span class="pre">Linear_CF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/consequent.html#Linear_CF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.consequent.Linear_CF" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#neuro_fuzzy_toolbox.func.consequent.ConsequentFunction" title="neuro_fuzzy_toolbox.func.consequent.ConsequentFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConsequentFunction</span></code></a></p>
+<p>Función consecuente lineal, se encarga de calcular la salida de la red neuro-difusa a partir de los antecedentes y los pesos de las reglas bajo la forma de una combinación lineal.</p>
+<p>Esta función consecuente se define como:</p>
+<div class="math notranslate nohighlight">
+\[O_j = \sum_{i=1}^{n} (c_{i,j} * x_i) + c_{n+1,j}\]</div>
+<dl class="simple">
+<dt>donde:</dt><dd><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(O_j\)</span> es la j-ésima salida de la capa consecuente de un modelo ANFIS.</p></li>
+<li><p><span class="math notranslate nohighlight">\(x_i\)</span> es el feature <span class="math notranslate nohighlight">\(i\)</span> de un dato de entrada <span class="math notranslate nohighlight">\(x\)</span> (que es de tamaño n).</p></li>
+<li><p><span class="math notranslate nohighlight">\(c_{i,j}\)</span> es el i-ésimo parámetro consecuente asociado a la j-ésima regla de un modelo ANFIS.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.consequent.Linear_CF.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consequents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/consequent.html#Linear_CF.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.consequent.Linear_CF.forward" title="Link to this definition"></a></dt>
+<dd><p>Paso hacia adelante de la función consecuente lineal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>torch.Tensor</em>) – Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.</p></li>
+<li><p><strong>consequents</strong> (<em>torch.Tensor</em>) – Tensor de tamaño (outputs, rules, input_size + 1) que contiene los parámetros consecuentes de la red ANFIS, donde <em>rules</em> es el número de reglas y <em>outputs</em> es el número de salidas del modelo.</p></li>
+<li><p><strong>weights</strong> (<em>torch.Tensor</em>) – Tensor de tamaño (batch_size, rules) que contiene los pesos de las reglas.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas de la red ANFIS.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.func.consequent.Linear_CF.initialize_consequents">
+<span class="sig-name descname"><span class="pre">initialize_consequents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rules</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/func/consequent.html#Linear_CF.initialize_consequents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.func.consequent.Linear_CF.initialize_consequents" title="Link to this definition"></a></dt>
+<dd><p>Inicializa los parámetros consecuentes de la red ANFIS de manera aleatoria en el rango [-1, 1].</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="membership.html" class="btn btn-neutral float-left" title="Membership Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../layers.html" class="btn btn-neutral float-right" title="Layers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Juan Suárez.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
