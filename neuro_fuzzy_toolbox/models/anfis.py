@@ -41,7 +41,7 @@ class base_ANFIS(nn.Module):
         return output
     
     
-    # ---- Initialize premises ----
+    # ---- Initialize parameters ----
     def init_premises(self, x):
         """
         Inicializa los parámetros de las funciones de membresía de la capa de fuzzificación del modelo a partir de los datos ingresados.
@@ -52,7 +52,37 @@ class base_ANFIS(nn.Module):
         self._dtype = x.dtype
         self._consequent_layer._to_dtype(x.dtype) # Set dtype to consequents
         self._fuzzification_layer.init_premises(x)
+        self._fuzzification_layer._membership_function._max_val_plot = x.max().item()
+        self._fuzzification_layer._membership_function._min_val_plot = x.min().item()
+        
     
+    def init_consequents(self, x, y):
+        """
+        Inicializa los parámetros consecuentes del modelo usando una estimación de mínimos cuadrados.
+        
+        Args:
+            x (torch.Tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
+            y (torch.Tensor): Tensor con los datos de salida. Es de tamaño (batch_size, outputs).
+        """
+        _, w_norm, _ = self.intermediate_values(x)
+        xe = torch.cat([x, torch.ones(x.shape[0], 1, dtype=self._dtype)], dim=1)
+        fs = w_norm.unsqueeze(2).repeat(1, 1, xe.shape[1]).view(w_norm.shape[0], -1)
+        X = xe.repeat(1, self.rules)
+        
+        '''preliminary fix for the dtype issue'''
+        if self._output_type == 'multiclass':
+            y = torch.nn.functional.one_hot(y, self._outputs)
+        if y.dtype != X.dtype:
+            y = y.to(X.dtype)
+        '''preliminary fix for the dtype issue'''
+        
+        # Solve least squares problem using QR decomposition with pivoting
+        C, _, _, _ = torch.linalg.lstsq(X * fs, y)
+        new_consequents = C.t().reshape(self._outputs, self.rules, xe.shape[1])
+        
+        # Update consequents
+        self.set_consequents(new_consequents)
+        
     
     # ---- Model predict ----
     def predict(self, x):
@@ -193,18 +223,6 @@ class base_ANFIS(nn.Module):
             group_by_dim (bool): Si es True, agrupa las funciones de membresía en un solo gráfico por cada dimensión de entrada. (Default: False)
         """
         self._fuzzification_layer.plot_premises(mf, input_dim, group_by_dim)
-        
-        
-    # ----- Load state dict -----
-    def load_state_dict(self, state_dict):
-        """
-        Carga un estado del modelo.
-        
-        Args:
-            state_dict (dict): Diccionario con el estado del modelo.
-        """
-        self.set_premises(state_dict['_fuzzification_layer._premises'])
-        self.set_consequents(state_dict['_consequent_layer._consequents'])
     
 
 
@@ -315,6 +333,17 @@ class h_ANFIS(base_ANFIS):
             int: Cantidad de funciones de membresía que tiene cada feature.
         """
         return self.get_premises().shape[1]
+    
+    # ----- Load state dict -----
+    def load_state_dict(self, state_dict):
+        """
+        Carga un estado del modelo.
+        
+        Args:
+            state_dict (dict): Diccionario con el estado del modelo.
+        """
+        self.set_premises(state_dict['_fuzzification_layer._premises'])
+        self.set_consequents(state_dict['_consequent_layer._consequents'])
         
 
 
@@ -412,3 +441,17 @@ class ANFIS(base_ANFIS):
             torch.tensor: Tensor con la cantidad de funciones de membresía por feature.
         """
         return self._mf_distribution
+    
+    # ----- Load state dict -----
+    def load_state_dict(self, state_dict):
+        """
+        Carga un estado del modelo.
+        
+        Args:
+            state_dict (dict): Diccionario con el estado del modelo.
+        """
+        prems = []
+        for i in range(self._input_size):
+            prems.append(state_dict['_fuzzification_layer._premises.' + str(i)])
+        self.set_premises(prems)
+        self.set_consequents(state_dict['_consequent_layer._consequents'])

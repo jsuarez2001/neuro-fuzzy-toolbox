@@ -43,6 +43,46 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/introduccion.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/h_anfis.html">ANFIS homogéneo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/anfis.html">ANFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/training.html">Training</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/training/considerations.html">Consideraciones Iniciales</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/training/considerations.html#entrada-y-salida-de-los-modelos">Entrada y salida de los modelos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/training/considerations.html#dataloaders-de-pytorch">DataLoaders de PyTorch</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/training/considerations.html#validacion-y-test">Validación y Test</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/training/considerations.html#estructura-general">Estructura general</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/training/considerations.html#algortimos-de-entrenamiento">Algortimos de entrenamiento</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/training/hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/training/hybrid_learning_algorithm.html#ejemplo-de-uso">Ejemplo de uso</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/training/optimizer_training.html">Basic Optimizer Training Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/training/sonfis.html">SONFIS</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../modules/func.html">Functions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/func/membership.html">Membership Functions</a><ul>
@@ -100,8 +140,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/training/training_algorithms.html">Training Algorithms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Basic_optimizer_training_algorithm"><code class="docutils literal notranslate"><span class="pre">Basic_optimizer_training_algorithm</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Hybrid_learning_algorithm"><code class="docutils literal notranslate"><span class="pre">Hybrid_learning_algorithm</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Optimizer_training"><code class="docutils literal notranslate"><span class="pre">Optimizer_training</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer"><code class="docutils literal notranslate"><span class="pre">base_model_trainer</span></code></a></li>
 </ul>
 </li>
@@ -114,37 +154,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../modules/evaluation.html">Evaluation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/evaluation.html#neuro_fuzzy_toolbox.evaluation.evaluator.get_measures"><code class="docutils literal notranslate"><span class="pre">get_measures()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../usage/introduccion.html">Introducción</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../usage/models.html">Models</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/h_anfis.html">ANFIS homogéneo</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#importacion">Importación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#inicializacion-de-parametros">Inicialización de parámetros</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#metodo-predict-vs-forward">Método predict vs forward</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#problemas-multiclase">Problemas multiclase</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/rule_reduced_anfis.html">rule-reduced ANFIS</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/rule_reduced_anfis.html#instanciacion">Instanciación</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/anfis.html">ANFIS</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#importacion">Importación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#instanciacion">Instanciación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#parametros-de-los-antecedentes">Parámetros de los antecedentes</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../usage/training.html">Training</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../usage/training/hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../usage/training/sonfis.html">SONFIS</a></li>
 </ul>
 </li>
 </ul>
@@ -225,7 +234,7 @@
 
     
     
-    <span class="c1"># ---- Initialize premises ----</span>
+    <span class="c1"># ---- Initialize parameters ----</span>
 <div class="viewcode-block" id="base_ANFIS.init_premises">
 <a class="viewcode-back" href="../../../modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS.init_premises">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">init_premises</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
@@ -237,9 +246,42 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_consequent_layer</span><span class="o">.</span><span class="n">_to_dtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="c1"># Set dtype to consequents</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_fuzzification_layer</span><span class="o">.</span><span class="n">init_premises</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fuzzification_layer</span><span class="o">.</span><span class="n">init_premises</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fuzzification_layer</span><span class="o">.</span><span class="n">_membership_function</span><span class="o">.</span><span class="n">_max_val_plot</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fuzzification_layer</span><span class="o">.</span><span class="n">_membership_function</span><span class="o">.</span><span class="n">_min_val_plot</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span></div>
 
+        
     
+<div class="viewcode-block" id="base_ANFIS.init_consequents">
+<a class="viewcode-back" href="../../../modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS.init_consequents">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_consequents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inicializa los parámetros consecuentes del modelo usando una estimación de mínimos cuadrados.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            x (torch.Tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).</span>
+<span class="sd">            y (torch.Tensor): Tensor con los datos de salida. Es de tamaño (batch_size, outputs).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">w_norm</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intermediate_values</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">xe</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">w_norm</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">xe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">w_norm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">xe</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rules</span><span class="p">)</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;preliminary fix for the dtype issue&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_type</span> <span class="o">==</span> <span class="s1">&#39;multiclass&#39;</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outputs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">X</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;preliminary fix for the dtype issue&#39;&#39;&#39;</span>
+        
+        <span class="c1"># Solve least squares problem using QR decomposition with pivoting</span>
+        <span class="n">C</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">X</span> <span class="o">*</span> <span class="n">fs</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">new_consequents</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">t</span><span class="p">()</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_outputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rules</span><span class="p">,</span> <span class="n">xe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        
+        <span class="c1"># Update consequents</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="n">new_consequents</span><span class="p">)</span></div>
+
+        
     
     <span class="c1"># ---- Model predict ----</span>
 <div class="viewcode-block" id="base_ANFIS.predict">
@@ -525,7 +567,21 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            int: Cantidad de funciones de membresía que tiene cada feature.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_premises</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_premises</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    
+    <span class="c1"># ----- Load state dict -----</span>
+<div class="viewcode-block" id="h_ANFIS.load_state_dict">
+<a class="viewcode-back" href="../../../modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.load_state_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Carga un estado del modelo.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            state_dict (dict): Diccionario con el estado del modelo.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_premises</span><span class="p">(</span><span class="n">state_dict</span><span class="p">[</span><span class="s1">&#39;_fuzzification_layer._premises&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="n">state_dict</span><span class="p">[</span><span class="s1">&#39;_consequent_layer._consequents&#39;</span><span class="p">])</span></div>
+</div>
 
         
 
@@ -637,7 +693,24 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.tensor: Tensor con la cantidad de funciones de membresía por feature.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mf_distribution</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mf_distribution</span>
+    
+    <span class="c1"># ----- Load state dict -----</span>
+<div class="viewcode-block" id="ANFIS.load_state_dict">
+<a class="viewcode-back" href="../../../modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.load_state_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Carga un estado del modelo.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            state_dict (dict): Diccionario con el estado del modelo.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prems</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_input_size</span><span class="p">):</span>
+            <span class="n">prems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state_dict</span><span class="p">[</span><span class="s1">&#39;_fuzzification_layer._premises.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_premises</span><span class="p">(</span><span class="n">prems</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="n">state_dict</span><span class="p">[</span><span class="s1">&#39;_consequent_layer._consequents&#39;</span><span class="p">])</span></div>
+</div>
 
 </pre></div>
 

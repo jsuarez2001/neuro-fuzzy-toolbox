@@ -8,5 +8,7 @@ Este módulo contiene una guía sobre los algoritmos de entrenamiento disponible
 .. toctree::
    :maxdepth: 2
 
+   training/considerations
    training/hybrid_learning_algorithm
+   training/optimizer_training
    training/sonfis

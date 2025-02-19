@@ -26,6 +26,12 @@ class OutputLayer(nn.Module):
             self._last_layer = nn.Identity()
         elif (self._output_type == 'binary'):
             self._last_layer = nn.Sigmoid()
+            
+        if self._output_type != 'multiclass':
+            self._get_output = lambda rules_outputs, return_probabilities: torch.sum(rules_outputs, dim=-1).t().squeeze(1)
+        else:
+            self._get_output = lambda rules_outputs, return_probabilities: nn.functional.softmax(torch.sum(rules_outputs, dim=-1).t().squeeze(1), dim=1) if return_probabilities else torch.sum(rules_outputs, dim=-1).t().squeeze(1)
+        
 
     def forward(self, rules_outputs, return_probabilities=False):
         """
@@ -35,7 +41,4 @@ class OutputLayer(nn.Module):
             rules_outputs (torch.Tensor): Tensor de tamaño (batch_size, rules) que contiene las salidas de cada regla.
             return_probabilities (bool): Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es 'multiclass', en caso contrario, se ignora (Default: False).
         """
-        rules_outputs = torch.sum(rules_outputs, dim=-1).t().squeeze(1)
-        if return_probabilities and self._output_type == 'multiclass':
-            rules_outputs = nn.functional.softmax(rules_outputs, dim=1)
-        return self._last_layer(rules_outputs)
+        return self._last_layer(self._get_output(rules_outputs, return_probabilities))

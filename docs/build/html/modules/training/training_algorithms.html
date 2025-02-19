@@ -46,6 +46,46 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../usage/introduccion.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../usage/models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/models/h_anfis.html">ANFIS homogéneo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/models/anfis.html">ANFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../usage/training.html">Training</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/training/considerations.html">Consideraciones Iniciales</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/training/considerations.html#entrada-y-salida-de-los-modelos">Entrada y salida de los modelos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/training/considerations.html#dataloaders-de-pytorch">DataLoaders de PyTorch</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/training/considerations.html#validacion-y-test">Validación y Test</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/training/considerations.html#estructura-general">Estructura general</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/training/considerations.html#algortimos-de-entrenamiento">Algortimos de entrenamiento</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/training/hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/training/hybrid_learning_algorithm.html#ejemplo-de-uso">Ejemplo de uso</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/training/optimizer_training.html">Basic Optimizer Training Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/training/sonfis.html">SONFIS</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../modules.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../func.html">Functions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../func/membership.html">Membership Functions</a><ul>
@@ -103,8 +143,8 @@
 </ul>
 </li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Training Algorithms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#neuro_fuzzy_toolbox.training.training_algorithms.Basic_optimizer_training_algorithm"><code class="docutils literal notranslate"><span class="pre">Basic_optimizer_training_algorithm</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#neuro_fuzzy_toolbox.training.training_algorithms.Hybrid_learning_algorithm"><code class="docutils literal notranslate"><span class="pre">Hybrid_learning_algorithm</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#neuro_fuzzy_toolbox.training.training_algorithms.Optimizer_training"><code class="docutils literal notranslate"><span class="pre">Optimizer_training</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer"><code class="docutils literal notranslate"><span class="pre">base_model_trainer</span></code></a></li>
 </ul>
 </li>
@@ -117,37 +157,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../evaluation.html">Evaluation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../evaluation.html#neuro_fuzzy_toolbox.evaluation.evaluator.get_measures"><code class="docutils literal notranslate"><span class="pre">get_measures()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../usage/introduccion.html">Introducción</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../usage/models.html">Models</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../usage/models/h_anfis.html">ANFIS homogéneo</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#importacion">Importación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#inicializacion-de-parametros">Inicialización de parámetros</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#metodo-predict-vs-forward">Método predict vs forward</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#problemas-multiclase">Problemas multiclase</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../usage/models/rule_reduced_anfis.html">rule-reduced ANFIS</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../usage/models/rule_reduced_anfis.html#instanciacion">Instanciación</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../usage/models/anfis.html">ANFIS</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#importacion">Importación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#instanciacion">Instanciación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#parametros-de-los-antecedentes">Parámetros de los antecedentes</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../usage/training.html">Training</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../usage/training/hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../usage/training/sonfis.html">SONFIS</a></li>
 </ul>
 </li>
 </ul>
@@ -185,6 +194,41 @@
 <span id="id1"></span><h1>Training Algorithms<a class="headerlink" href="#training-algorithms" title="Link to this heading"></a></h1>
 <p>Este módulo contiene información sobre los algoritmos de entrenamiento para los modelos disponibles en Neuro-Fuzzy Toolbox.</p>
 <dl class="py class" id="module-neuro_fuzzy_toolbox.training.training_algorithms">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.training.training_algorithms.Basic_optimizer_training_algorithm">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neuro_fuzzy_toolbox.training.training_algorithms.</span></span><span class="sig-name descname"><span class="pre">Basic_optimizer_training_algorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stopping=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_params={}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/training/training_algorithms.html#Basic_optimizer_training_algorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.training.training_algorithms.Basic_optimizer_training_algorithm" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer" title="neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">base_model_trainer</span></code></a></p>
+<p>Clase para representar un algoritmo de entrenamiento por optimización para un modelo de aprendizaje automático. Solo permite entrenar modelos de aprendizaje automático con un solo optimizador para todos los parámetros del modelo.</p>
+<dl>
+<dt>Pseudocódigo:</dt><dd><div class="highlight-text notranslate"><div class="highlight"><pre><span></span>testes test:
+    Para cada test en test:
+        Calcular test de membresía usando la función de test
+        Guardar en el tensor de test
+Retornar el test con los valores de test
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.training.training_algorithms.Basic_optimizer_training_algorithm.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stopping=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_params={}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/training/training_algorithms.html#Basic_optimizer_training_algorithm.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.training.training_algorithms.Basic_optimizer_training_algorithm.__init__" title="Link to this definition"></a></dt>
+<dd><p>Inicializa una nueva instancia de la clase Basic_optimizer_training_algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>epochs</strong> (<em>int</em>) – Número de épocas de entrenamiento.</p></li>
+<li><p><strong>loss_function</strong> (<em>torch.nn.functional</em>) – Función de pérdida a utilizar en el entrenamiento.</p></li>
+<li><p><strong>validation</strong> (<em>float</em>) – Proporción de los datos de entrenamiento a utilizar como datos de validación (Default: 0).</p></li>
+<li><p><strong>early_stopping</strong> (<a class="reference internal" href="early_stopping.html#neuro_fuzzy_toolbox.training.early_stopping.EarlyStopping" title="neuro_fuzzy_toolbox.training.early_stopping.EarlyStopping"><em>EarlyStopping</em></a>) – Mecanismo de Early Stopping a utilizar en el entrenamiento (Default: None).</p></li>
+<li><p><strong>optimizer</strong> (<em>torch.optim</em>) – Optimizador a utilizar en el entrenamiento (Default: torch.optim.Adam).</p></li>
+<li><p><strong>optimizer_params</strong> (<em>dict</em>) – Parámetros a utilizar en el optimizador (Default: {}).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="neuro_fuzzy_toolbox.training.training_algorithms.Hybrid_learning_algorithm">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neuro_fuzzy_toolbox.training.training_algorithms.</span></span><span class="sig-name descname"><span class="pre">Hybrid_learning_algorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stopping=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_params={}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/training/training_algorithms.html#Hybrid_learning_algorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.training.training_algorithms.Hybrid_learning_algorithm" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer" title="neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">base_model_trainer</span></code></a></p>
@@ -220,41 +264,6 @@ Retornar el test con los valores de test
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.training.training_algorithms.Optimizer_training">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neuro_fuzzy_toolbox.training.training_algorithms.</span></span><span class="sig-name descname"><span class="pre">Optimizer_training</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stopping=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_params={}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/training/training_algorithms.html#Optimizer_training"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.training.training_algorithms.Optimizer_training" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer" title="neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">base_model_trainer</span></code></a></p>
-<p>Clase para representar un algoritmo de entrenamiento por optimización para un modelo de aprendizaje automático.</p>
-<dl>
-<dt>Pseudocódigo:</dt><dd><div class="highlight-text notranslate"><div class="highlight"><pre><span></span>testes test:
-    Para cada test en test:
-        Calcular test de membresía usando la función de test
-        Guardar en el tensor de test
-Retornar el test con los valores de test
-</pre></div>
-</div>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.training.training_algorithms.Optimizer_training.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stopping=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_params={}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/training/training_algorithms.html#Optimizer_training.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.training.training_algorithms.Optimizer_training.__init__" title="Link to this definition"></a></dt>
-<dd><p>Inicializa una nueva instancia de la clase Optimizer_training.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>epochs</strong> (<em>int</em>) – Número de épocas de entrenamiento.</p></li>
-<li><p><strong>loss_function</strong> (<em>torch.nn.functional</em>) – Función de pérdida a utilizar en el entrenamiento.</p></li>
-<li><p><strong>validation</strong> (<em>float</em>) – Proporción de los datos de entrenamiento a utilizar como datos de validación (Default: 0).</p></li>
-<li><p><strong>early_stopping</strong> (<a class="reference internal" href="early_stopping.html#neuro_fuzzy_toolbox.training.early_stopping.EarlyStopping" title="neuro_fuzzy_toolbox.training.early_stopping.EarlyStopping"><em>EarlyStopping</em></a>) – Mecanismo de Early Stopping a utilizar en el entrenamiento (Default: None).</p></li>
-<li><p><strong>optimizer</strong> (<em>torch.optim</em>) – Optimizador a utilizar en el entrenamiento (Default: torch.optim.Adam).</p></li>
-<li><p><strong>optimizer_params</strong> (<em>dict</em>) – Parámetros a utilizar en el optimizador (Default: {}).</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neuro_fuzzy_toolbox.training.training_algorithms.</span></span><span class="sig-name descname"><span class="pre">base_model_trainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stopping=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_params={}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/training/training_algorithms.html#base_model_trainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -267,7 +276,7 @@ Retornar el test con los valores de test
 <p class="admonition-title">Note</p>
 <ul class="simple">
 <li><p>Las clases que hereden de esta clase deben implementar las funciones _update_parameters(model, loader) e init_optimizer(self, model, optimizer, optim_params).</p></li>
-<li><p>La función _update_parameters(model, loader) ejecuta la actualización de parámetros durante una sola época en el entrenamiento del modelo.</p></li>
+<li><p>La función _update_parameters(model, loader) ejecuta la actualización de parámetros durante una sola época el entrenamiento del modelo.</p></li>
 <li><p>La función init_optimizer(self, model, optimizer, optim_params) instancia el optimizador a utilizar durante el entrenamiento del modelo.</p></li>
 </ul>
 </div>

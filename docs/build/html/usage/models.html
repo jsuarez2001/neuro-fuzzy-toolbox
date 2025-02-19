@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="ANFIS homogéneo" href="models/h_anfis.html" />
-    <link rel="prev" title="Introducción" href="introduccion.html" /> 
+    <link rel="prev" title="Introduction" href="introduccion.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,6 +46,45 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../usage.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduccion.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models/h_anfis.html">ANFIS homogéneo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="models/h_anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models/h_anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models/h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models/h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="models/anfis.html">ANFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="models/anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models/anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models/anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models/anfis.html#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="training.html">Training</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="training/considerations.html">Consideraciones Iniciales</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="training/considerations.html#entrada-y-salida-de-los-modelos">Entrada y salida de los modelos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="training/considerations.html#dataloaders-de-pytorch">DataLoaders de PyTorch</a></li>
+<li class="toctree-l4"><a class="reference internal" href="training/considerations.html#validacion-y-test">Validación y Test</a></li>
+<li class="toctree-l4"><a class="reference internal" href="training/considerations.html#estructura-general">Estructura general</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="training/hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="training/hybrid_learning_algorithm.html#ejemplo-de-uso">Ejemplo de uso</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="training/optimizer_training.html">Optimizer Training Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="training/sonfis.html">SONFIS</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../modules.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../modules/func.html">Functions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../modules/func/membership.html">Membership Functions</a><ul>
@@ -121,37 +160,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="reference internal" href="../usage.html">Usage</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="introduccion.html">Introducción</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Models</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="models/h_anfis.html">ANFIS homogéneo</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="models/h_anfis.html#importacion">Importación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="models/h_anfis.html#instanciacion">Instanciación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="models/h_anfis.html#inicializacion-de-parametros">Inicialización de parámetros</a></li>
-<li class="toctree-l4"><a class="reference internal" href="models/h_anfis.html#metodo-predict-vs-forward">Método predict vs forward</a></li>
-<li class="toctree-l4"><a class="reference internal" href="models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
-<li class="toctree-l4"><a class="reference internal" href="models/h_anfis.html#problemas-multiclase">Problemas multiclase</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="models/rule_reduced_anfis.html">rule-reduced ANFIS</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="models/rule_reduced_anfis.html#instanciacion">Instanciación</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="models/anfis.html">ANFIS</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="models/anfis.html#importacion">Importación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="models/anfis.html#instanciacion">Instanciación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="models/anfis.html#parametros-de-los-antecedentes">Parámetros de los antecedentes</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="training.html">Training</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="training/hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a></li>
-<li class="toctree-l3"><a class="reference internal" href="training/sonfis.html">SONFIS</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
 </ul>
 
@@ -188,20 +196,17 @@
 <li class="toctree-l1"><a class="reference internal" href="models/h_anfis.html">ANFIS homogéneo</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="models/h_anfis.html#importacion">Importación</a></li>
 <li class="toctree-l2"><a class="reference internal" href="models/h_anfis.html#instanciacion">Instanciación</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models/h_anfis.html#inicializacion-de-parametros">Inicialización de parámetros</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models/h_anfis.html#metodo-predict-vs-forward">Método predict vs forward</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models/h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models/h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
 <li class="toctree-l2"><a class="reference internal" href="models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models/h_anfis.html#problemas-multiclase">Problemas multiclase</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="models/rule_reduced_anfis.html">rule-reduced ANFIS</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="models/rule_reduced_anfis.html#instanciacion">Instanciación</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models/anfis.html">ANFIS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="models/anfis.html#importacion">Importación</a></li>
 <li class="toctree-l2"><a class="reference internal" href="models/anfis.html#instanciacion">Instanciación</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models/anfis.html#parametros-de-los-antecedentes">Parámetros de los antecedentes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models/anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models/anfis.html#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
 </ul>
 </li>
 </ul>
@@ -212,7 +217,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="introduccion.html" class="btn btn-neutral float-left" title="Introducción" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="introduccion.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="models/h_anfis.html" class="btn btn-neutral float-right" title="ANFIS homogéneo" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

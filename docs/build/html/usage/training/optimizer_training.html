@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rule-reduced ANFIS &mdash; Neuro-Fuzzy Toolbox 0.0.1 documentation</title>
+  <title>Basic Optimizer Training Algorithm &mdash; Neuro-Fuzzy Toolbox 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
@@ -19,8 +19,8 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="ANFIS" href="anfis.html" />
-    <link rel="prev" title="ANFIS homogéneo" href="h_anfis.html" /> 
+    <link rel="next" title="SONFIS" href="sonfis.html" />
+    <link rel="prev" title="Hybrid Learning Algorithm" href="hybrid_learning_algorithm.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,6 +46,46 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../usage.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../introduccion.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../models/h_anfis.html">ANFIS homogéneo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../models/h_anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../models/h_anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../models/h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../models/h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../models/anfis.html">ANFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../models/anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../models/anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../models/anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../models/anfis.html#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="../training.html">Training</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="considerations.html">Consideraciones Iniciales</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="considerations.html#entrada-y-salida-de-los-modelos">Entrada y salida de los modelos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="considerations.html#dataloaders-de-pytorch">DataLoaders de PyTorch</a></li>
+<li class="toctree-l4"><a class="reference internal" href="considerations.html#validacion-y-test">Validación y Test</a></li>
+<li class="toctree-l4"><a class="reference internal" href="considerations.html#estructura-general">Estructura general</a></li>
+<li class="toctree-l4"><a class="reference internal" href="considerations.html#algortimos-de-entrenamiento">Algortimos de entrenamiento</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="hybrid_learning_algorithm.html#ejemplo-de-uso">Ejemplo de uso</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Basic Optimizer Training Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sonfis.html">SONFIS</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../modules/func.html">Functions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../modules/func/membership.html">Membership Functions</a><ul>
@@ -103,8 +143,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../modules/training/training_algorithms.html">Training Algorithms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Basic_optimizer_training_algorithm"><code class="docutils literal notranslate"><span class="pre">Basic_optimizer_training_algorithm</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Hybrid_learning_algorithm"><code class="docutils literal notranslate"><span class="pre">Hybrid_learning_algorithm</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Optimizer_training"><code class="docutils literal notranslate"><span class="pre">Optimizer_training</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer"><code class="docutils literal notranslate"><span class="pre">base_model_trainer</span></code></a></li>
 </ul>
 </li>
@@ -117,37 +157,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../modules/evaluation.html">Evaluation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../modules/evaluation.html#neuro_fuzzy_toolbox.evaluation.evaluator.get_measures"><code class="docutils literal notranslate"><span class="pre">get_measures()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1 current"><a class="reference internal" href="../../usage.html">Usage</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../introduccion.html">Introducción</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../models.html">Models</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="h_anfis.html">ANFIS homogéneo</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#importacion">Importación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#instanciacion">Instanciación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#inicializacion-de-parametros">Inicialización de parámetros</a></li>
-<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#metodo-predict-vs-forward">Método predict vs forward</a></li>
-<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
-<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#problemas-multiclase">Problemas multiclase</a></li>
-</ul>
-</li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">rule-reduced ANFIS</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#instanciacion">Instanciación</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="anfis.html">ANFIS</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="anfis.html#importacion">Importación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="anfis.html#instanciacion">Instanciación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="anfis.html#parametros-de-los-antecedentes">Parámetros de los antecedentes</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../training.html">Training</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../training/hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../training/sonfis.html">SONFIS</a></li>
 </ul>
 </li>
 </ul>
@@ -170,10 +179,10 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../usage.html">Usage</a></li>
-          <li class="breadcrumb-item"><a href="../models.html">Models</a></li>
-      <li class="breadcrumb-item active">rule-reduced ANFIS</li>
+          <li class="breadcrumb-item"><a href="../training.html">Training</a></li>
+      <li class="breadcrumb-item active">Basic Optimizer Training Algorithm</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/usage/models/rule_reduced_anfis.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/usage/training/optimizer_training.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -181,48 +190,17 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="rule-reduced-anfis">
-<span id="rule-reduced-anfis-usage"></span><h1>rule-reduced ANFIS<a class="headerlink" href="#rule-reduced-anfis" title="Link to this heading"></a></h1>
-<p>Modelo ANFIS con reglas reducidas. Es una variante del modelo ANFIS homogéneo (<a class="reference internal" href="../../modules/models/anfis.html#anfis"><span class="std std-ref">mas información de los modelos implementados.</span></a>) que reduce el número de reglas y, por ende, el número de parámetros concecuentes en el modelo ANFIS.</p>
-<p>A continuación se muestra una comparación entre el modelo ANFIS homogéneo y el modelo ANFIS con reglas reducidas, ambos con 2 reglas y 3 funciones de pertenencia por variable de entrada:</p>
-<ul class="simple">
-<li><p><strong>Modelo ANFIS homogéneo</strong></p></li>
-</ul>
-<figure class="align-center">
-<a class="reference internal image-reference" href="../../_images/h_anfis.png"><img alt="h_ANFIS example" src="../../_images/h_anfis.png" style="width: 600px;" />
-</a>
-</figure>
-<ul class="simple">
-<li><p><strong>Modelo rule-reduced ANFIS</strong></p></li>
-</ul>
-<figure class="align-center">
-<a class="reference internal image-reference" href="../../_images/rule_reduced_anfis.png"><img alt="Rule-Reduced ANFIS example" src="../../_images/rule_reduced_anfis.png" style="width: 600px;" />
-</a>
-</figure>
-<section id="instanciacion">
-<h2>Instanciación<a class="headerlink" href="#instanciacion" title="Link to this heading"></a></h2>
-<p>Para su instanciación, la clase h_ANFIS tiene un parámetro llamado <cite>rule_reduced</cite>, el cual debe ser establecido en <cite>True</cite> (Por defecto es <cite>False</cite>):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">neuro_fuzzy_toolbox</span><span class="w"> </span><span class="kn">import</span> <span class="n">h_ANFIS</span>
-
-<span class="n">x_train</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># ejemplo de datos de entrenamiento con 2 features</span>
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">h_ANFIS</span><span class="p">(</span>
-    <span class="n">input_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">num_mfs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">outputs</span><span class="o">=</span><span class="mi">1</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>Todos los métodos y herramientas presentados con el modelo ANFIS homogéneo (<a class="reference internal" href="h_anfis.html#h-anfis-usage"><span class="std std-ref">h_ANFIS</span></a>) son válidos para el modelo ANFIS con reglas reducidas, como las múltiples salidas y las aplicaciones a distintos tipos de problemas.</p>
-</section>
+  <section id="basic-optimizer-training-algorithm">
+<h1>Basic Optimizer Training Algorithm<a class="headerlink" href="#basic-optimizer-training-algorithm" title="Link to this heading"></a></h1>
+<p>Algoritmo de entrenamiento basado en optimizadores. Este es aplicable a cualquier modelo personalizado que herede de la clase base nn.Module de PyTorch.</p>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="h_anfis.html" class="btn btn-neutral float-left" title="ANFIS homogéneo" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="anfis.html" class="btn btn-neutral float-right" title="ANFIS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="hybrid_learning_algorithm.html" class="btn btn-neutral float-left" title="Hybrid Learning Algorithm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="sonfis.html" class="btn btn-neutral float-right" title="SONFIS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -64,3 +64,15 @@ def optimizer_training_epoch(model, loader, optimizer, loss_function):
         loss.backward()
         optimizer.step()
         
+        if torch.isnan(loss):
+            print("--- prem grads --- prem grads --- prem grads ----")
+            for i in range (model._input_size):
+                print(model._fuzzification_layer._premises[i].grad)
+                
+            print("")
+            print("--- prem param --- prem param --- prem param ----")
+            print(model.premises_structure)
+            print("")
+            
+            raise ValueError('Loss is NaN')
+        

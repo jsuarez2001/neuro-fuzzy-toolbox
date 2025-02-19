@@ -9,5 +9,4 @@ Esta sección contiene una guía sobre los modelos neurodifusos implementados en
    :maxdepth: 2
 
    models/h_anfis
-   models/rule_reduced_anfis
    models/anfis

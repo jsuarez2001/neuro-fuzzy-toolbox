@@ -17,7 +17,7 @@ class FiringLevelsLayer(nn.Module):
         """
         super(FiringLevelsLayer, self).__init__()
         self._firing_level_mask = (torch.arange(mf_distribution.max()).unsqueeze(1) < mf_distribution).t()
-        self._rules = mf_distribution.sum()
+        self._rules = mf_distribution.prod()
 
     def forward(self, membership_values):
         """
@@ -49,7 +49,10 @@ class h_FiringLevelsLayer(nn.Module):
             rule_reduced (bool): Indica si se deben reducir las reglas para realizar el cálculo de los niveles de disparo (Default: False).
         """
         super(h_FiringLevelsLayer, self).__init__()
-        self._rule_reduced = rule_reduced
+        if rule_reduced:
+            self._get_firing_levels = lambda membership_values: membership_values.prod(dim=membership_values.dim()-2)
+        else:
+            self._get_firing_levels = lambda membership_values: torch.cat([torch.cartesian_prod(*torch.unbind(t, dim=0)).prod(dim=-1) for t in membership_values]).reshape(-1, membership_values.shape[-1]**membership_values.shape[-2])
 
     def forward(self, membership_values):
         """
@@ -62,11 +65,7 @@ class h_FiringLevelsLayer(nn.Module):
             torch.Tensor: Tensor de tamaño (batch_size, num_mfs^input_size) que contiene los niveles de disparo. Si es 'rule_reduced' es True, el tamaño será (batch_size, num_mfs).
             
         """
-        if self._rule_reduced:
-            w = membership_values.prod(dim=membership_values.dim()-2)
-        else:
-            w = torch.cat([torch.cartesian_prod(*torch.unbind(t, dim=0)).prod(dim=-1) for t in membership_values]).reshape(-1, membership_values.shape[-1]**membership_values.shape[-2])
-        return w
+        return self._get_firing_levels(membership_values)
 
 
 

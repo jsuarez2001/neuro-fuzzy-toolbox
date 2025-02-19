@@ -43,6 +43,46 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/introduccion.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/h_anfis.html">ANFIS homogéneo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/anfis.html">ANFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/training.html">Training</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/training/considerations.html">Consideraciones Iniciales</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/training/considerations.html#entrada-y-salida-de-los-modelos">Entrada y salida de los modelos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/training/considerations.html#dataloaders-de-pytorch">DataLoaders de PyTorch</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/training/considerations.html#validacion-y-test">Validación y Test</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/training/considerations.html#estructura-general">Estructura general</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/training/considerations.html#algortimos-de-entrenamiento">Algortimos de entrenamiento</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/training/hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/training/hybrid_learning_algorithm.html#ejemplo-de-uso">Ejemplo de uso</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/training/optimizer_training.html">Basic Optimizer Training Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/training/sonfis.html">SONFIS</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../modules/func.html">Functions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/func/membership.html">Membership Functions</a><ul>
@@ -100,8 +140,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/training/training_algorithms.html">Training Algorithms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Basic_optimizer_training_algorithm"><code class="docutils literal notranslate"><span class="pre">Basic_optimizer_training_algorithm</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Hybrid_learning_algorithm"><code class="docutils literal notranslate"><span class="pre">Hybrid_learning_algorithm</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Optimizer_training"><code class="docutils literal notranslate"><span class="pre">Optimizer_training</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer"><code class="docutils literal notranslate"><span class="pre">base_model_trainer</span></code></a></li>
 </ul>
 </li>
@@ -114,37 +154,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../modules/evaluation.html">Evaluation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/evaluation.html#neuro_fuzzy_toolbox.evaluation.evaluator.get_measures"><code class="docutils literal notranslate"><span class="pre">get_measures()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../usage/introduccion.html">Introducción</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../usage/models.html">Models</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/h_anfis.html">ANFIS homogéneo</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#importacion">Importación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#inicializacion-de-parametros">Inicialización de parámetros</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#metodo-predict-vs-forward">Método predict vs forward</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#problemas-multiclase">Problemas multiclase</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/rule_reduced_anfis.html">rule-reduced ANFIS</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/rule_reduced_anfis.html#instanciacion">Instanciación</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/anfis.html">ANFIS</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#importacion">Importación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#instanciacion">Instanciación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#parametros-de-los-antecedentes">Parámetros de los antecedentes</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../usage/training.html">Training</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../usage/training/hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../usage/training/sonfis.html">SONFIS</a></li>
 </ul>
 </li>
 </ul>
@@ -198,7 +207,7 @@
 <span class="sd">        </span>
 <span class="sd">    Note:</span>
 <span class="sd">        - Las clases que hereden de esta clase deben implementar las funciones _update_parameters(model, loader) e init_optimizer(self, model, optimizer, optim_params).</span>
-<span class="sd">        - La función _update_parameters(model, loader) ejecuta la actualización de parámetros durante una sola época en el entrenamiento del modelo.</span>
+<span class="sd">        - La función _update_parameters(model, loader) ejecuta la actualización de parámetros durante una sola época el entrenamiento del modelo.</span>
 <span class="sd">        - La función init_optimizer(self, model, optimizer, optim_params) instancia el optimizador a utilizar durante el entrenamiento del modelo.</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -439,6 +448,28 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">optimizer</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_premises_as_parameters_list</span><span class="p">(),</span> <span class="o">**</span><span class="n">optim_params</span><span class="p">)</span>
     
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_premises_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Actualiza los parámetros de los antecedentes del modelo ANFIS.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            ANFISmodel (ANFIS | h_ANFIS): Modelo ANFIS a entrenar.</span>
+<span class="sd">            loader (DataLoader): DataLoader con los datos de entrenamiento.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">optimizer_training_epoch</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">)</span>
+        
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_consequents_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Actualiza los parámetros consecuentes del modelo ANFIS.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            ANFISmodel (ANFIS | h_ANFIS): Modelo ANFIS a entrenar.</span>
+<span class="sd">            loader (DataLoader): DataLoader con los datos de entrenamiento.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="n">classical_consequents_estimation_with_OLS</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">))</span>
+    
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -448,17 +479,17 @@
 <span class="sd">            ANFISmodel (ANFIS | h_ANFIS): Modelo ANFIS a entrenar.</span>
 <span class="sd">            loader (DataLoader): DataLoader con los datos de entrenamiento.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="n">classical_consequents_estimation_with_OLS</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">))</span>
-        <span class="n">optimizer_training_epoch</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_consequents_update</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_premises_update</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span></div>
 
 
 
 
-<div class="viewcode-block" id="Optimizer_training">
-<a class="viewcode-back" href="../../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Optimizer_training">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Optimizer_training</span><span class="p">(</span><span class="n">base_model_trainer</span><span class="p">):</span>
+<div class="viewcode-block" id="Basic_optimizer_training_algorithm">
+<a class="viewcode-back" href="../../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Basic_optimizer_training_algorithm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Basic_optimizer_training_algorithm</span><span class="p">(</span><span class="n">base_model_trainer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Clase para representar un algoritmo de entrenamiento por optimización para un modelo de aprendizaje automático.</span>
+<span class="sd">    Clase para representar un algoritmo de entrenamiento por optimización para un modelo de aprendizaje automático. Solo permite entrenar modelos de aprendizaje automático con un solo optimizador para todos los parámetros del modelo.</span>
 <span class="sd">    </span>
 <span class="sd">    Pseudocódigo:</span>
 <span class="sd">        .. code-block:: text</span>
@@ -470,11 +501,11 @@
 <span class="sd">            Retornar el test con los valores de test</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
-<div class="viewcode-block" id="Optimizer_training.__init__">
-<a class="viewcode-back" href="../../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Optimizer_training.__init__">[docs]</a>
+<div class="viewcode-block" id="Basic_optimizer_training_algorithm.__init__">
+<a class="viewcode-back" href="../../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Basic_optimizer_training_algorithm.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">loss_function</span><span class="p">,</span> <span class="n">validation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">early_stopping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">,</span> <span class="n">optimizer_params</span><span class="o">=</span><span class="p">{}):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Inicializa una nueva instancia de la clase Optimizer_training.</span>
+<span class="sd">        Inicializa una nueva instancia de la clase Basic_optimizer_training_algorithm.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            epochs (int): Número de épocas de entrenamiento.</span>

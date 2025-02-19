@@ -20,14 +20,32 @@ Se importará la clase **h_ANFIS** y la función de membresía **Gaussian_MF** p
     from neuro_fuzzy_toolbox import h_ANFIS, Gaussian_MF
     import torch
 
-.. code-block:: python
-
-    # Se simulará un conjunto de datos de entrada con 3 features
-    x_train = 2 * torch.rand(200, 3) - 1
-
 
 Instanciación
 -------------
+Los parámetros a tomar en cuenta para instanciar un modelo h_ANFIS son los siguientes:
+
+- **input_size**: Número de features de los datos de entrada.
+- **num_mfs**: Número de funciones de membresía para cada feature.
+- **outputs**: Número de salidas del modelo. Por defecto es 1.
+- **membership_function**: Función de membresía a utilizar. Puede ser Gaussian_MF, GeneralizedBell_MF. Por defecto es GeneralizedBell_MF.
+- **output_type**: Tipo de salida del modelo. Puede ser 'regression', 'binary' o 'multiclass'. Por defecto es 'regression'.
+- **rule_reduced**: Booleano que indica si se quiere instanciar un modelo h_ANFIS con reglas reducidas. Por defecto es False. Más detalles en :ref:`rule-reduced ANFIS <rule-reduced ANFIS>`.
+- **dtype**: Tipo de dato de los tensores que contienen los parámetros del modelo. Por defecto es torch.float32.
+
+.. note::
+
+    Con respecto al parámetro **output_type**, se debe tener en cuenta que el modelo se comportará de manera distinta dependiendo del mismo. 
+    Por ejemplo, si se instancia un modelo con **output_type='binary'**, el modelo se comportará como un clasificador binario, mientras que si se instancía 
+    con **output_type='multiclass'**, el modelo se comportará como un clasificador multiclase. Más detalles en :ref:`Salida binaria y multiclase <Salida binaria y multiclase>`.
+
+Se utilizarán datos de entrenamiento generados aleatoriamente para el ejemplo a continuación.
+
+.. code-block:: python
+
+    # Se simulará un conjunto de datos de 200 muestras con 3 features
+    x_train = 2 * torch.rand(200, 3) - 1 # la dimensión debe ser (200, 3)
+
 A continuación se instancia un modelo h_ANFIS con 3 funciones de membresía para cada feature de los datos de entrada y con una salida. Se mostrarán todos los parámetros relevantes para instanciar la clase.
 
 .. code-block:: python
@@ -40,11 +58,11 @@ A continuación se instancia un modelo h_ANFIS con 3 funciones de membresía par
         output_type='regression', # Tipo de salida: regresión
     )
 
+Algunos métodos útiles
+----------------------
 
-.. note::
-
-    Por defecto, la función de membresía es GeneralizedBell_MF, pero se trabajará con Gaussian_MF en este ejemplo. para más detalles sobre las funciones de membresía, ver :ref:`Membership Functions <Membership Functions>`.
-
+plot_premises
+~~~~~~~~~~~~~
 El método *plot_premises()* permite visualizar las funciones de membresía de los antecedentes del modelo.
 
 .. code-block:: python
@@ -62,8 +80,9 @@ El método *plot_premises()* permite visualizar las funciones de membresía de l
 .. image:: ../../_static/h_anfis_plot_premises_grouped.png
     :align: center
 
-Inicialización de parámetros
-----------------------------
+
+init_premises
+~~~~~~~~~~~~~
 Ahora mismo el modelo se encuentra con todos sus parámetros inicializados aleatoriamente.
 En caso de que se estime conveniente, es posible inicializar los parámetros de los antecedentes en base a los datos con los que se trabajará:
 
@@ -77,6 +96,8 @@ En caso de que se estime conveniente, es posible inicializar los parámetros de 
 .. image:: ../../_static/h_anfis_plot_init_premises_grouped.png
     :align: center
 
+show_premises_structure, premises_structure y get_premises
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Para visualizar los parámetros en cuestión se puede utilizar el método **show_premises_structure()**, el cual imprime por pantalla un dataframe con los valores de los parámetros de las funciones de membresía:
 
 .. code-block:: python
@@ -90,11 +111,35 @@ Para visualizar los parámetros en cuestión se puede utilizar el método **show
     MF 1  0.004761    0.497452  0.002970    0.494897  0.005518    0.494364
     MF 2  0.999665    0.497452  0.992764    0.494897  0.994247    0.494364
 
-El método **model.premises_structure** retorna el dataframe correspondiente, mientras que el método **model.get_premises()** retorna un tensor con los valores correspondientes.
+El método **model.premises_structure** retorna el dataframe correspondiente.
 
+Por otro lado, **model.get_premises()** retorna un tensor que contiene estos parámetros (como están almacenados en el modelo):
+
+.. code-block:: python
+
+    model.get_premises()
+
+.. code-block:: python
+
+    tensor([[[-0.9869,  0.4963],
+             [ 0.0056,  0.4963],
+             [ 0.9981,  0.4963]],
+
+            [[-0.9966,  0.4973],
+             [-0.0021,  0.4973],
+             [ 0.9924,  0.4973]],
+
+            [[-0.9920,  0.4968],
+             [ 0.0015,  0.4968],
+             [ 0.9951,  0.4968]]])
+
+.. note::
+
+    La dimensión del tensor es (input_size, num_mfs, 2), donde input_size es el número de features de los datos de entrada, num_mfs es el número de funciones de membresía y 2 corresponde a los parámetros mu y sigma de las funciones de membresía (Gaussian_MF).
+
+show_consequents_structure, consequents_structure y get_consequents
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 En cuanto a los consecuentes, hay métodos análogos a los de los antecedentes: **show_consequents_structure()**, **model.consequents_structure** y **get_consequents()**. 
-
-La única diferencia es que, en el caso del método **model.consequents_structure**, se retorna una lista con los dataframe correspondientes a cada una de las salidas del modelo. En este caso, como solo hay una salida, se retorna una lista con un solo dataframe.
 
 .. code-block:: python
 
@@ -132,9 +177,10 @@ La única diferencia es que, en el caso del método **model.consequents_structur
     rule 26 -0.872414  0.364831  0.624177  0.791676
     rule 27  0.880137 -0.213823 -0.404114 -0.578382
 
-Método predict vs forward
---------------------------
+La única diferencia es que, en el caso del método **model.consequents_structure**, se retorna una lista con los dataframe correspondientes a cada una de las salidas del modelo. En este caso, como solo hay una salida, se retorna una lista con un solo dataframe.
 
+forward
+~~~~~~~
 El método **forward** permite obtener la salida del modelo para un conjunto de datos de entrada en forma de un tensor de PyTorch. Este método genera el grafo de cómputo de PyTorch, lo que permite realizar backpropagation y entrenar el modelo.
 
 .. code-block:: python
@@ -143,7 +189,11 @@ El método **forward** permite obtener la salida del modelo para un conjunto de 
 
 .. code-block:: python
 
-    tensor([ 0.3339, -0.0306, -0.1787, -0.3885,  0.7853, -0.6146,  0.0076, -0.4021, -0.1976,  0.3151], grad_fn=<SqueezeBackward1>)
+    tensor([ 0.0515,  0.2146,  0.5617,  0.2492,  0.4197,  0.1205,  0.0435,  0.2851, 0.1256, -0.3293], grad_fn=<SqueezeBackward1>)
+
+.. note::
+
+    El método se comporta de diferente manera dependiendo del tipo de salida del modelo (especificado por el parámetro *output_type*).
 
 Para evitar generar el grafo de cómputo de PyTorch, se puede utilizar el método **no_grad** de PyTorch.
 
@@ -156,19 +206,161 @@ Para evitar generar el grafo de cómputo de PyTorch, se puede utilizar el métod
 
 .. code-block:: python
     
-    tensor([ 0.3339, -0.0306, -0.1787, -0.3885,  0.7853, -0.6146,  0.0076, -0.4021, -0.1976,  0.3151])
+    tensor([ 0.0515,  0.2146,  0.5617,  0.2492,  0.4197,  0.1205,  0.0435,  0.2851, 0.1256, -0.3293])
 
-El método **predict** retorna la predicción del modelo para un conjunto de datos de entrada en forma de un array de numpy sin generar el grafo de cómputo de PyTorch (como lo hace el método forward). Dependiendo del tipo de salida del modelo se realizan ciertas operaciones para entregar el resultado.
+predict
+~~~~~~~
+El método **predict** retorna la predicción del modelo para un conjunto de datos de entrada en forma de un array de numpy sin generar el grafo de cómputo de PyTorch 
+(como lo hace el método forward). Dependiendo del tipo de salida del modelo se realizan ciertas operaciones especiales para entregar el resultado.
 
 .. code-block:: python
 
-    pred = model.predict(x)
+    model.predict(x)
 
-Si el modelo es de tipo:
+.. code-block:: python
 
-- Regresión: Se retorna el valor de la salida directamente.
-- Clasificación binaria: Se retorna 1 si la probabilidad de la clase positiva es mayor a 0.5, 0 en caso contrario. (La salida pasa por una función sigmoide).
-- Clasificación multiclase: Se retorna el índice de la clase con mayor probabilidad. (La salida pasa por una función softmax y posteriormente se elige la clase con mayor probabilidad).
+    array([ 0.05152027,  0.2146402 ,  0.561749  ,  0.24923508,  0.4197383 , 0.12053609,  0.04348549,  0.28514066,  0.12556443, -0.32934883], dtype=float32)
+
+.. _Salida binaria y multiclase:
+
+Salida binaria y multiclase
+---------------------------
+El modelo h_ANFIS puede ser instanciado con distintos tipos de salida según el parámetro *output_type*, si es:
+
+- **'regression'**: El modelo se comportará como un regresor (modelo por defecto).
+- **'binary'**: El modelo se comportará como un clasificador binario.
+- **'multiclass'**: El modelo se comportará como un clasificador multiclase.
+
+Esto cambia la estructura del modelo y la forma en que se obtienen las predicciones. A continuación se detallará cómo instanciar el modelo para cada uno de estos casos.
+
+Salida binaria
+~~~~~~~~~~~~~~
+Si se especifica 'binary' como tipo de salida, el modelo se comportará como un clasificador binario. En este caso, se le añadirá una última capa sigmoide al modelo, por lo que su salida (método forward) será un número entre 0 y 1.
+
+.. code-block:: python
+
+    # Se simulará un conjunto de datos de 200 muestras con 2 features
+    x_train = 2 * torch.rand(200, 2) - 1 # la dimensión debe ser (200, 2)
+
+Se inicializa el modelo con 2 funciones de membresía para cada feature de los datos de entrada y con una salida binaria.
+
+.. code-block:: python
+
+    model = h_ANFIS(
+        input_size=x_train.shape[1], # 2 features
+        num_mfs=2, # 2 funciones de membresía
+        outputs=1, # 1 salida
+        output_type='binary', # Tipo de salida: clasificación binaria
+    )
+
+La salida del modelo (método forward) se vería de la siguiente manera:
+
+.. code-block:: python
+
+    model(x_train[:10])
+
+.. code-block:: python
+
+    tensor([0.4850, 0.4174, 0.5303, 0.5792, 0.5409, 0.3680, 0.4975, 0.5391, 0.4606, 0.5040], grad_fn=<SigmoidBackward0>)
+
+El método *predict* retornará 1 si la probabilidad de la clase positiva es mayor a 0.5, 0 en caso contrario:
+
+.. code-block:: python
+
+    model.predict(x_train[:10])
+
+.. code-block:: python
+
+    array([0, 0, 1, 1, 1, 0, 0, 1, 0, 1])
+
+Salida multiclase
+~~~~~~~~~~~~~~~~~
+Si se especifica 'multiclass' como tipo de salida, el modelo se comportará como un clasificador multiclase. En este caso, el método *forward* tendrá un parámetro adicional llamado *return_probabilities* que, si es True, retornará las probabilidades de las clases (las salidas pasarán por una función softmax), en caso contrario, retornará los logits sin normalizar de las clases.
+En este caso, se debe especificar el número de clases en el parámetro *outputs*.
+
+.. code-block:: python
+
+    # Se simulará un conjunto de datos de 200 muestras con 3 features
+    x_train = 2 * torch.rand(200, 3) - 1 # la dimensión debe ser (200, 3)
+
+Se inicializa el modelo con 2 funciones de membresía para cada feature de los datos de entrada y con una salida binaria.
+
+.. code-block:: python
+
+    model = h_ANFIS(
+        input_size=x_train.shape[1], # 3 features
+        num_mfs=3, # 3 funciones de membresía
+        outputs=4, # 4 clases
+        membership_function=Gaussian_MF, # Función de membresía gaussiana
+        output_type='multiclass', # Tipo de salida: clasificación multiclase
+    )
+
+La salida del modelo (método forward) serán los logits de cada clase:
+
+.. code-block:: python
+
+    model(x_train[:10])
+
+.. code-block:: python
+
+    tensor([[ 0.4425,  0.2284,  0.3152,  0.1618],
+            [ 0.3934,  0.1950,  0.3640,  0.2418],
+            [ 0.2840,  0.2651,  0.3129,  0.1921],
+            [ 0.2482,  0.5278,  0.3655, -0.7933],
+            [ 0.0890,  0.1157,  0.2529,  0.0178],
+            [ 0.1855,  0.2477,  0.2571, -0.1530],
+            [ 0.4424, -0.0780,  0.4180,  0.2541],
+            [ 0.2046,  0.4696,  0.2142,  0.0049],
+            [ 0.4243, -0.0578,  0.3322,  0.1703],
+            [ 0.5209,  0.3951,  0.3004,  0.5666]], grad_fn=<SqueezeBackward1>)
+
+Si se especifica *return_probabilities=True* en este método, se retornarán las probabilidades de las clases (pasa por una función softmax):
+
+.. code-block:: python
+
+    model(x_train[:10], return_probabilities=True)
+
+.. code-block:: python
+
+    tensor([[0.2905, 0.2345, 0.2557, 0.2194],
+            [0.2739, 0.2247, 0.2660, 0.2354],
+            [0.2549, 0.2501, 0.2624, 0.2325],
+            [0.2632, 0.3480, 0.2959, 0.0929],
+            [0.2418, 0.2483, 0.2848, 0.2251],
+            [0.2597, 0.2763, 0.2789, 0.1851],
+            [0.2942, 0.1749, 0.2871, 0.2437],
+            [0.2420, 0.3154, 0.2443, 0.1982],
+            [0.3026, 0.1868, 0.2759, 0.2347],
+            [0.2680, 0.2364, 0.2150, 0.2806]], grad_fn=<SoftmaxBackward0>)
+
+El método *predict* retornará el índice de la clase con mayor probabilidad:
+
+.. code-block:: python
+
+    model.predict(x_train[:10])
+
+.. code-block:: python
+
+    array([0, 0, 2, 1, 2, 2, 0, 1, 0, 3])
+
+.. tip::
+    
+    El valor 'multiclass' junto con la multiple salida se puede usar para clasificación binaria de todas maneras (con 2 outputs), la diferencia estará en la estructura interna del modelo, pues tendrá conjuntos de parámetros concecuentes distintos para cada salida:
+
+    .. figure:: ../../_static/2_output_anfis.png
+        :align: center
+        :width: 600px
+        :alt: binary class example 1
+    
+    Si se usa 'binary' con 1 output, el modelo tendrá una capa sigmoide al final y 1 un conjunto de parámetros consecuentes para la salida en cuestión.
+
+    .. figure:: ../../_static/1_output_binary_anfis.png
+        :align: center
+        :width: 600px
+        :alt: binary class example 2
+    
+    Sin embargo la aplicación es la misma, queda en el criterio del usuario decidir cuál usar.
+
 
 Múltiples salidas
 -----------------
@@ -176,15 +368,21 @@ La única diferencia en la arquitectura del modelo al trabajar con múltiples sa
 
 .. code-block:: python
 
-    x_train = 2 * torch.rand(200, 2) - 1 # ejemplo de datos de entrenamiento con 2 features
+    # Se simulará un conjunto de datos de 200 muestras con 2 features
+    x_train = 2 * torch.rand(200, 2) - 1 # la dimensión debe ser (200, 2)
 
+.. code-block:: python
+
+    # Se instancía un modelo para un problema de regresión con 3 funciones de membresía para cada feature de los datos de entrada y con 2 salidas
     model = h_ANFIS(
-        input_size=x_train.shape[1], # 3 features
+        input_size=x_train.shape[1], # 2 features
         num_mfs=3, # 3 funciones de membresía
         outputs=2, # 2 salidas
         membership_function=Gaussian_MF, # Función de membresía gaussiana
         output_type='regression', # Tipo de salida: regresión
     )
+
+Por cada salida se generará un conjunto de parámetros concecuentes:
 
 .. code-block:: python
 
@@ -217,7 +415,7 @@ La única diferencia en la arquitectura del modelo al trabajar con múltiples sa
     rule 8 -0.063006 -0.112478 -0.040473
     rule 9  0.690270  0.598800 -0.420998
 
-Ahora la salida del modelo se vería de la siguiente manera:
+Ahora la salida del modelo será de dimensión (batch_size, outputs):
 
 .. code-block:: python
 
@@ -236,71 +434,71 @@ Ahora la salida del modelo se vería de la siguiente manera:
             [ 0.0827,  0.1670],
             [-0.2726,  0.4799]], grad_fn=<SqueezeBackward1>)
 
-Problemas multiclase
---------------------
+.. tip::
 
-Para trabajar con clasificación multiclase, se debe instanciar el modelo con el parámetro *output_type='multiclass'* y el número de clases correspondientes al problema se deben especificar en el parámetro *outputs*.
+    El modelo también debería ser aplicable a problemas multilabel, bastaría con usar **output_type='binary'** con múltiples salidas.
 
-Suponiendo que se cuenta con un problema de 3 clases, la instanciación del modelo sería la siguiente:
+    .. figure:: ../../_static/multilabel_anfis.png
+        :align: center
+        :width: 600px
+        :alt: multilabel example
+
+    De esta manera se permitirían salidas en las que más de una clase sea detectada. Pero queda a criterio del usuario decidir si usar este enfoque o varios modelos de tipo 'multiclass' paralelamente.
+
+
+.. _rule-reduced ANFIS:
+
+rule-reduced ANFIS
+==================
+Modelo ANFIS con reglas reducidas. Es una variante del modelo ANFIS homogéneo que reduce el número de reglas y, por ende, el número de parámetros concecuentes en el modelo.
+
+A continuación se muestra una comparación entre el modelo ANFIS homogéneo y el modelo ANFIS con reglas reducidas, ambos con 2 features y 3 funciones de pertenencia por dimensión en los datos de entrada:
+
+- **Modelo ANFIS homogéneo**
+
+.. figure:: ../../_static/h_anfis.png
+   :align: center
+   :width: 600px
+   :alt: h_ANFIS example
+
+- **Modelo rule-reduced ANFIS**
+
+.. figure:: ../../_static/rule_reduced_anfis.png
+   :align: center
+   :width: 600px
+   :alt: Rule-Reduced ANFIS example
+
+Para su instanciación, la clase h_ANFIS tiene un parámetro llamado `rule_reduced`, el cual debe ser establecido en `True` (Por defecto es `False`):
 
 .. code-block:: python
 
-    x_train = 2 * torch.rand(200, 2) - 1 # ejemplo de datos de entrenamiento con 2 features
+    from neuro_fuzzy_toolbox import h_ANFIS
+
+    # Se simulará un conjunto de datos de 200 muestras con 2 features
+    x_train = 2 * torch.rand(200, 2) - 1 # la dimensión debe ser (200, 2)
+
+.. code-block:: python
 
     model = h_ANFIS(
-        input_size=x_train.shape[1], # 3 features
-        num_mfs=2, # 2 funciones de membresía
-        outputs=3, # 3 salidas
-        membership_function=Gaussian_MF, # Función de membresía gaussiana
-        output_type='multiclass', # Tipo de salida: clasificación multiclase
+        input_size=2,
+        num_mfs=3,
+        outputs=1,
+        rule_reduced=True
     )
 
-Una comparación de las posibles salidas del método forward y el método predict se puede ver a continuación: 
-
-- **forward**: Retorna los logits sin normalizar de las clases.
+Los parámetros concecuentes generados por el modelo ANFIS con reglas reducidas serán claramente menores que los generados por el modelo ANFIS homogéneo:
 
 .. code-block:: python
 
-    model(x_train[:10])
+    model.show_consequents_structure()
 
 .. code-block:: python
 
-    tensor([[-0.5759,  0.9541,  0.2970],
-            [-0.2917,  0.4547, -0.9439],
-            [ 0.5124, -0.6826, -0.3454],
-            [-0.8390,  0.9174, -0.9471],
-            [-0.9870,  1.0792, -0.8661],
-            [-1.7170,  1.9342, -0.3654],
-            [-0.0322,  0.5905,  0.7484],
-            [ 0.1828, -0.0688, -1.1221],
-            [-0.4592,  0.7823, -0.2416],
-            [-0.3206,  0.5607, -0.6278]], grad_fn=<SqueezeBackward1>)
+    - Output 1:
+             c0 (x0)   c1 (x1)        c2
+    rule 1 -0.729495 -0.345188  0.441197
+    rule 2  0.894614  0.420384 -0.635486
+    rule 3  0.235036 -0.248037  0.702353
 
-- **forward con return_probabilities=True**: Retorna las probabilidades de las clases (los logits son pasados por una función softmax).
+Todos los métodos y herramientas presentados con el modelo ANFIS homogéneo (:ref:`h_ANFIS <h_ANFIS usage>`) son válidos para el modelo ANFIS con reglas reducidas, como las múltiples salidas y las aplicaciones a distintos tipos de problemas.
 
-.. code-block:: python
-
-    model(x_train[:10], return_probabilities=True)
-
-.. code-block:: python
-
-    tensor([[0.1248, 0.5764, 0.2988],
-            [0.2755, 0.5811, 0.1435],
-            [0.5791, 0.1753, 0.2456],
-            [0.1301, 0.7532, 0.1167],
-            [0.0998, 0.7876, 0.1126],
-            [0.0231, 0.8879, 0.0891],
-            [0.1981, 0.3693, 0.4325],
-            [0.4881, 0.3795, 0.1324],
-            [0.1753, 0.6067, 0.2179],
-            [0.2410, 0.5817, 0.1772]], grad_fn=<SoftmaxBackward0>)
-
-- **predict**: Retorna la predicción del modelo en forma de array de numpy (los índices correspondientes a la clase con mayor probabilidad)
-
-.. code-block:: python
-
-    model.predict(x_train[:10])
-
-.. code-block:: python
-
-    array([1, 1, 0, 1, 1, 1, 2, 0, 1, 1])

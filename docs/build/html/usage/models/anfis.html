@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Training" href="../training.html" />
-    <link rel="prev" title="rule-reduced ANFIS" href="rule_reduced_anfis.html" /> 
+    <link rel="prev" title="ANFIS homogéneo" href="h_anfis.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,6 +46,45 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../usage.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../introduccion.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../models.html">Models</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="h_anfis.html">ANFIS homogéneo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ANFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../training.html">Training</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../training/considerations.html">Consideraciones Iniciales</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../training/considerations.html#entrada-y-salida-de-los-modelos">Entrada y salida de los modelos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../training/considerations.html#dataloaders-de-pytorch">DataLoaders de PyTorch</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../training/considerations.html#validacion-y-test">Validación y Test</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../training/considerations.html#estructura-general">Estructura general</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../training/hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../training/hybrid_learning_algorithm.html#ejemplo-de-uso">Ejemplo de uso</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../training/optimizer_training.html">Optimizer Training Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../training/sonfis.html">SONFIS</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../modules/func.html">Functions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../modules/func/membership.html">Membership Functions</a><ul>
@@ -121,37 +160,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="reference internal" href="../../usage.html">Usage</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../introduccion.html">Introducción</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../models.html">Models</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="h_anfis.html">ANFIS homogéneo</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#importacion">Importación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#instanciacion">Instanciación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#inicializacion-de-parametros">Inicialización de parámetros</a></li>
-<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#metodo-predict-vs-forward">Método predict vs forward</a></li>
-<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
-<li class="toctree-l4"><a class="reference internal" href="h_anfis.html#problemas-multiclase">Problemas multiclase</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="rule_reduced_anfis.html">rule-reduced ANFIS</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="rule_reduced_anfis.html#instanciacion">Instanciación</a></li>
-</ul>
-</li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">ANFIS</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#importacion">Importación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#instanciacion">Instanciación</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#parametros-de-los-antecedentes">Parámetros de los antecedentes</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../training.html">Training</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../training/hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../training/sonfis.html">SONFIS</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
 </ul>
 
@@ -198,63 +206,175 @@
 </section>
 <section id="instanciacion">
 <h2>Instanciación<a class="headerlink" href="#instanciacion" title="Link to this heading"></a></h2>
-<p>Considerando que se tiene datos de entrada con 3 features:</p>
+<p>Los parámetros a tomar en cuenta para instanciar un modelo ANFIS son los siguientes:</p>
+<ul class="simple">
+<li><p><strong>mf_distribution</strong>: Lista que contiene el número de funciones de membresía para cada feature de los datos de entrada.</p></li>
+<li><p><strong>outputs</strong>: Número de salidas del modelo. Por defecto es 1.</p></li>
+<li><p><strong>membership_function</strong>: Función de membresía a utilizar. Puede ser Gaussian_MF, GeneralizedBell_MF. Por defecto es GeneralizedBell_MF.</p></li>
+<li><p><strong>output_type</strong>: Tipo de salida del modelo. Puede ser ‘regression’, ‘binary’ o ‘multiclass’. Por defecto es ‘regression’.</p></li>
+<li><p><strong>dtype</strong>: Tipo de dato de los tensores que contienen los parámetros del modelo. Por defecto es torch.float32.</p></li>
+</ul>
+<p>Considerando que se tiene datos con 3 features por ejemplo:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x_train</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 </pre></div>
 </div>
-<p>Antes de instanciar el modelo como tal, se debe definir la estructura de las funciones de membresía para cada feature de los datos de entrada. Para ello, se debe definir una lista, que contenga el número de funciones de membresía para cada feature.
+<p>Antes de instanciar el modelo como tal, se debe definir la estructura de las funciones de membresía.
+Para ello, se debe definir una lista que contenga el número de funciones de membresía para cada feature.
 Por ejemplo:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mf_distribution</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mf_distribution</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>En este caso, se está definiendo que el primer feature tiene 3 funciones de membresía, el segundo 2 y el tercero 4.</p>
-<p>Luego, se puede instanciar el modelo utilizando la distribución definida.
-Tener presente que el manejo de los tipos de salida (y su cantidad) es el mismo que en el modelo homogéneo (<a class="reference internal" href="h_anfis.html#h-anfis-usage"><span class="std std-ref">h_ANFIS</span></a>).</p>
-<p>Por ejemplo:</p>
-<ul class="simple">
-<li><p><strong>Modelo ANFIS con 2 salidas para problemas de regresión</strong></p></li>
-</ul>
+<p>En este caso, se establece que el primer y tercer feature tienen 3 funciones de membresía, mientras que el segundo tiene 2.</p>
+<p>Luego, se puede instanciar el modelo utilizando la distribución definida:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">ANFIS</span><span class="p">(</span>
-    <span class="n">mf_distribution</span><span class="o">=</span><span class="n">mf_distribution</span><span class="p">,</span>
-    <span class="n">outputs</span><span class="o">=</span><span class="mi">2</span>
+    <span class="n">mf_distribution</span><span class="o">=</span><span class="n">mf_distribution</span>
 <span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="algunos-metodos-utiles">
+<h2>Algunos métodos útiles<a class="headerlink" href="#algunos-metodos-utiles" title="Link to this heading"></a></h2>
+<p>Casi todos los métodos y herramientas presentados con el modelo ANFIS homogéneo (<a class="reference internal" href="h_anfis.html#h-anfis-usage"><span class="std std-ref">h_ANFIS</span></a>) son válidos para el modelo ANFIS clásico, como las múltiples salidas y las aplicaciones a distintos tipos de problemas.
+En este caso no existe el concepto de “reducción de reglas” debido a que el número de funciones de membresía puede variar para cada feature de los datos de entrada.
+A continuación se presentan las proncipales diferencias respecto al modelo ANFIS homogéneo.</p>
+<section id="plot-premises">
+<h3>plot_premises<a class="headerlink" href="#plot-premises" title="Link to this heading"></a></h3>
+<p>En este caso se generarán algunos gráficos vacíos (dependiendo de la distribución establecida para las funciones de membresía).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">plot_premises</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../_images/anfis_plot_premises.png" class="align-center" src="../../_images/anfis_plot_premises.png" />
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">plot_premises</span><span class="p">(</span><span class="n">group_by_dim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../_images/anfis_plot_premises_grouped.png" class="align-center" src="../../_images/anfis_plot_premises_grouped.png" />
+</section>
+<section id="init-premises">
+<h3>init_premises<a class="headerlink" href="#init-premises" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">init_premises</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">plot_premises</span><span class="p">(</span><span class="n">group_by_dim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../_images/anfis_plot_init_premises_grouped.png" class="align-center" src="../../_images/anfis_plot_init_premises_grouped.png" />
+</section>
+<section id="show-premises-structure-premises-structure-y-get-premises">
+<h3>show_premises_structure, premises_structure y get_premises<a class="headerlink" href="#show-premises-structure-premises-structure-y-get-premises" title="Link to this heading"></a></h3>
+<p>Los antecedentes del modelo ANFIS clásico no se almacenan en un tensor único, sino en una lista de tensores, uno por cada feature de los datos de entrada. Por lo que la interacción con estos métodos es distinta.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">show_premises_structure</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>        <span class="n">a</span> <span class="p">(</span><span class="n">x0</span><span class="p">)</span>  <span class="n">b</span> <span class="p">(</span><span class="n">x0</span><span class="p">)</span>    <span class="n">c</span> <span class="p">(</span><span class="n">x0</span><span class="p">)</span>    <span class="n">a</span> <span class="p">(</span><span class="n">x1</span><span class="p">)</span>  <span class="n">b</span> <span class="p">(</span><span class="n">x1</span><span class="p">)</span>    <span class="n">c</span> <span class="p">(</span><span class="n">x1</span><span class="p">)</span>    <span class="n">a</span> <span class="p">(</span><span class="n">x2</span><span class="p">)</span>  <span class="n">b</span> <span class="p">(</span><span class="n">x2</span><span class="p">)</span>    <span class="n">c</span> <span class="p">(</span><span class="n">x2</span><span class="p">)</span>
+<span class="n">MF</span> <span class="mi">0</span>  <span class="mf">0.499232</span>     <span class="mf">4.0</span> <span class="o">-</span><span class="mf">0.998560</span>  <span class="mf">0.986531</span>     <span class="mf">4.0</span> <span class="o">-</span><span class="mf">0.985168</span>  <span class="mf">0.498638</span>     <span class="mf">4.0</span> <span class="o">-</span><span class="mf">0.995316</span>
+<span class="n">MF</span> <span class="mi">1</span>  <span class="mf">0.499232</span>     <span class="mf">4.0</span> <span class="o">-</span><span class="mf">0.000096</span>  <span class="mf">0.986531</span>     <span class="mf">4.0</span>  <span class="mf">0.987893</span>  <span class="mf">0.498638</span>     <span class="mf">4.0</span>  <span class="mf">0.001960</span>
+<span class="n">MF</span> <span class="mi">2</span>  <span class="mf">0.499232</span>     <span class="mf">4.0</span>  <span class="mf">0.998368</span>       <span class="n">NaN</span>     <span class="n">NaN</span>       <span class="n">NaN</span>  <span class="mf">0.498638</span>     <span class="mf">4.0</span>  <span class="mf">0.999236</span>
+</pre></div>
+</div>
+<p>Los valores NaN indican que no existe la función de membresía correspondiente para ese feature.</p>
+<p>El método <strong>model.premises_structure</strong> retorna el dataframe correspondiente.</p>
+<p>Por otro lado, el método <strong>model.get_premises()</strong> retorna una lista de tensores, cuyo largo es igual al número de features de los datos de entrada (input_size).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">get_premises</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">tensor</span><span class="p">([[</span> <span class="mf">4.9923e-01</span><span class="p">,</span>  <span class="mf">4.0000e+00</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.9856e-01</span><span class="p">],</span>
+         <span class="p">[</span> <span class="mf">4.9923e-01</span><span class="p">,</span>  <span class="mf">4.0000e+00</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.5725e-05</span><span class="p">],</span>
+         <span class="p">[</span> <span class="mf">4.9923e-01</span><span class="p">,</span>  <span class="mf">4.0000e+00</span><span class="p">,</span>  <span class="mf">9.9837e-01</span><span class="p">]]),</span>
+ <span class="n">tensor</span><span class="p">([[</span> <span class="mf">0.9865</span><span class="p">,</span>  <span class="mf">4.0000</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.9852</span><span class="p">],</span>
+         <span class="p">[</span> <span class="mf">0.9865</span><span class="p">,</span>  <span class="mf">4.0000</span><span class="p">,</span>  <span class="mf">0.9879</span><span class="p">]]),</span>
+ <span class="n">tensor</span><span class="p">([[</span> <span class="mf">4.9864e-01</span><span class="p">,</span>  <span class="mf">4.0000e+00</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.9532e-01</span><span class="p">],</span>
+         <span class="p">[</span> <span class="mf">4.9864e-01</span><span class="p">,</span>  <span class="mf">4.0000e+00</span><span class="p">,</span>  <span class="mf">1.9597e-03</span><span class="p">],</span>
+         <span class="p">[</span> <span class="mf">4.9864e-01</span><span class="p">,</span>  <span class="mf">4.0000e+00</span><span class="p">,</span>  <span class="mf">9.9924e-01</span><span class="p">]])]</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<ul class="simple">
-<li><p>El valor por defecto del parámetro <cite>output_type</cite> es <cite>regression</cite>.</p></li>
-<li><p>El valor por defecto del parámetro <cite>membership_function</cite> es <cite>GeneralizedBell_MF</cite>.</p></li>
-</ul>
+<p>En este caso, cada tensor tiene dimensiones (num_mfs, 3), donde num_mfs es el número de funciones de membresía para ese feature y 3 corresponde a los parámetros a, b y c de la función GeneralizedBell_MF.
+Sin embargo, si se hubiera utilizado Gaussian_MF, las dimensiones serían (num_mfs, 2), ya que la función de membresía Gaussian_MF solo tiene dos parámetros (mu y sigma).</p>
+</div>
+</section>
+</section>
+<section id="otros-metodos-y-herramientas">
+<h2>Otros métodos y herramientas<a class="headerlink" href="#otros-metodos-y-herramientas" title="Link to this heading"></a></h2>
+<p>El resto de métodos y herramientas presentados con el modelo ANFIS homogéneo (<a class="reference internal" href="h_anfis.html#h-anfis-usage"><span class="std std-ref">h_ANFIS</span></a>) son válidos para el modelo ANFIS clásico: la interacción con los parámetros consecuentes, los métodos forward y predict, el manejo de distintos tipos de salidas, etc.</p>
+<p>En general, la única diferencia entre ambos modelos es la forma en que se almacenan los parámetros de los antecedentes, debido a que el número de funciones de membresía puede variar para cada feature de los datos de entrada. Además de la ausencia del concepto de “reducción de reglas” en el modelo ANFIS clásico.</p>
+<section id="ejemplos">
+<h3>Ejemplos:<a class="headerlink" href="#ejemplos" title="Link to this heading"></a></h3>
+<p>Considerando que se tienen datos con 3 features:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x_train</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># 200 ejemplos con 3 features</span>
+</pre></div>
 </div>
 <ul class="simple">
-<li><p><strong>Modelo ANFIS con 3 salidas para problemas de clasificación multiclase</strong></p></li>
+<li><p><strong>Modelo ANFIS con 1 salida para problemas de clasificación binaria</strong></p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">ANFIS</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mf_distribution</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">ANFIS</span><span class="p">(</span>
+    <span class="n">mf_distribution</span><span class="o">=</span><span class="n">mf_distribution</span><span class="p">,</span>
+    <span class="n">output_type</span><span class="o">=</span><span class="s1">&#39;binary&#39;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="p">(</span><span class="n">x_train</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span><span class="p">([</span><span class="mf">0.6582</span><span class="p">,</span> <span class="mf">0.5680</span><span class="p">,</span> <span class="mf">0.4394</span><span class="p">,</span> <span class="mf">0.5558</span><span class="p">,</span> <span class="mf">0.6047</span><span class="p">,</span> <span class="mf">0.5961</span><span class="p">,</span> <span class="mf">0.5114</span><span class="p">,</span> <span class="mf">0.5837</span><span class="p">,</span> <span class="mf">0.5545</span><span class="p">,</span> <span class="mf">0.5618</span><span class="p">],</span> <span class="n">grad_fn</span><span class="o">=&lt;</span><span class="n">SigmoidBackward0</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_train</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>Modelo ANFIS para problema de clasificación multiclase con 3 clases</strong></p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mf_distribution</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">ANFIS</span><span class="p">(</span>
     <span class="n">mf_distribution</span><span class="o">=</span><span class="n">mf_distribution</span><span class="p">,</span>
     <span class="n">outputs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">output_type</span><span class="o">=</span><span class="s1">&#39;multiclass&#39;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<ul class="simple">
-<li><p><strong>Modelo ANFIS con 1 salida para problemas de clasificación binaria</strong></p></li>
-</ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">ANFIS</span><span class="p">(</span>
-    <span class="n">mf_distribution</span><span class="o">=</span><span class="n">mf_distribution</span><span class="p">,</span>
-    <span class="n">outputs</span><span class="o">=</span><span class="mi">1</span>
-    <span class="n">output_type</span><span class="o">=</span><span class="s1">&#39;binary&#39;</span>
-<span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="p">(</span><span class="n">x_train</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>Todos los métodos y herramientas presentados con el modelo ANFIS homogéneo (<a class="reference internal" href="h_anfis.html#h-anfis-usage"><span class="std std-ref">h_ANFIS</span></a>) son válidos para el modelo ANFIS clásico, como las múltiples salidas y las aplicaciones a distintos tipos de problemas.</p>
-<p>Pero existen ciertas consideraciones a tener en cuenta:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span><span class="p">([[</span> <span class="mf">0.0307</span><span class="p">,</span>  <span class="mf">0.2805</span><span class="p">,</span>  <span class="mf">0.2558</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.1029</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0219</span><span class="p">,</span>  <span class="mf">0.3365</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.1156</span><span class="p">,</span>  <span class="mf">0.2894</span><span class="p">,</span>  <span class="mf">0.3657</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.3065</span><span class="p">,</span>  <span class="mf">0.1498</span><span class="p">,</span>  <span class="mf">0.0498</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.3051</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0133</span><span class="p">,</span>  <span class="mf">0.3439</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.0618</span><span class="p">,</span>  <span class="mf">0.1224</span><span class="p">,</span>  <span class="mf">0.0748</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.7534</span><span class="p">,</span>  <span class="mf">0.1007</span><span class="p">,</span>  <span class="mf">0.0843</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.1371</span><span class="p">,</span>  <span class="mf">0.0147</span><span class="p">,</span>  <span class="mf">0.0977</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.5956</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0822</span><span class="p">,</span>  <span class="mf">0.0667</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.4173</span><span class="p">,</span>  <span class="mf">0.2276</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0357</span><span class="p">]],</span> <span class="n">grad_fn</span><span class="o">=&lt;</span><span class="n">SqueezeBackward1</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="p">(</span><span class="n">x_train</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="n">return_probabilities</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span><span class="p">([[</span><span class="mf">0.2828</span><span class="p">,</span> <span class="mf">0.3630</span><span class="p">,</span> <span class="mf">0.3542</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.3179</span><span class="p">,</span> <span class="mf">0.2806</span><span class="p">,</span> <span class="mf">0.4015</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.2429</span><span class="p">,</span> <span class="mf">0.3641</span><span class="p">,</span> <span class="mf">0.3930</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.3804</span><span class="p">,</span> <span class="mf">0.3253</span><span class="p">,</span> <span class="mf">0.2943</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.3614</span><span class="p">,</span> <span class="mf">0.2629</span><span class="p">,</span> <span class="mf">0.3757</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.3251</span><span class="p">,</span> <span class="mf">0.3454</span><span class="p">,</span> <span class="mf">0.3294</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.4919</span><span class="p">,</span> <span class="mf">0.2561</span><span class="p">,</span> <span class="mf">0.2520</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.2917</span><span class="p">,</span> <span class="mf">0.3395</span><span class="p">,</span> <span class="mf">0.3688</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.2169</span><span class="p">,</span> <span class="mf">0.3624</span><span class="p">,</span> <span class="mf">0.4206</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.4060</span><span class="p">,</span> <span class="mf">0.3359</span><span class="p">,</span> <span class="mf">0.2581</span><span class="p">]],</span> <span class="n">grad_fn</span><span class="o">=&lt;</span><span class="n">SoftmaxBackward0</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_train</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
 </section>
-<section id="parametros-de-los-antecedentes">
-<h2>Parámetros de los antecedentes<a class="headerlink" href="#parametros-de-los-antecedentes" title="Link to this heading"></a></h2>
-<p>Al contrario que en la clase h_ANFIS, en la clase ANFIS los parámetros de los antecedentes no se almacenan en un tensor único, debido a que el número de funciones de membresía puede variar para cada feature de los datos de entrada.
-Por lo tanto, los parámetros de los antecedentes se almacenan en una lista de parámetros de pytorch (torch.nn.ParameterList).</p>
-<p>Esto implica que el método <cite>get_premises()</cite> no devolverá un tensor único, sino una lista de tensores, uno por cada feature de los datos de entrada.</p>
 </section>
 </section>
 
@@ -262,7 +382,7 @@ Por lo tanto, los parámetros de los antecedentes se almacenan en una lista de p
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="rule_reduced_anfis.html" class="btn btn-neutral float-left" title="rule-reduced ANFIS" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="h_anfis.html" class="btn btn-neutral float-left" title="ANFIS homogéneo" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../training.html" class="btn btn-neutral float-right" title="Training" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

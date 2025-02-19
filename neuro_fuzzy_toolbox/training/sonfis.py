@@ -1,4 +1,7 @@
 import torch
+import torch.utils.data as data
+
+from sklearn.model_selection import train_test_split
 
 from neuro_fuzzy_toolbox.training import (
     base_model_trainer,
@@ -93,7 +96,7 @@ class SONFIS(base_model_trainer):
         if ANFISmodel._rule_reduced == False:
             raise ValueError('The ANFIS model must be rule reduced')
             
-        train_loader, val_loader = self._train_val_split(loader)
+        train_loader, val_loader = self._train_val_split(ANFISmodel, loader)
         self._register_loss(ANFISmodel, train_loader, val_loader)
         
         self._ages = torch.zeros(ANFISmodel.rules, dtype=torch.int)
@@ -154,6 +157,36 @@ class SONFIS(base_model_trainer):
         
         print('\nTraining finished')
         print(f' -> ANFIS rules: {ANFISmodel.rules}\n')
+        
+    
+    def _train_val_split(self, ANFISmodel, train_loader):
+        """
+        Divide los datos de entrenamiento en datos de entrenamiento y validación.
+        
+        Args:
+            ANFISmodel (h_ANFIS): Instancia del modelo ANFIS reducido en reglas.
+            train_loader (DataLoader): DataLoader con los datos de entrenamiento.
+            
+        Returns:
+            DataLoader: DataLoader con los datos de entrenamiento.
+            DataLoader: DataLoader con los datos de validación.
+        """
+        val_loader = None
+        
+        if self.validation != 0:
+            x_train, y_train = train_loader.dataset.tensors
+            
+            if ANFISmodel._output_type == 'regression':
+                x_train, x_val, y_train, y_val = train_test_split(x_train.numpy(), y_train.numpy(), test_size=self.validation, shuffle=True)
+            else:
+                x_train, x_val, y_train, y_val = train_test_split(x_train.numpy(), y_train.numpy(), test_size=self.validation, shuffle=True, stratify=y_train.numpy())
+                
+            x_train, x_val, y_train, y_val = torch.from_numpy(x_train), torch.from_numpy(x_val), torch.from_numpy(y_train), torch.from_numpy(y_val)
+            
+            train_loader = data.DataLoader(data.TensorDataset(x_train, y_train), batch_size=train_loader.batch_size, shuffle=True)
+            val_loader = data.DataLoader(data.TensorDataset(x_val, y_val), batch_size=train_loader.batch_size, shuffle=False)
+
+        return train_loader, val_loader
         
     
     def _freeze_subnets(self):

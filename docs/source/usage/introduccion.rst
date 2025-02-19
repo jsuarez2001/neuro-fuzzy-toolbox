@@ -1,9 +1,9 @@
-Introducción
+Introduction
 ============
 
 Una vez que se hayan seguido las indicaciones de :ref:`Installation`, se puede proceder al uso de las herramientas del toolbox.
 
-Para importarlas todas, se puede hacer de la siguiente manera:
+Para importarlas, se puede hacer de la siguiente manera:
 
 .. code-block:: python
 

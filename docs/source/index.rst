@@ -6,7 +6,7 @@
 Neuro-Fuzzy Toolbox documentation
 =================================
 
-Bienvenido a la documentación de Neuro-Fuzzy Toolbox. Este paquete de Python contiene una serie de módulos y clases que permiten la creación y entrenamiento de sistemas neurodifusos.
+Bienvenido a la documentación de Neuro-Fuzzy Toolbox.
 
 .. toctree::
    :maxdepth: 2
@@ -14,6 +14,6 @@ Bienvenido a la documentación de Neuro-Fuzzy Toolbox. Este paquete de Python co
 
    introduction
    installation
-   modules
    usage
+   modules
    examples

@@ -213,11 +213,7 @@ class Hybrid_learning_algorithm(base_model_trainer):
     Pseudocódigo:
         .. code-block:: text
 
-            testes test:
-                Para cada test en test:
-                    Calcular test de membresía usando la función de test
-                    Guardar en el tensor de test
-            Retornar el test con los valores de test
+            No hay pseudocodigo disponible.
     """
     def __init__(self, epochs, loss_function, validation=0, early_stopping=None, optimizer=torch.optim.Adam, optimizer_params={}):
         """
@@ -285,9 +281,9 @@ class Hybrid_learning_algorithm(base_model_trainer):
 
 
 
-class Optimizer_training(base_model_trainer):
+class Basic_optimizer_training_algorithm(base_model_trainer):
     """
-    Clase para representar un algoritmo de entrenamiento por optimización para un modelo de aprendizaje automático.
+    Clase para representar un algoritmo de entrenamiento por optimización para un modelo de aprendizaje automático. Solo permite entrenar modelos de aprendizaje automático con un solo optimizador para todos los parámetros del modelo.
     
     Pseudocódigo:
         .. code-block:: text
@@ -301,7 +297,7 @@ class Optimizer_training(base_model_trainer):
     
     def __init__(self, epochs, loss_function, validation=0, early_stopping=None, optimizer=torch.optim.Adam, optimizer_params={}):
         """
-        Inicializa una nueva instancia de la clase Optimizer_training.
+        Inicializa una nueva instancia de la clase Basic_optimizer_training_algorithm.
         
         Args:
             epochs (int): Número de épocas de entrenamiento.
