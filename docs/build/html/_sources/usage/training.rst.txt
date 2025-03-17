@@ -9,6 +9,7 @@ Este módulo contiene una guía sobre los algoritmos de entrenamiento disponible
    :maxdepth: 2
 
    training/considerations
+   training/early_stopping
    training/hybrid_learning_algorithm
    training/optimizer_training
    training/sonfis

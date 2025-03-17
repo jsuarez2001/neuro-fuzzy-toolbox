@@ -50,9 +50,7 @@ class MembershipFunction(nn.Module):
 
 class Gaussian_MF(MembershipFunction):
     """  
-    Función de membresía Gaussiana.
-
-    Esta función está definida como:
+    Función de membresía Gaussiana. Está definida como:  
 
     .. math::
 
@@ -60,7 +58,7 @@ class Gaussian_MF(MembershipFunction):
 
     donde:
         - :math:`x` es la variable de entrada.
-        - :math:`\\mu` es el centro de la función Gaussiana.
+        - :math:`\\mu` es el centro de la función.
         - :math:`\\sigma` es la desviación estándar, que controla la anchura de la curva.
     
     """
@@ -133,7 +131,7 @@ class Gaussian_MF(MembershipFunction):
         
         Args:
             x_train (torch.tensor): Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).
-            mf_distribution (list): Número de funciones de membresía por característica de entrada.
+            mf_distribution (list): Número de funciones de membresía por característica de entrada en forma de lista.
             
         Returns:
             list: Lista de tensores con los parámetros de las funciones de membresía asociadas a cada feature de los datos de entrada. La forma del tensor i de la lista es (input_size, mf_distribution[i], len(self._params)).
@@ -164,7 +162,7 @@ class Gaussian_MF(MembershipFunction):
     
     def random_premises(self, input_size, num_mfs, dtype):
         """
-        Genera parámetros aleatorios para las premisas en el rango [-1, 1], con la excepción del parámetro :math:`\\sigma` que siempre es positivo.
+        Genera parámetros aleatorios para las premisas en el rango [-1, 1], restringiendo el parámetro :math:`\\sigma` a valores positivos.
         
         Args:
             input_size (int): Número de características de entrada.
@@ -180,7 +178,7 @@ class Gaussian_MF(MembershipFunction):
     
     def random_single_feature_mfs(self, n_mfs, dtype):
         """
-        Genera parámetros aleatorios para una sola función de membresía Gaussiana en el rango [-1, 1], con la excepción del parámetro :math:`\\sigma` que siempre es positivo.
+        Genera parámetros aleatorios para una sola función de membresía Gaussiana en el rango [-1, 1], restringiendo el parámetro :math:`\\sigma` a valores positivos.
         
         Args:
             n_mfs (int): Número de funciones de membresía.
@@ -195,7 +193,7 @@ class Gaussian_MF(MembershipFunction):
 
     def _grow_new_premise_parameters(self, means, stds):
         """
-        Método utilizado en el algoritmo para la modificación de la estructura del modelo SONFIS. Genera nuevas premisas dado un conjunto de medias y desviaciones estándar en la forma de un tensor.
+        Método utilizado para la modificación de la estructura del modelo SONFIS. Genera nuevas premisas dado un conjunto de medias y desviaciones estándar en la forma de un tensor.
         
         Args:
             means (torch.tensor): Medias por característica de entrada y función de membresía. La dimensión de la entrada es (num_new_mfs, input_size), donde num_new_mfs es el número de nuevas funciones de membresía que se agregarán a cada feature de los datos de entrada.
@@ -208,7 +206,7 @@ class Gaussian_MF(MembershipFunction):
     
     def _split_premise_parameters(self, premises):
         """
-        Método utilizado en el algoritmo para la modificación de la estructura del modelo SONFIS. Divide las premisas ingresadas en dos nuevas.
+        Método utilizado para la modificación de la estructura del modelo SONFIS. Divide las premisas ingresadas en dos nuevas.
         
         Args:
             premises (torch.tensor): Parámetros de las premisas. La forma de entrada es (input_size, num_mfs, len(self._params)).
@@ -229,9 +227,7 @@ class Gaussian_MF(MembershipFunction):
 
 class GeneralizedBell_MF(MembershipFunction):
     """
-    Función de membresía de tipo generalized bell-shaped.
-    
-    Esta función está definida como:
+    Función de membresía de tipo generalized bell-shaped. Está definida como:  
     
     .. math::
     
@@ -304,7 +300,7 @@ class GeneralizedBell_MF(MembershipFunction):
     
     def random_premises(self, input_size, num_mfs, dtype):
         """
-        Genera parámetros aleatorios para las premisas en el rango [-1, 1], con la excepción de los parámetros de ancho y pendiente que siempre son positivos. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Genera parámetros aleatorios para las premisas en el rango [-1, 1], restringiendo a los parámetros de ancho y pendiente (**a** y **b**) a valores positivos. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
         
         Args:
             input_size (int): Número de características de entrada.
@@ -325,7 +321,7 @@ class GeneralizedBell_MF(MembershipFunction):
         
         Args:
             x_train (torch.tensor): Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).
-            mf_distribution (list): Número de funciones de membresía por característica de entrada.
+            mf_distribution (list): Número de funciones de membresía por característica de entrada en forma de lista.
             
         Returns:
             list: Lista de tensores con los parámetros de las funciones de membresía asociadas a cada feature de los datos de entrada. La forma del tensor i de la lista es (input_size, mf_distribution[i], len(self._params)).
@@ -357,7 +353,7 @@ class GeneralizedBell_MF(MembershipFunction):
     
     def random_single_feature_mfs(self, n_mfs, dtype):
         """
-        Genera parámetros aleatorios para una sola función de membresía Generalized Bell en el rango [-1, 1], con la excepción de los parámetros de ancho y pendiente que siempre son positivos.
+        Genera parámetros aleatorios para una sola función de membresía Generalized Bell en el rango [-1, 1], restringiendo a los parámetros de ancho y pendiente (**a** y **b**) a valores positivos.
         
         Args:
             n_mfs (int): Número de funciones de membresía.

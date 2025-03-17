@@ -15,7 +15,7 @@ Importación
 
     sys.path.append(os.path.abspath('../'))
 
-    from neuro_fuzzy_toolbox import ANFIS
+    import neuro_fuzzy_toolbox as nft
     import torch
 
 Instanciación
@@ -48,7 +48,7 @@ Luego, se puede instanciar el modelo utilizando la distribución definida:
 
 .. code-block:: python
 
-    model = ANFIS(
+    model = nft.ANFIS(
         mf_distribution=mf_distribution
     )
 
@@ -130,7 +130,7 @@ Por otro lado, el método **model.get_premises()** retorna una lista de tensores
 
 Otros métodos y herramientas
 ----------------------------
-El resto de métodos y herramientas presentados con el modelo ANFIS homogéneo (:ref:`h_ANFIS <h_ANFIS usage>`) son válidos para el modelo ANFIS clásico: la interacción con los parámetros consecuentes, los métodos forward y predict, el manejo de distintos tipos de salidas, etc.
+El resto de métodos y herramientas presentados con el modelo ANFIS homogéneo (:ref:`h_ANFIS <h_ANFIS usage>`) son válidos para el modelo ANFIS clásico, como la interacción e inicialización de parámetros consecuentes, los métodos forward y predict, el manejo de distintos tipos de salidas, etc.
 
 En general, la única diferencia entre ambos modelos es la forma en que se almacenan los parámetros de los antecedentes, debido a que el número de funciones de membresía puede variar para cada feature de los datos de entrada. Además de la ausencia del concepto de "reducción de reglas" en el modelo ANFIS clásico.
 
@@ -148,7 +148,7 @@ Considerando que se tienen datos con 3 features:
 
     mf_distribution = [3, 2, 3]
 
-    model = ANFIS(
+    model = nft.ANFIS(
         mf_distribution=mf_distribution,
         output_type='binary'
     )
@@ -176,7 +176,7 @@ Considerando que se tienen datos con 3 features:
 
     mf_distribution = [3, 2, 3]
     
-    model = ANFIS(
+    model = nft.ANFIS(
         mf_distribution=mf_distribution,
         outputs=3,
         output_type='multiclass'

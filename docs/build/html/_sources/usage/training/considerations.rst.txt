@@ -20,6 +20,8 @@ Y con respecto a las salidas:
 
 Esto es importante tenerlo en cuenta al momento de definir los DataLoaders para el entrenamiento de los modelos y para su posterior evaluación.
 
+.. _DataLoaders_usage:
+
 DataLoaders de PyTorch
 ----------------------
 Los algoritmos de entrenamiento disponibles en Neuro-Fuzzy Toolbox trabajan con DataLoaders de PyTorch. Estos objetos permiten cargar los datos de entrenamiento y validación de manera eficiente y sencilla, por lo que
@@ -53,26 +55,16 @@ Validación y Test
 - Con respecto al típico split de los datos en entrenamiento y validación, esto se realiza internamente en los algoritmos de entrenamiento de Neuro-Fuzzy Toolbox controlando un parámetro.
 - Para el conjunto de datos de test, queda en manos del usuario dejar un conjunto de datos de testeo aparte (antes de definir el DataLoader de entrenamiento) para evaluar el modelo una vez entrenado.
 
-Estructura general
-------------------
-La estructura general de un script de entrenamiento de un modelo de Neuro-Fuzzy Toolbox es la siguiente:
-
-1. **Definición de los datos**: Conjunto de test y entrenamiento.
-2. **Preprocesamiento de los datos**: Escalamiento, normalización, etc.
-3. **Definición del Dataloader**: Sobre el que se iterará para el entrenamiento del modelo.
-4. **Definición del modelo**
-5. **Definición del algoritmo de entrenamiento**: sus hiperparámetros y los mecanismos implicados (como la clase *EarlyStopping* disponible en el toolbox).
-6. **Entrenamiento del modelo**
-7. **Evaluación del modelo**: Con la función *get_measures* disponible en el toolbox.
-
-Cada algoritmo de entrenamiento tiene sus propios parámetros y métodos de entrenamiento, por lo que se recomienda revisar la documentación de cada uno para más información.
-
-En la siguientes secciones se muestran ejemplos de uso para los algoritmos de entrenamiento disponibles en Neuro-Fuzzy Toolbox.
-
 Algortimos de entrenamiento
 ---------------------------
 Los algoritmos de entrenamiento disponibles en Neuro-Fuzzy Toolbox son:
 
 - **Hybrid Learning Algorithm**
 - **Basic Optimizer Training Algorithm**
+- **Double Optimizer Training Algorithm**
 - **SONFIS**
+
+y para el uso de cada uno de ellos solo se deben tener en cuenta 2 métodos: 
+
+- **Inicialización** (*__init__*): Para crear las instancias de los modelos (definiendo los parámetros y/u otros mecanismos).
+- **Entrenamiento** (*__call__*): Para entrenar los modelos con los DataLoaders definidos.

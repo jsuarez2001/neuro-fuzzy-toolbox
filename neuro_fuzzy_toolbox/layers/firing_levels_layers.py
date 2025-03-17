@@ -39,7 +39,7 @@ class h_FiringLevelsLayer(nn.Module):
     con la misma cantidad de funciones de membresía para cada feature de los datos de entrada. Esta capa emula las operaciones AND entre los valores de pertenencia de las reglas.
     
     Cuenta con un parámetro especial 'rule_reduced' que permite reducir en número de reglas generadas en el cálculo de los niveles de disparo. Esto se logra evitando hacer la combinatoria completa para las multiplicaciones de los valores de pertenencia.
-    El procedimiento en este caso se realizaría solo multiplicando entre sí los valores de pertenencia *i* de cada feature, dando como resultado una cantidad de reglas igual al número de funciones de membresía de cada feature.
+    El procedimiento en este caso se realizaría solo multiplicando entre sí los valores de pertenencia *i* de cada feature, dando como resultado una cantidad de reglas igual al número de funciones de membresía de cada feature. (esto se detalla de mejor manera en :ref:`rule-reduced ANFIS <rule-reduced ANFIS>`).
     """
     def __init__(self, rule_reduced=False):
         """

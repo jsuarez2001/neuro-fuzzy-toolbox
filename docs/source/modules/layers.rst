@@ -1,7 +1,7 @@
 Layers
 ======
 
-En este módulo se encuentran las capas utilizadas en el Toolbox.
+En este módulo se encuentran las capas de los modelos de tipo ANFIS implementados en el Toolbox.
 
 .. toctree::
    :maxdepth: 2

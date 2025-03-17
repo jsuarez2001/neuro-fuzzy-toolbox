@@ -1,0 +1,10 @@
+.. _sonfis_examples:
+
+SONFIS Examples
+===============
+
+Example 1:
+----------
+
+0. Imports
+##########

@@ -8,5 +8,4 @@ Estas capas se utilizan para transformar las entradas del sistema en valores de 
 
 .. automodule:: neuro_fuzzy_toolbox.layers.fuzzification_layer
    :members:
-   :undoc-members:
    :show-inheritance:

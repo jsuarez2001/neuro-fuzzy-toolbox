@@ -12,7 +12,7 @@ Para importarlas, se puede hacer de la siguiente manera:
 
     sys.path.append(os.path.abspath('../'))
 
-    from neuro_fuzzy_toolbox import *
+    import neuro_fuzzy_toolbox as nft
 
 .. note::
 

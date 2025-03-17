@@ -4,9 +4,7 @@ import torch.utils.data as data
 from sklearn.model_selection import train_test_split
 
 from neuro_fuzzy_toolbox.training import (
-    base_model_trainer,
-    classical_consequents_estimation_with_OLS,
-    optimizer_training_epoch
+    base_model_trainer
 )
 
 class SONFIS(base_model_trainer):
@@ -16,15 +14,6 @@ class SONFIS(base_model_trainer):
     
     Note:
         El modelo ANFIS al que se le aplique debe ser rule-reduced, por lo que será una instancia de la clase h_ANFIS.
-    
-    El procedimiento es el siguiente:
-        .. code-block:: text
-
-            Para cada muestra en x:
-                Para cada feature en la muestra:
-                    Calcular valores de membresía usando la función de pertenencia
-                    Guardar en el tensor de salida
-            Retornar el tensor con los valores de membresía
     """
     def __init__(self, Ngrow, dGrow, Nsplit, eSplit, Nvanish, lVanish, max_iterations, ANFIStrainer, validation=0, early_stopping=None, last_training_iteration=False):
         """
@@ -56,7 +45,7 @@ class SONFIS(base_model_trainer):
         
         # Early stopping
         self.validation = validation
-        self.early_stopping = early_stopping
+        self.sonfis_early_stopping = early_stopping
         
         # history
         self.history = {"loss": []}
@@ -64,17 +53,13 @@ class SONFIS(base_model_trainer):
         
         
         # --------- ANFIS trainer ---------
-        # Training parameters
-        self.trainer_epochs = ANFIStrainer.epochs
-        self.loss_function = ANFIStrainer.loss_function
+        self.trainer = ANFIStrainer
+        self.loss_function = self.trainer.loss_function
+        self.trainer.validation = self.validation
         
         # Optimizer
-        self.optimizer = ANFIStrainer.optimizer
-        self.optimizer_params = ANFIStrainer.optimizer_params
         self._optimizer_instance = None
         
-        # Early stopping
-        self.trainer_early_stopping = ANFIStrainer.early_stopping
         
         # ------ Internal variables ------
         self._freezed = torch.tensor([], dtype=torch.int)
@@ -102,7 +87,7 @@ class SONFIS(base_model_trainer):
         self._ages = torch.zeros(ANFISmodel.rules, dtype=torch.int)
         self._freezed = torch.zeros(ANFISmodel.rules, dtype=torch.int).bool()
         
-        self._update_parameters(ANFISmodel, train_loader, val_loader)
+        self.trainer._sonfis_update_parameters(ANFISmodel, train_loader, val_loader, self._freezed)
         if verbose:
             iter_width = len(str(self.max_iterations))
             if self.validation > 0:
@@ -110,7 +95,6 @@ class SONFIS(base_model_trainer):
             else:
                 print(f'Iteration: {0:{iter_width}}/{self.max_iterations} - loss: {self.history["loss"][-1]:.6f}')
             print(f' -> ANFIS rules: {ANFISmodel.rules}\n')
-        
         
         model_updated = True
         i = 0
@@ -121,7 +105,8 @@ class SONFIS(base_model_trainer):
             model_updated = self._update_structure(ANFISmodel, train_loader)
             
             if model_updated:
-                self._update_parameters(ANFISmodel, train_loader, val_loader)
+                self.trainer._sonfis_update_parameters(ANFISmodel, train_loader, val_loader, self._freezed)
+
             else:
                 if verbose:
                     print('No more updates')
@@ -144,7 +129,7 @@ class SONFIS(base_model_trainer):
         self._unfreeze_subnets()
         
         if self.last_training_iteration:
-            self._update_parameters(ANFISmodel, train_loader, val_loader)
+            self.trainer._sonfis_update_parameters(ANFISmodel, train_loader, val_loader, self._freezed)
             
             self._register_loss(ANFISmodel, train_loader, val_loader)
             if verbose:
@@ -159,36 +144,6 @@ class SONFIS(base_model_trainer):
         print(f' -> ANFIS rules: {ANFISmodel.rules}\n')
         
     
-    def _train_val_split(self, ANFISmodel, train_loader):
-        """
-        Divide los datos de entrenamiento en datos de entrenamiento y validación.
-        
-        Args:
-            ANFISmodel (h_ANFIS): Instancia del modelo ANFIS reducido en reglas.
-            train_loader (DataLoader): DataLoader con los datos de entrenamiento.
-            
-        Returns:
-            DataLoader: DataLoader con los datos de entrenamiento.
-            DataLoader: DataLoader con los datos de validación.
-        """
-        val_loader = None
-        
-        if self.validation != 0:
-            x_train, y_train = train_loader.dataset.tensors
-            
-            if ANFISmodel._output_type == 'regression':
-                x_train, x_val, y_train, y_val = train_test_split(x_train.numpy(), y_train.numpy(), test_size=self.validation, shuffle=True)
-            else:
-                x_train, x_val, y_train, y_val = train_test_split(x_train.numpy(), y_train.numpy(), test_size=self.validation, shuffle=True, stratify=y_train.numpy())
-                
-            x_train, x_val, y_train, y_val = torch.from_numpy(x_train), torch.from_numpy(x_val), torch.from_numpy(y_train), torch.from_numpy(y_val)
-            
-            train_loader = data.DataLoader(data.TensorDataset(x_train, y_train), batch_size=train_loader.batch_size, shuffle=True)
-            val_loader = data.DataLoader(data.TensorDataset(x_val, y_val), batch_size=train_loader.batch_size, shuffle=False)
-
-        return train_loader, val_loader
-        
-    
     def _freeze_subnets(self):
         """
         Congela todas las subredes.
@@ -200,65 +155,8 @@ class SONFIS(base_model_trainer):
         """
         Descongela todas las subredes.
         """
-        self._freezed = torch.zeros_like(self._freezed).bool()
+        self._freezed = torch.zeros_like(self._freezed).bool()  
     
-    
-    def _init_optimizer(self, ANFISmodel, optimizer, optimizer_params):
-        """
-        Inicializa el optimizador.
-        
-        Args:
-            ANFISmodel (h_ANFIS): Instancia del modelo ANFIS reducido en reglas.
-            optimizer (torch.optim): Optimizador a utilizar en el entrenamiento
-            optimizer_params (dict): Parámetros del optimizador.
-        
-        Returns:
-            torch.optim.Optimizer: Instancia del optimizador.
-        """
-        return optimizer(ANFISmodel.get_premises_as_parameters_list(), **optimizer_params)
-    
-    
-    def _update_parameters(self, ANFISmodel, train_loader, val_loader):
-        """
-        Ejecuta el algoritmo de actualización de parámetros del modelo. Utiliza el enfoque de algoritmo de aprendizaje híbrido ANFIS.
-        
-        Args:
-            ANFISmodel (h_ANFIS): Instancia del modelo ANFIS reducido en reglas.
-            train_loader (DataLoader): DataLoader de entrenamiento.
-            val_loader (DataLoader): DataLoader de validación.
-        """
-        ep = 0
-        self._optimizer_instance = self._init_optimizer(ANFISmodel, self.optimizer, self.optimizer_params)
-        while ep < self.trainer_epochs:
-            # Consequents update
-            current_consequents = ANFISmodel.get_consequents()
-            ANFISmodel.set_consequents(classical_consequents_estimation_with_OLS(ANFISmodel, train_loader))
-            new_consequents = ANFISmodel.get_consequents()
-            
-            freezed_consequents = self._freezed
-            
-            new_consequents[:, freezed_consequents, :] = current_consequents[:, freezed_consequents, :]
-            ANFISmodel.set_consequents(new_consequents)
-            
-            # Premises update
-            current_premises = ANFISmodel.get_premises()
-            optimizer_training_epoch(ANFISmodel, train_loader, self._optimizer_instance, self.loss_function)
-            new_premises = ANFISmodel.get_premises()
-        
-            freezed_premises = self._freezed
-            
-            new_premises[:, freezed_premises, :] = current_premises[:, freezed_premises, :]
-            ANFISmodel.set_premises(new_premises)
-            
-            if self.validation > 0 and self.trainer_early_stopping is not None:
-                _, val_loss = self._loss(ANFISmodel, train_loader, val_loader)
-                self.trainer_early_stopping(ANFISmodel, val_loss, False)
-                if self.trainer_early_stopping._stop:
-                    break
-                
-            ep += 1
-        
-        self.trainer_early_stopping.reset()        
     
     def _update_structure(self, ANFISmodel, train_loader):
         """
@@ -273,10 +171,15 @@ class SONFIS(base_model_trainer):
         """
         did_Grow = self._GrowNet(ANFISmodel, train_loader)
         
+        did_Split = False
         if not did_Grow:
             did_Split = self._SplitSubNet(ANFISmodel, train_loader)
         
         did_Vanish = self._VanishNet(ANFISmodel, train_loader)
+        
+        #print("did_Grow: ", did_Grow)
+        #print("did_Split: ", did_Split)
+        #print("did_Vanish: ", did_Vanish)
         
         return did_Grow or did_Split or did_Vanish
     
@@ -292,9 +195,9 @@ class SONFIS(base_model_trainer):
         Returns:
             bool: Indica si se debe detener el entrenamiento.
         """
-        if self.early_stopping is not None:
-            self.early_stopping(ANFISmodel, loss, verbose)
-            if self.early_stopping.stop:
+        if self.sonfis_early_stopping is not None:
+            self.sonfis_early_stopping(ANFISmodel, loss, verbose)
+            if self.sonfis_early_stopping.stop:
                 self._ages = torch.zeros(ANFISmodel.rules, dtype=torch.int)
                 self._freezed = torch.zeros(ANFISmodel.rules, dtype=torch.int).bool()
                 return True
@@ -343,7 +246,7 @@ class SONFIS(base_model_trainer):
             ANFISmodel.set_premises(torch.cat((ANFISmodel.get_premises(), new_premises), dim=1))
             
             n_new_consequents = new_premises.shape[1]
-            new_consequents = ANFISmodel._consequent_layer._consequent_function.initialize_consequents(ANFISmodel._outputs, n_new_consequents, ANFISmodel._input_size, ANFISmodel._dtype)
+            new_consequents = ANFISmodel._consequent_layer._consequent_function.random_consequents(ANFISmodel._outputs, n_new_consequents, ANFISmodel._input_size, ANFISmodel._dtype)
             ANFISmodel.set_consequents(torch.cat((ANFISmodel.get_consequents(), new_consequents), dim=1))
             
             self._ages = torch.cat((self._ages, torch.zeros(new_premises.shape[1], dtype=torch.int)))
@@ -418,7 +321,7 @@ class SONFIS(base_model_trainer):
                     new_premises = torch.cat((new_premises, split), dim=1)
                     
                     new_consequents = torch.cat((new_consequents[:, :rule, :], new_consequents[:, rule+1:, :]), dim=1)
-                    new_consequent = ANFISmodel._consequent_layer._consequent_function.initialize_consequents(ANFISmodel._outputs, 2, ANFISmodel._input_size, ANFISmodel._dtype)
+                    new_consequent = ANFISmodel._consequent_layer._consequent_function.random_consequents(ANFISmodel._outputs, 2, ANFISmodel._input_size, ANFISmodel._dtype)
                     new_consequents = torch.cat((new_consequents, new_consequent), dim=1)
                     
                     self._ages = torch.cat((self._ages[:rule], self._ages[rule+1:]))
@@ -565,7 +468,7 @@ class alt_SONFIS(SONFIS):
             ANFISmodel.set_premises(new_premises)
             
             # Add new consequents    
-            new_consequents = ANFISmodel._consequent_layer._consequent_function.initialize_consequents(ANFISmodel._outputs, n_new_rules, ANFISmodel._input_size, ANFISmodel._dtype)
+            new_consequents = ANFISmodel._consequent_layer._consequent_function.random_consequents(ANFISmodel._outputs, n_new_rules, ANFISmodel._input_size, ANFISmodel._dtype)
             ANFISmodel.set_consequents(torch.cat((ANFISmodel.get_consequents(), new_consequents), dim=1))
 
             # Update ages and freezed
@@ -636,7 +539,7 @@ class alt_SONFIS(SONFIS):
             
             # New Consequents
             still_consequents = ANFISmodel.get_consequents()[:, ~rules_to_split, :]
-            split_consequents = ANFISmodel._consequent_layer._consequent_function.initialize_consequents(ANFISmodel._outputs, split_premises.shape[1], ANFISmodel._input_size, ANFISmodel._dtype)
+            split_consequents = ANFISmodel._consequent_layer._consequent_function.random_consequents(ANFISmodel._outputs, split_premises.shape[1], ANFISmodel._input_size, ANFISmodel._dtype)
             new_consequents = torch.cat((still_consequents, split_consequents), dim=1)
             ANFISmodel.set_consequents(new_consequents)
 

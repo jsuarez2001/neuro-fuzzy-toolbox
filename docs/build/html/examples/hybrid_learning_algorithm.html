@@ -1,0 +1,478 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hybrid Learning Algorithm Examples &mdash; Neuro-Fuzzy Toolbox 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SONFIS Examples" href="sonfis.html" />
+    <link rel="prev" title="Optimizer Training Examples" href="optimizer_training.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Neuro-Fuzzy Toolbox
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/introduccion.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage/models/h_anfis.html">ANFIS homogéneo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../usage/models/anfis.html">ANFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../usage/models/anfis.html#importacion">Importación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/models/anfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/models/anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/models/anfis.html#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/training.html">Training</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage/training/considerations.html">Consideraciones Iniciales</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../usage/training/considerations.html#entrada-y-salida-de-los-modelos">Entrada y salida de los modelos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/training/considerations.html#dataloaders-de-pytorch">DataLoaders de PyTorch</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/training/considerations.html#validacion-y-test">Validación y Test</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/training/considerations.html#algortimos-de-entrenamiento">Algortimos de entrenamiento</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../usage/training/early_stopping.html">Early Stopping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../usage/training/early_stopping.html#instanciacion">Instanciación</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../usage/training/hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../usage/training/hybrid_learning_algorithm.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/training/hybrid_learning_algorithm.html#llamado">Llamado</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../usage/training/optimizer_training.html">Basic Optimizer Training Algorithm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../usage/training/optimizer_training.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/training/optimizer_training.html#llamado">Llamado</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../usage/training/sonfis.html">SONFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../usage/training/sonfis.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/training/sonfis.html#llamado">Llamado</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="optimizer_training.html">Optimizer Training Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimizer_training.html#example-1-auto-mpg-anfis">Example 1: Auto MPG (ANFIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#imports">1. Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#definicion-de-los-datos">1. Definición de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#preprocesamiento-de-los-datos">2. Preprocesamiento de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#definicion-del-dataloader">3. Definición del DataLoader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#definicion-del-modelo">4. Definición del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#definicion-del-algoritmo-de-entrenamiento">5. Definición del algoritmo de entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#entrenamiento-del-modelo">6. Entrenamiento del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#evaluacion-del-modelo">7. Evaluación del modelo</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimizer_training.html#example-2-parkinsons-rule-reduced-h-anfis">Example 2: Parkinsons (rule reduced h_ANFIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#id2">0. Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#id3">1. Definición de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#id4">2. Preprocesamiento de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#id5">3. Definición del DataLoader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#id6">4. Definición del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#id7">5. Definición del algoritmo de entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#id8">6. Entrenamiento del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#id9">7. Evaluación del modelo</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Hybrid Learning Algorithm Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example-1-surface-approximation-h-anfis">Example 1: Surface Approximation (h_ANFIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#imports">0. Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#definicion-de-los-datos">1. Definición de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#preprocesamiento-de-los-datos">2. Preprocesamiento de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#definicion-del-dataloader">3. Definición del DataLoader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#definicion-del-modelo">4. Definición del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#definicion-del-algoritmo-de-entrenamiento">5. Definición del algoritmo de entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#entrenamiento-del-modelo">6. Entrenamiento del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#evaluacion-del-modelo">7. Evaluación del modelo</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sonfis.html">SONFIS Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sonfis.html#example-1">Example 1:</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="sonfis.html#imports">0. Imports</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/func.html">Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../modules/func/membership.html">Membership Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../modules/func/membership.html#neuro_fuzzy_toolbox.func.membership.Gaussian_MF"><code class="docutils literal notranslate"><span class="pre">Gaussian_MF</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modules/func/membership.html#neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF"><code class="docutils literal notranslate"><span class="pre">GeneralizedBell_MF</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/func/consequent.html">Consequent Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../modules/func/consequent.html#neuro_fuzzy_toolbox.func.consequent.Linear_CF"><code class="docutils literal notranslate"><span class="pre">Linear_CF</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/layers.html">Layers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../modules/layers/fuzzification.html">Fuzzification Layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">FuzzificationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">h_FuzzificationLayer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/layers/firing_levels.html">Firing Levels Layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../modules/layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.FiringLevelsLayer"><code class="docutils literal notranslate"><span class="pre">FiringLevelsLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modules/layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.NormalizationLayer"><code class="docutils literal notranslate"><span class="pre">NormalizationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modules/layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.h_FiringLevelsLayer"><code class="docutils literal notranslate"><span class="pre">h_FiringLevelsLayer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/layers/consequent.html">Consequent Layer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">ConsequentLayer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/layers/output.html">Output Layer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../modules/layers/output.html#neuro_fuzzy_toolbox.layers.output_layer.OutputLayer"><code class="docutils literal notranslate"><span class="pre">OutputLayer</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../modules/models/anfis.html">ANFIS models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.h_ANFIS"><code class="docutils literal notranslate"><span class="pre">h_ANFIS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS"><code class="docutils literal notranslate"><span class="pre">ANFIS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS"><code class="docutils literal notranslate"><span class="pre">base_ANFIS</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/training.html">Training</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../modules/training/early_stopping.html">Early Stopping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../modules/training/early_stopping.html#neuro_fuzzy_toolbox.training.early_stopping.EarlyStopping"><code class="docutils literal notranslate"><span class="pre">EarlyStopping</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/training/update_strategies.html">Update Strategies</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../modules/training/update_strategies.html#ols-estimation-for-consequents">OLS Estimation for Consequents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modules/training/update_strategies.html#optimizer-training-epoch">Optimizer Training Epoch</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/training/training_algorithms.html">Training Algorithms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../modules/training/training_algorithms.html#hybrid-learning-algorithm">Hybrid Learning Algorithm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modules/training/training_algorithms.html#basic-optimizer-based-training-algorithm">Basic Optimizer Based Training Algorithm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modules/training/training_algorithms.html#base-model-training-class">base model training class</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/training/sonfis.html">SONFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../modules/training/sonfis.html#id2">SONFIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modules/training/sonfis.html#alternative-sonfis">alternative SONFIS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/evaluation.html">Evaluation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../modules/evaluation.html#neuro_fuzzy_toolbox.evaluation.evaluator.get_measures"><code class="docutils literal notranslate"><span class="pre">get_measures()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Neuro-Fuzzy Toolbox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">Hybrid Learning Algorithm Examples</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/hybrid_learning_algorithm.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hybrid-learning-algorithm-examples">
+<span id="id1"></span><h1>Hybrid Learning Algorithm Examples<a class="headerlink" href="#hybrid-learning-algorithm-examples" title="Link to this heading"></a></h1>
+<section id="example-1-surface-approximation-h-anfis">
+<h2>Example 1: Surface Approximation (h_ANFIS)<a class="headerlink" href="#example-1-surface-approximation-h-anfis" title="Link to this heading"></a></h2>
+<section id="imports">
+<h3>0. Imports<a class="headerlink" href="#imports" title="Link to this heading"></a></h3>
+<p>Importamos las librerías necesarias para el ejemplo:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">data</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;../../&#39;</span><span class="p">))</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">neuro_fuzzy_toolbox</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nft</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MinMaxScaler</span><span class="p">,</span>
+    <span class="n">StandardScaler</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+</pre></div>
+</div>
+<p>Para este ejemplo en particular, se intentará aproximar una superficie en el espacio R3:</p>
+<div class="math notranslate nohighlight">
+\[f(x, y) = 3\cdot (1-x)^2\cdot e^{-x^2 - (y+1)^2} - 10\cdot (\frac{1}{5}x - x^3 - y^5)\cdot e^{-x^2-y^2} - \frac{1}{3}\cdot e^{-(x+1)^2 - y^2}\]</div>
+</section>
+<section id="definicion-de-los-datos">
+<h3>1. Definición de los datos<a class="headerlink" href="#definicion-de-los-datos" title="Link to this heading"></a></h3>
+<p>Conjunto entrenamiento (simulando cierto nivel de ruido) y testeo:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">z</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">((</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="p">((</span><span class="n">y</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span> <span class="o">-</span> <span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">x</span><span class="o">/</span><span class="mi">5</span><span class="p">)</span><span class="o">-</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span><span class="o">-</span><span class="p">(</span><span class="n">y</span><span class="o">**</span><span class="mi">5</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="p">(</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="p">(</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span>
+
+<span class="c1">#Training</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">x1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">e</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span> <span class="c1">#noise</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">z</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span><span class="n">x1</span><span class="p">)</span> <span class="o">+</span> <span class="n">e</span>
+
+<span class="c1">#Testing</span>
+<span class="n">x0_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">x1_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">Y_test</span> <span class="o">=</span> <span class="n">z</span><span class="p">(</span><span class="n">x0_test</span><span class="p">,</span><span class="n">x1_test</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="preprocesamiento-de-los-datos">
+<h3>2. Preprocesamiento de los datos<a class="headerlink" href="#preprocesamiento-de-los-datos" title="Link to this heading"></a></h3>
+<p>Escalado de los datos:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#Training</span>
+<span class="n">scaler</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">(</span><span class="n">feature_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">vstack_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">x0</span><span class="p">,</span><span class="n">x1</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+<span class="n">scaled_train</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">vstack_train</span><span class="p">)</span>
+
+<span class="c1">#Testing</span>
+<span class="n">vstack_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">x0_test</span><span class="p">,</span><span class="n">x1_test</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+<span class="n">scaled_test</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">vstack_test</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="definicion-del-dataloader">
+<h3>3. Definición del DataLoader<a class="headerlink" href="#definicion-del-dataloader" title="Link to this heading"></a></h3>
+<p>Los conjuntos de datos se transforman a tensores de pytorch y se define el DataLoader para el conjunto de entrenamiento junto con el tamaño de los batches en las iteraciones del posterior entrenamiento del modelo.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">TensorDataset</span>
+
+<span class="n">train_loader</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">TensorDataset</span><span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">scaled_train</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="p">),</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+    <span class="n">shuffle</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Extraemos los tensores para su uso posterior si es necesario</span>
+<span class="n">x_train</span> <span class="o">=</span> <span class="n">train_loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">train_loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">x_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">scaled_test</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">y_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="definicion-del-modelo">
+<h3>4. Definición del modelo<a class="headerlink" href="#definicion-del-modelo" title="Link to this heading"></a></h3>
+<p>En este caso, se optará por el uso de un modelo h_ANFIS (ANFIS homogéneo).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>El Hybrid_learning_algorithm es aplicable a cualquier modelo ANFIS disponible en Neuro-Fuzzy Toolbox (ANFIS y h_ANFIS).</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">nft</span><span class="o">.</span><span class="n">h_ANFIS</span><span class="p">(</span>
+    <span class="n">input_size</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">num_mfs</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Inicializar los parámetros de las funciones de membresía tiene mejores resultados en este ejemplo:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">init_premises</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">show_premises_structure</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>      <span class="n">a</span> <span class="p">(</span><span class="n">x0</span><span class="p">)</span>  <span class="n">b</span> <span class="p">(</span><span class="n">x0</span><span class="p">)</span>  <span class="n">c</span> <span class="p">(</span><span class="n">x0</span><span class="p">)</span>  <span class="n">a</span> <span class="p">(</span><span class="n">x1</span><span class="p">)</span>  <span class="n">b</span> <span class="p">(</span><span class="n">x1</span><span class="p">)</span>  <span class="n">c</span> <span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+<span class="n">MF</span> <span class="mi">0</span>     <span class="mf">0.2</span>     <span class="mf">4.0</span>    <span class="o">-</span><span class="mf">1.0</span>     <span class="mf">0.2</span>     <span class="mf">4.0</span>    <span class="o">-</span><span class="mf">1.0</span>
+<span class="n">MF</span> <span class="mi">1</span>     <span class="mf">0.2</span>     <span class="mf">4.0</span>    <span class="o">-</span><span class="mf">0.6</span>     <span class="mf">0.2</span>     <span class="mf">4.0</span>    <span class="o">-</span><span class="mf">0.6</span>
+<span class="n">MF</span> <span class="mi">2</span>     <span class="mf">0.2</span>     <span class="mf">4.0</span>    <span class="o">-</span><span class="mf">0.2</span>     <span class="mf">0.2</span>     <span class="mf">4.0</span>    <span class="o">-</span><span class="mf">0.2</span>
+<span class="n">MF</span> <span class="mi">3</span>     <span class="mf">0.2</span>     <span class="mf">4.0</span>     <span class="mf">0.2</span>     <span class="mf">0.2</span>     <span class="mf">4.0</span>     <span class="mf">0.2</span>
+<span class="n">MF</span> <span class="mi">4</span>     <span class="mf">0.2</span>     <span class="mf">4.0</span>     <span class="mf">0.6</span>     <span class="mf">0.2</span>     <span class="mf">4.0</span>     <span class="mf">0.6</span>
+<span class="n">MF</span> <span class="mi">5</span>     <span class="mf">0.2</span>     <span class="mf">4.0</span>     <span class="mf">1.0</span>     <span class="mf">0.2</span>     <span class="mf">4.0</span>     <span class="mf">1.0</span>
+</pre></div>
+</div>
+</section>
+<section id="definicion-del-algoritmo-de-entrenamiento">
+<h3>5. Definición del algoritmo de entrenamiento<a class="headerlink" href="#definicion-del-algoritmo-de-entrenamiento" title="Link to this heading"></a></h3>
+<p>Luego, podemos definir el algoritmo de entrenamiento junto con un mecanismo <strong>EarlyStopping</strong> implementado en el toolbox:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">epochs</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">loss_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">mse_loss</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lr&#39;</span><span class="p">:</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="s1">&#39;weight_decay&#39;</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">}</span>
+<span class="n">validation</span> <span class="o">=</span> <span class="mf">0.3</span>
+<span class="n">early_stopping</span> <span class="o">=</span> <span class="n">nft</span><span class="o">.</span><span class="n">EarlyStopping</span><span class="p">(</span><span class="n">patience</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">nft</span><span class="o">.</span><span class="n">Hybrid_learning_algorithm</span><span class="p">(</span>
+    <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span>
+    <span class="n">loss_function</span><span class="o">=</span><span class="n">loss_fn</span><span class="p">,</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+    <span class="n">optimizer_params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+    <span class="n">validation</span><span class="o">=</span><span class="n">validation</span><span class="p">,</span>
+    <span class="n">early_stopping</span><span class="o">=</span><span class="n">early_stopping</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="entrenamiento-del-modelo">
+<h3>6. Entrenamiento del modelo<a class="headerlink" href="#entrenamiento-del-modelo" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Epoch</span><span class="p">:</span>   <span class="mi">1</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.480801</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.721475</span>
+<span class="n">Epoch</span><span class="p">:</span>   <span class="mi">2</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.477840</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.718508</span>
+<span class="n">Epoch</span><span class="p">:</span>   <span class="mi">3</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.475277</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.716161</span>
+<span class="n">Epoch</span><span class="p">:</span>   <span class="mi">4</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.472659</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.713498</span>
+<span class="n">Epoch</span><span class="p">:</span>   <span class="mi">5</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.470017</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.711177</span>
+<span class="n">Epoch</span><span class="p">:</span>   <span class="mi">6</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.467647</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.708426</span>
+<span class="n">Epoch</span><span class="p">:</span>   <span class="mi">7</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.464859</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.706709</span>
+<span class="n">Epoch</span><span class="p">:</span>   <span class="mi">8</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.462323</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.703486</span>
+<span class="n">Epoch</span><span class="p">:</span>   <span class="mi">9</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.460128</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.701562</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">10</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.457874</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.698973</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">11</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.455350</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.696706</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">12</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.452771</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.694189</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">13</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.450527</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.692190</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">14</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.448317</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.689814</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">15</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.446008</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.687502</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">16</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.443802</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.684893</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">17</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.441731</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.683295</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">18</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.439670</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.680978</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">19</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.437192</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.678953</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">20</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.435192</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.676556</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">21</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.433183</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.674573</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">22</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.431081</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.672719</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">23</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.429033</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.670726</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">24</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.427356</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.669143</span>
+<span class="n">Epoch</span><span class="p">:</span>  <span class="mi">25</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.425483</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.667172</span>
+<span class="o">...</span>
+<span class="n">Epoch</span><span class="p">:</span> <span class="mi">306</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.375460</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.625092</span>
+<span class="n">Epoch</span><span class="p">:</span> <span class="mi">307</span><span class="o">/</span><span class="mi">500</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.375455</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.624849</span>
+<span class="n">Early</span> <span class="n">stopping</span>
+<span class="n">Training</span> <span class="n">finished</span>
+</pre></div>
+</div>
+</section>
+<section id="evaluacion-del-modelo">
+<h3>7. Evaluación del modelo<a class="headerlink" href="#evaluacion-del-modelo" title="Link to this heading"></a></h3>
+<p>Finalmente, podemos evaluar el modelo usando el conjunto de testeo y la función <strong>get_measures</strong> del toolbox si se desea:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">test_measures</span> <span class="o">=</span> <span class="n">nft</span><span class="o">.</span><span class="n">get_measures</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">measure</span> <span class="ow">in</span> <span class="n">test_measures</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">measure</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">test_measures</span><span class="p">[</span><span class="n">measure</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MSE</span><span class="p">:</span> <span class="mf">0.12230610102415085</span>
+<span class="n">RMSE</span><span class="p">:</span> <span class="mf">0.34972289204597473</span>
+<span class="n">MAE</span><span class="p">:</span> <span class="mf">0.2811751365661621</span>
+<span class="n">R2</span><span class="p">:</span> <span class="mf">0.9658823609352112</span>
+<span class="n">MAPE</span><span class="p">:</span> <span class="mf">153.28375244140625</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="optimizer_training.html" class="btn btn-neutral float-left" title="Optimizer Training Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="sonfis.html" class="btn btn-neutral float-right" title="SONFIS Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Juan Suárez.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

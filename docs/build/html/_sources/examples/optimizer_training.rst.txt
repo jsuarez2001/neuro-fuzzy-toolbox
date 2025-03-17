@@ -1,0 +1,409 @@
+.. _optimizer_training_examples:
+
+Optimizer Training Examples
+===========================
+
+Example 1: Auto MPG (ANFIS)
+---------------------------
+
+1. Imports
+##########
+Importamos las librerías necesarias para el ejemplo:
+
+.. code:: python
+
+    import sys
+    import os
+    import torch
+    import torch.utils.data as data
+    import torch.nn as nn
+
+    sys.path.append(os.path.abspath('../../'))
+
+    import neuro_fuzzy_toolbox as nft
+
+    import pandas as pd
+    import numpy as np
+
+    from sklearn.preprocessing import (
+        MinMaxScaler,
+        StandardScaler
+    )
+    from sklearn.model_selection import train_test_split
+
+El ejemplo consiste en un dataset de UC Irvine Machine Learning Repository llamado "Auto MPG" con 7 features y 1 target, para más detalles sobre el dataset puede consultar `aquí <https://archive.ics.uci.edu/dataset/9/auto+mpg>`_.
+
+.. code:: python
+
+    from ucimlrepo import fetch_ucirepo
+
+    auto_mpg = fetch_ucirepo(id=9)
+
+    X = auto_mpg.data.features 
+    y = auto_mpg.data.targets
+
+1. Definición de los datos
+##########################
+El conjunto de datos se partirá en 2 conjuntos iguales para el entrenamiento y testeo del modelo:
+
+.. code:: python
+
+    # Reemplazamos valores NaN por la media de la columna y transformamos a tipo float32
+    X = X.fillna(X.mean()).astype(np.float32)
+    y = y.astype(np.float32)
+
+    x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.5)
+
+2. Preprocesamiento de los datos
+################################
+Se escalan tanto las features como el target para evitar problemas de estabilidad en el entrenamiento. 
+
+.. code:: python
+
+    #Features
+    scaler_x = StandardScaler()
+
+    x_train = scaler_x.fit_transform(x_train)
+
+    x_test = scaler_x.transform(x_test)
+
+    #Target
+    scaler_y = StandardScaler()
+
+    y_train = scaler_y.fit_transform(y_train)
+
+    y_test = scaler_y.transform(y_test)
+
+3. Definición del DataLoader
+############################
+Los conjuntos de datos se transforman a tensores de pytorch y se define el DataLoader para el conjunto de entrenamiento junto con el tamaño de los batches en las iteraciones del posterior entrenamiento del modelo.
+
+.. code:: python
+
+    loader = data.DataLoader(
+        data.TensorDataset(
+            torch.from_numpy(x_train), 
+            torch.from_numpy(y_train).squeeze()), 
+        batch_size = 4, 
+        shuffle = True)
+
+    x_train = loader.dataset.tensors[0]
+    y_train = loader.dataset.tensors[1]
+
+    x_test = torch.from_numpy(x_test)
+    y_test = torch.from_numpy(y_test).squeeze()
+
+4. Definición del modelo
+########################
+En este caso, se optará por el uso de un modelo ANFIS.
+
+.. note:: 
+    El Basic_optimizer_training_algorithm es aplicable a cualquier modelo ANFIS disponible en Neuro-Fuzzy Toolbox (ANFIS y h_ANFIS).
+
+.. code:: python
+
+    mf_distribution = [3, 3, 2, 3, 3, 2, 3]
+    model = nft.ANFIS(
+        mf_distribution=mf_distribution,
+        membership_function=Gaussian_MF
+    )
+
+Inicializar los parámetros de las funciones de membresía y posteriormente de los consecuentes tiene mejores resultados en este ejemplo:
+
+.. code:: python
+
+    model.init_premises(x_train)
+
+    model.init_consequents(x_train, y_train)
+
+
+5. Definición del algoritmo de entrenamiento
+############################################
+Luego, podemos definir el algoritmo de entrenamiento junto con un mecanismo **EarlyStopping** implementado en el toolbox:
+
+.. code:: python
+
+    epochs=1000
+    loss_fn = nn.functional.mse_loss
+    optimizer = torch.optim.AdamW
+    params = {'lr': 0.001, 'weight_decay': 0.01}
+    validation = 0.3
+    early_stopping = nft.EarlyStopping(patience=40)
+
+    trainer = nft.Basic_optimizer_training_algorithm(
+        epochs=epochs,
+        loss_function=loss_fn,
+        optimizer=optimizer,
+        optimizer_params=params,
+        validation=validation,
+        early_stopping=early_stopping
+    )
+
+6. Entrenamiento del modelo
+###########################
+
+.. code:: python
+
+    trainer(model, loader, verbose=True)
+
+.. code:: python
+
+    Epoch:    1/1000 - loss: 0.406679 - validation loss: 0.261190
+    Epoch:    2/1000 - loss: 0.319634 - validation loss: 0.212707
+    Epoch:    3/1000 - loss: 0.257622 - validation loss: 0.173961
+    Epoch:    4/1000 - loss: 0.216210 - validation loss: 0.154205
+    Epoch:    5/1000 - loss: 0.183572 - validation loss: 0.144177
+    Epoch:    6/1000 - loss: 0.162618 - validation loss: 0.135198
+    Epoch:    7/1000 - loss: 0.146440 - validation loss: 0.131196
+    Epoch:    8/1000 - loss: 0.134903 - validation loss: 0.130492
+    Epoch:    9/1000 - loss: 0.125897 - validation loss: 0.131084
+    Epoch:   10/1000 - loss: 0.118316 - validation loss: 0.130907
+    Epoch:   11/1000 - loss: 0.111574 - validation loss: 0.131533
+    Epoch:   12/1000 - loss: 0.106256 - validation loss: 0.134013
+    Epoch:   13/1000 - loss: 0.101435 - validation loss: 0.131734
+    Epoch:   14/1000 - loss: 0.098651 - validation loss: 0.129580
+    Epoch:   15/1000 - loss: 0.093336 - validation loss: 0.135087
+    Epoch:   16/1000 - loss: 0.089220 - validation loss: 0.134498
+    Epoch:   17/1000 - loss: 0.086061 - validation loss: 0.133210
+    Epoch:   18/1000 - loss: 0.083270 - validation loss: 0.132367
+    Epoch:   19/1000 - loss: 0.079974 - validation loss: 0.133363
+    Epoch:   20/1000 - loss: 0.077667 - validation loss: 0.135707
+    Epoch:   21/1000 - loss: 0.075467 - validation loss: 0.132253
+    Epoch:   22/1000 - loss: 0.072791 - validation loss: 0.132343
+    Epoch:   23/1000 - loss: 0.070582 - validation loss: 0.133913
+    Epoch:   24/1000 - loss: 0.068705 - validation loss: 0.130556
+    Epoch:   25/1000 - loss: 0.066321 - validation loss: 0.133296
+    ...
+    Epoch:  102/1000 - loss: 0.030091 - validation loss: 0.126440
+    Epoch:  103/1000 - loss: 0.029945 - validation loss: 0.125822
+    Early stopping
+    Training finished
+
+
+7. Evaluación del modelo
+########################
+Finalmente, podemos evaluar el modelo usando el conjunto de testeo y la función **get_measures** del toolbox si se desea:
+
+.. code:: python
+
+    test_measures = nft.get_measures(model, x_test, y_test)
+
+    for measure in test_measures:
+        print(measure + ':', test_measures[measure])
+
+.. code::
+
+    MSE: 0.14718928933143616
+    RMSE: 0.38365256786346436
+    MAE: 0.2677644193172455
+    R2: 0.8740177154541016
+    MAPE: 2.730555295944214
+
+
+Example 2: Parkinsons (rule reduced h_ANFIS)
+--------------------------------------------
+
+0. Imports
+##########
+Importamos las librerías necesarias para el ejemplo:
+
+.. code:: python
+
+    import sys
+    import os
+    import torch
+    import torch.utils.data as data
+    import torch.nn as nn
+
+    sys.path.append(os.path.abspath('../../'))
+
+    import neuro_fuzzy_toolbox as nft
+
+    import pandas as pd
+    import numpy as np
+
+    from sklearn.preprocessing import (
+        MinMaxScaler,
+        StandardScaler
+    )
+    from sklearn.model_selection import train_test_split
+
+Esta vez, para el ejemplo se usará un dataset de UC Irvine Machine Learning Repository llamado "Parkinsons" con 22 features y 1 target, para más detalles sobre el dataset puede consultar en este `enlace <https://archive.ics.uci.edu/dataset/174/parkinsons>`_.
+
+.. code:: python
+
+    from ucimlrepo import fetch_ucirepo
+
+    parkinsons = fetch_ucirepo(id=174)
+
+    X = parkinsons.data.features
+    y = parkinsons.data.targets
+
+1. Definición de los datos
+##########################
+El 30% de los datos se usarán para testeo y el 70% restante para entrenamiento:
+
+.. code:: python
+
+    # Reemplazamos valores NaN por la media de la columna y transformamos a tipo float32
+    x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.3, stratify=y)
+
+2. Preprocesamiento de los datos
+################################
+
+.. code:: python
+
+    scaler = MinMaxScaler(feature_range=(-1, 1))
+
+    x_train = scaler.fit_transform(x_train)
+
+    x_test = scaler.transform(x_test)
+
+3. Definición del DataLoader
+############################
+Los conjuntos de datos se transforman a tensores de pytorch y se define el DataLoader para el conjunto de entrenamiento junto con el tamaño de los batches en las iteraciones del posterior entrenamiento del modelo.
+
+.. code:: python
+
+    x_train = torch.from_numpy(x_train)
+    x_test = torch.from_numpy(x_test)
+    y_train = torch.from_numpy(y_train.values).squeeze()
+    y_test = torch.from_numpy(y_test.values).squeeze()
+
+    loader = data.DataLoader(
+        data.TensorDataset(
+            torch.from_numpy(x_train), 
+            torch.from_numpy(y_train).squeeze()), 
+        batch_size = 4, 
+        shuffle = True)
+
+    x_train = loader.dataset.tensors[0]
+    y_train = loader.dataset.tensors[1]
+
+4. Definición del modelo
+########################
+En este caso, se optará por el uso de un modelo h_ANFIS rule reduced debido a la gran cantidad de features que hay (usar un modelo ANFIS típico generaría una cantidad gigantezca de reglas).
+
+.. code:: python
+
+    model = nft.h_ANFIS(
+        input_size=x_train.shape[1], 
+        num_mfs=7, 
+        outputs=2,
+        rule_reduced=True,
+        output_type='multiclass',
+        dtype=torch.float64
+    )
+
+Inicializar los parámetros de las funciones de membresía y posteriormente de los consecuentes tiene mejores resultados en este ejemplo:
+
+.. code:: python
+
+    model.init_premises(x_train)
+
+    model.init_consequents(x_train, y_train)
+
+
+5. Definición del algoritmo de entrenamiento
+############################################
+Luego, podemos definir el algoritmo de entrenamiento junto con un mecanismo **EarlyStopping** implementado en el toolbox:
+
+.. code:: python
+
+    epochs=1000
+    loss_fn = nn.functional.cross_entropy
+    optimizer = torch.optim.AdamW
+    params = {'lr': 0.001, 'weight_decay': 0.01}
+    validation=0.3
+    early_stopping = nft.EarlyStopping(
+        patience=60, 
+        delta=0.0001
+    )
+
+    trainer = nft.Basic_optimizer_training_algorithm(
+        epochs=epochs,
+        loss_function=loss_fn,
+        optimizer=optimizer,
+        optimizer_params=params,
+        validation=validation,
+        early_stopping=early_stopping
+    )
+
+6. Entrenamiento del modelo
+###########################
+
+.. code:: python
+
+    trainer(model, loader, verbose=True)
+
+.. code:: python
+
+    Epoch:    1/1000 - loss: 0.467904 - validation loss: 0.431925
+    Epoch:    2/1000 - loss: 0.446155 - validation loss: 0.413192
+    Epoch:    3/1000 - loss: 0.430608 - validation loss: 0.394856
+    Epoch:    4/1000 - loss: 0.421752 - validation loss: 0.390067
+    Epoch:    5/1000 - loss: 0.413778 - validation loss: 0.380687
+    Epoch:    6/1000 - loss: 0.406342 - validation loss: 0.373894
+    Epoch:    7/1000 - loss: 0.400777 - validation loss: 0.367174
+    Epoch:    8/1000 - loss: 0.395463 - validation loss: 0.363702
+    Epoch:    9/1000 - loss: 0.390779 - validation loss: 0.362394
+    Epoch:   10/1000 - loss: 0.381779 - validation loss: 0.345421
+    Epoch:   11/1000 - loss: 0.375767 - validation loss: 0.331390
+    Epoch:   12/1000 - loss: 0.367880 - validation loss: 0.321370
+    Epoch:   13/1000 - loss: 0.344484 - validation loss: 0.291263
+    Epoch:   14/1000 - loss: 0.350039 - validation loss: 0.316823
+    Epoch:   15/1000 - loss: 0.327000 - validation loss: 0.292700
+    Epoch:   16/1000 - loss: 0.304245 - validation loss: 0.246718
+    Epoch:   17/1000 - loss: 0.316334 - validation loss: 0.293547
+    Epoch:   18/1000 - loss: 0.270667 - validation loss: 0.261833
+    Epoch:   19/1000 - loss: 0.259823 - validation loss: 0.265399
+    Epoch:   20/1000 - loss: 0.270951 - validation loss: 0.289159
+    Epoch:   21/1000 - loss: 0.244253 - validation loss: 0.268197
+    Epoch:   22/1000 - loss: 0.231825 - validation loss: 0.267712
+    Epoch:   23/1000 - loss: 0.302661 - validation loss: 0.327096
+    Epoch:   24/1000 - loss: 0.306579 - validation loss: 0.322958
+    Epoch:   25/1000 - loss: 0.301141 - validation loss: 0.316257
+    ...
+    Epoch:  129/1000 - loss: 0.074942 - validation loss: 0.154349
+    Epoch:  130/1000 - loss: 0.074778 - validation loss: 0.158906
+    Early stopping
+    Training finished
+
+
+7. Evaluación del modelo
+########################
+Finalmente, podemos evaluar el modelo usando el conjunto de testeo y la función **get_measures** del toolbox si se desea:
+
+.. code:: python
+
+    test_measures = nft.get_measures(model, x_test, y_test)
+
+    for measure in test_measures:
+        print(measure + ':', test_measures[measure])
+
+.. code::
+
+    Accuracy: 0.847457627118644
+    Precision: 0.8412369275153264
+    Recall: 0.847457627118644
+    F1: 0.8414974855652821
+    Confusion Matrix: [[ 9  6]
+     [ 3 41]]
+
+
+.. code:: python
+
+    train_measures = nft.get_measures(model, x_train, y_train)
+
+    for measure in train_measures:
+        print(measure + ':', train_measures[measure])
+
+.. code::
+
+    Accuracy: 0.9632352941176471
+    Precision: 0.9680727554179567
+    Recall: 0.9632352941176471
+    F1: 0.9640725535536897
+    Confusion Matrix: [[33  0]
+     [ 5 98]]
+

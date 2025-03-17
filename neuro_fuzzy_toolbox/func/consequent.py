@@ -12,7 +12,7 @@ class ConsequentFunction(nn.Module):
         pass
     
     @abstractmethod
-    def initialize_consequents(self, outputs, rules, input_size, dtype):
+    def random_consequents(self, outputs, rules, input_size, dtype):
         pass
 
 
@@ -47,7 +47,7 @@ class Linear_CF(ConsequentFunction):
         """
         return (torch.bmm(x.unsqueeze(0).expand(consequents[:, :, :-1].size(0), -1, -1), torch.transpose(consequents[:, :, :-1], 1, 2)) + consequents[:, :, -1].unsqueeze(1)).mul(weights.unsqueeze(0))
 
-    def initialize_consequents(self, outputs, rules, input_size, dtype):
+    def random_consequents(self, outputs, rules, input_size, dtype):
         """
         Inicializa los parámetros consecuentes de la red ANFIS de manera aleatoria en el rango [-1, 1].
         """

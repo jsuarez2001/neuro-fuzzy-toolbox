@@ -19,8 +19,8 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="API Reference" href="../../modules.html" />
-    <link rel="prev" title="Optimizer Training Algorithm" href="optimizer_training.html" /> 
+    <link rel="next" title="Examples" href="../../examples.html" />
+    <link rel="prev" title="Basic Optimizer Training Algorithm" href="optimizer_training.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -72,15 +72,77 @@
 <li class="toctree-l4"><a class="reference internal" href="considerations.html#entrada-y-salida-de-los-modelos">Entrada y salida de los modelos</a></li>
 <li class="toctree-l4"><a class="reference internal" href="considerations.html#dataloaders-de-pytorch">DataLoaders de PyTorch</a></li>
 <li class="toctree-l4"><a class="reference internal" href="considerations.html#validacion-y-test">Validación y Test</a></li>
-<li class="toctree-l4"><a class="reference internal" href="considerations.html#estructura-general">Estructura general</a></li>
+<li class="toctree-l4"><a class="reference internal" href="considerations.html#algortimos-de-entrenamiento">Algortimos de entrenamiento</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="early_stopping.html">Early Stopping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="early_stopping.html#instanciacion">Instanciación</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="hybrid_learning_algorithm.html">Hybrid Learning Algorithm</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="hybrid_learning_algorithm.html#ejemplo-de-uso">Ejemplo de uso</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hybrid_learning_algorithm.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="hybrid_learning_algorithm.html#llamado">Llamado</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="optimizer_training.html">Optimizer Training Algorithm</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">SONFIS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimizer_training.html">Basic Optimizer Training Algorithm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizer_training.html#llamado">Llamado</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">SONFIS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#instanciacion">Instanciación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#llamado">Llamado</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/optimizer_training.html">Optimizer Training Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/optimizer_training.html#example-1-auto-mpg-anfis">Example 1: Auto MPG (ANFIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#imports">1. Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#definicion-de-los-datos">1. Definición de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#preprocesamiento-de-los-datos">2. Preprocesamiento de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#definicion-del-dataloader">3. Definición del DataLoader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#definicion-del-modelo">4. Definición del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#definicion-del-algoritmo-de-entrenamiento">5. Definición del algoritmo de entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#entrenamiento-del-modelo">6. Entrenamiento del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#evaluacion-del-modelo">7. Evaluación del modelo</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/optimizer_training.html#example-2-parkinsons-rule-reduced-h-anfis">Example 2: Parkinsons (rule reduced h_ANFIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#id2">0. Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#id3">1. Definición de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#id4">2. Preprocesamiento de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#id5">3. Definición del DataLoader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#id6">4. Definición del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#id7">5. Definición del algoritmo de entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#id8">6. Entrenamiento del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/optimizer_training.html#id9">7. Evaluación del modelo</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/hybrid_learning_algorithm.html">Hybrid Learning Algorithm Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/hybrid_learning_algorithm.html#example-1-surface-approximation-h-anfis">Example 1: Surface Approximation (h_ANFIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/hybrid_learning_algorithm.html#imports">0. Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/hybrid_learning_algorithm.html#definicion-de-los-datos">1. Definición de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/hybrid_learning_algorithm.html#preprocesamiento-de-los-datos">2. Preprocesamiento de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/hybrid_learning_algorithm.html#definicion-del-dataloader">3. Definición del DataLoader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/hybrid_learning_algorithm.html#definicion-del-modelo">4. Definición del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/hybrid_learning_algorithm.html#definicion-del-algoritmo-de-entrenamiento">5. Definición del algoritmo de entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/hybrid_learning_algorithm.html#entrenamiento-del-modelo">6. Entrenamiento del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/hybrid_learning_algorithm.html#evaluacion-del-modelo">7. Evaluación del modelo</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/sonfis.html">SONFIS Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/sonfis.html#example-1">Example 1:</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/sonfis.html#imports">0. Imports</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -88,13 +150,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../modules/func.html">Functions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../modules/func/membership.html">Membership Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../modules/func/membership.html#neuro_fuzzy_toolbox.func.membership.MembershipFunction"><code class="docutils literal notranslate"><span class="pre">MembershipFunction</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../modules/func/membership.html#neuro_fuzzy_toolbox.func.membership.Gaussian_MF"><code class="docutils literal notranslate"><span class="pre">Gaussian_MF</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../modules/func/membership.html#neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF"><code class="docutils literal notranslate"><span class="pre">GeneralizedBell_MF</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../modules/func/consequent.html">Consequent Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../modules/func/consequent.html#neuro_fuzzy_toolbox.func.consequent.ConsequentFunction"><code class="docutils literal notranslate"><span class="pre">ConsequentFunction</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../modules/func/consequent.html#neuro_fuzzy_toolbox.func.consequent.Linear_CF"><code class="docutils literal notranslate"><span class="pre">Linear_CF</span></code></a></li>
 </ul>
 </li>
@@ -124,9 +184,9 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../modules/models.html">Models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../modules/models/anfis.html">ANFIS models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.h_ANFIS"><code class="docutils literal notranslate"><span class="pre">h_ANFIS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS"><code class="docutils literal notranslate"><span class="pre">ANFIS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS"><code class="docutils literal notranslate"><span class="pre">base_ANFIS</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.h_ANFIS"><code class="docutils literal notranslate"><span class="pre">h_ANFIS</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -137,19 +197,19 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../modules/training/update_strategies.html">Update Strategies</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../modules/training/update_strategies.html#neuro_fuzzy_toolbox.training.update_strategies.classical_consequents_estimation_with_OLS"><code class="docutils literal notranslate"><span class="pre">classical_consequents_estimation_with_OLS()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../modules/training/update_strategies.html#neuro_fuzzy_toolbox.training.update_strategies.optimizer_training_epoch"><code class="docutils literal notranslate"><span class="pre">optimizer_training_epoch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/update_strategies.html#ols-estimation-for-consequents">OLS Estimation for Consequents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/update_strategies.html#optimizer-training-epoch">Optimizer Training Epoch</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../modules/training/training_algorithms.html">Training Algorithms</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Hybrid_learning_algorithm"><code class="docutils literal notranslate"><span class="pre">Hybrid_learning_algorithm</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Optimizer_training"><code class="docutils literal notranslate"><span class="pre">Optimizer_training</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer"><code class="docutils literal notranslate"><span class="pre">base_model_trainer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/training_algorithms.html#hybrid-learning-algorithm">Hybrid Learning Algorithm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/training_algorithms.html#basic-optimizer-based-training-algorithm">Basic Optimizer Based Training Algorithm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/training_algorithms.html#base-model-training-class">base model training class</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../modules/training/sonfis.html">SONFIS</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../modules/training/sonfis.html#neuro_fuzzy_toolbox.training.sonfis.SONFIS"><code class="docutils literal notranslate"><span class="pre">SONFIS</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../modules/training/sonfis.html#neuro_fuzzy_toolbox.training.sonfis.alt_SONFIS"><code class="docutils literal notranslate"><span class="pre">alt_SONFIS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/sonfis.html#id2">SONFIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modules/training/sonfis.html#alternative-sonfis">alternative SONFIS</a></li>
 </ul>
 </li>
 </ul>
@@ -160,7 +220,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
 </ul>
 
         </div>
@@ -191,16 +250,111 @@
              
   <section id="sonfis">
 <h1>SONFIS<a class="headerlink" href="#sonfis" title="Link to this heading"></a></h1>
-<p>Self-Organizing Neuro-Fuzzy Inference System (SONFIS). Algoritmo que combina el algoritmo híbrido clásico para ANFIS con una serie de operaciones para la actualización de la estructura del modelo.
-Está diseñado solo para trabajar con modelos rule-reduced h_ANFIS.</p>
+<p>Self-Organizing Neuro-Fuzzy Inference System (SONFIS). Algoritmo que combina el algoritmo híbrido clásico para ANFIS con una serie de operaciones para la actualización de la estructura del modelo.</p>
+<a class="reference internal image-reference" href="../../_images/SONFIS_pseudocode.png"><img alt="../../_images/SONFIS_pseudocode.png" class="align-center" src="../../_images/SONFIS_pseudocode.png" style="width: 100%;" />
+</a>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Este módulo solo es aplicable a modelos ANFIS homogéneos con reglas reducidas (rule_reduced h_ANFIS).</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>Para más detalles sobre el algoritmo SONFIS, puede consultar el artículo original: <a class="reference external" href="https://doi.org/10.1080/18756891.2016.1175809">SONFIS: Structure Identification and Modeling with a Self-Organizing Neuro-Fuzzy Inference System</a>.</p></li>
+<li><p>Para más información sobre su implementación en el toolbox, ver <a class="reference internal" href="../../modules/training/sonfis.html#sonfis"><span class="std std-ref">SONFIS</span></a>.</p></li>
+<li><p>Puede ver ejemplos de uso <a class="reference internal" href="../../examples/sonfis.html#sonfis-examples"><span class="std std-ref">aquí</span></a>.</p></li>
+</ul>
+</div>
+<section id="instanciacion">
+<h2>Instanciación<a class="headerlink" href="#instanciacion" title="Link to this heading"></a></h2>
+<p>Para instanciar el algoritmo SONFIS se deben pasar los siguientes argumentos:</p>
+<ul class="simple">
+<li><p><cite>Ngrow</cite> (int): Número mínimo de muestras para crecer una nueva subred.</p></li>
+<li><p>dGrow (float): Si el nivel de disparo máximo de un conjunto de muestras mal modeladas es menor o igual a este valor elevado a la dimensión de los datos, se considera para crecer una nueva subred.</p></li>
+<li><p>Nsplit (int): Número mínimo de muestras para dividir una subred.</p></li>
+<li><p>eSplit (float): Error cuadrado medio mínimo de un conjunto de muestras para dividir una subred.</p></li>
+<li><p>Nvanish (int): Número máximo de muestras para desvanecer una subred.</p></li>
+<li><p>lVanish (int): Edad máxima para desvanecer una subred.</p></li>
+<li><p>max_iterations (int): Número máximo de iteraciones.</p></li>
+<li><p>ANFIStrainer (Hybrid_learning_algorithm): Instancia del algoritmo de aprendizaje híbrido. Se utiliza para obtener sus parámetros, ya que el algoritmo de actualización de parámetros híbrido del modelo ANFIS clásico es por defecto el aplicado en SONFIS.</p></li>
+<li><p>validation (float): Porcentaje de división de validación. Si es 0, no se realiza validación (Default: 0).</p></li>
+<li><p>early_stopping (EarlyStopping): Instancia de EarlyStopping (Default: None).</p></li>
+<li><p>last_training_iteration (bool): Indica si se debe realizar una última actualización de parámetros después de que el algoritmo SONFIS finalice (Default: False).</p></li>
+</ul>
+</section>
+<section id="llamado">
+<h2>Llamado<a class="headerlink" href="#llamado" title="Link to this heading"></a></h2>
+<p>Para llamar al algoritmo SONFIS, se debe pasar el modelo a entrenar y el DataLoader con los datos de entrenamiento. Adicionalmente, se puede especificar si se desea mostrar información del progreso del entrenamiento con el argumento <cite>verbose</cite>.</p>
+<section id="ejemplo">
+<h3>Ejemplo<a class="headerlink" href="#ejemplo" title="Link to this heading"></a></h3>
+<p>Para instanciar el algoritmo, primero hay que instanciar el algoritmo de entrenamiento híbrido:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">neuro_fuzzy_toolbox</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nft</span>
+
+<span class="n">epochs</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">loss_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">mse_loss</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lr&#39;</span><span class="p">:</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="s1">&#39;weight_decay&#39;</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">}</span>
+<span class="n">early_stopping</span> <span class="o">=</span> <span class="n">nft</span><span class="o">.</span><span class="n">EarlyStopping</span><span class="p">(</span><span class="n">patience</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span>
+
+<span class="n">ANFIStrainer</span> <span class="o">=</span> <span class="n">nft</span><span class="o">.</span><span class="n">Hybrid_learning_algorithm</span><span class="p">(</span>
+    <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span>
+    <span class="n">loss_function</span><span class="o">=</span><span class="n">loss_fn</span><span class="p">,</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+    <span class="n">optimizer_params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+    <span class="n">early_stopping</span><span class="o">=</span><span class="n">early_stopping</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>El argumento <cite>validation</cite> para la instancia del algoritmo de entrenamiento híbrido no es tomado en cuenta, pues este se define en la instancia del algoritmo SONFIS.
+Es decir, independientemente de si se define o no en el algoritmo de entrenamiento híbrido, se debe definir en el algoritmo SONFIS (el mecanismo early stopping
+del algoritmo de entrenamiento híbrido trabajará con el conjunto de validación definido en SONFIS).</p>
+</div>
+<p>Luego, se puede instanciar el algoritmo SONFIS:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Ngrow</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">dGrow</span> <span class="o">=</span> <span class="mf">0.8</span>
+<span class="n">Nsplit</span> <span class="o">=</span> <span class="mi">25</span>
+<span class="n">eSplit</span> <span class="o">=</span> <span class="mf">1.2</span>
+<span class="n">Nvanish</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">lVanish</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">max_iterations</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">validation</span> <span class="o">=</span> <span class="mf">0.3</span>
+<span class="n">sonfis_early_stopping</span> <span class="o">=</span> <span class="n">nft</span><span class="o">.</span><span class="n">EarlyStopping</span><span class="p">(</span><span class="n">patience</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">last_training_iteration</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="n">sonfis</span> <span class="o">=</span> <span class="n">nft</span><span class="o">.</span><span class="n">SONFIS</span><span class="p">(</span>
+    <span class="n">Ngrow</span><span class="o">=</span><span class="n">Ngrow</span><span class="p">,</span>
+    <span class="n">dGrow</span><span class="o">=</span><span class="n">dGrow</span><span class="p">,</span>
+    <span class="n">Nsplit</span><span class="o">=</span><span class="n">Nsplit</span><span class="p">,</span>
+    <span class="n">eSplit</span><span class="o">=</span><span class="n">eSplit</span><span class="p">,</span>
+    <span class="n">Nvanish</span><span class="o">=</span><span class="n">Nvanish</span><span class="p">,</span>
+    <span class="n">lVanish</span><span class="o">=</span><span class="n">lVanish</span><span class="p">,</span>
+    <span class="n">max_iterations</span><span class="o">=</span><span class="n">max_iterations</span><span class="p">,</span>
+    <span class="n">ANFIStrainer</span><span class="o">=</span><span class="n">ANFIStrainer</span><span class="p">,</span>
+    <span class="n">validation</span><span class="o">=</span><span class="n">validation</span><span class="p">,</span>
+    <span class="n">early_stopping</span><span class="o">=</span><span class="n">sonfis_early_stopping</span><span class="p">,</span>
+    <span class="n">last_training_iteration</span><span class="o">=</span><span class="n">last_training_iteration</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Finalmente, se puede proceder con el entrenamiento del modelo:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Considerando que &quot;model&quot; es el modelo ANFIS instanciado en cuestión</span>
+<span class="c1"># y que &quot;train_loader&quot; es el DataLoader con los datos de entrenamiento</span>
+
+<span class="n">sonfis</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># Esto ejecutará el entrenamiento del modelo</span>
+</pre></div>
+</div>
+</section>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="optimizer_training.html" class="btn btn-neutral float-left" title="Optimizer Training Algorithm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../../modules.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="optimizer_training.html" class="btn btn-neutral float-left" title="Basic Optimizer Training Algorithm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

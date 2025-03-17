@@ -25,7 +25,7 @@ class EarlyStopping():
 
     def __call__(self, model, loss, verbose=False):
         """
-        Llama al mecanismo de Early Stopping para evaluar si se debe detener el entrenamiento del modelo.
+        Llama al mecanismo de Early Stopping para evaluar si se debe detener el entrenamiento del modelo. En caso de que así sea, el atributo stop se actualiza a True.
         
         Args:
             model (torch.nn.Module): Modelo a evaluar
@@ -62,6 +62,6 @@ class EarlyStopping():
     @property
     def stop(self):
         """
-        Indica si el entrenamiento debe detenerse.
+        Booleano que indica si el entrenamiento debe detenerse.
         """
         return self._stop

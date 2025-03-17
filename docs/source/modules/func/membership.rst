@@ -3,10 +3,9 @@
 Membership Functions
 ====================
 
-Aquí están definidas las funciones de membresía utilizadas en el Toolbox. Estas funciones son utilizadas para definir los conjuntos difusos en las variables de entrada de los modelos neurodifusos.
-Conocidos también como variables lingüísticas, los conjuntos difusos son una forma de representar la incertidumbre en los sistemas de inferencia difusa.
+Aquí están definidas las funciones de membresía utilizadas en el Toolbox. Estas funciones son utilizadas para definir los conjuntos difusos (variables lingüisticas) en las variables de entrada de los modelos neurodifusos.
 
-.. autoclass:: neuro_fuzzy_toolbox.func.membership.MembershipFunction
+Todas las clases a continuación heredan de la clase base llamada *MembershipFunction*, la cual solo define su estructura y sirve de guía para futuras implementaciones.
 
 .. _Gaussian_MF:
 .. autoclass:: neuro_fuzzy_toolbox.func.membership.Gaussian_MF

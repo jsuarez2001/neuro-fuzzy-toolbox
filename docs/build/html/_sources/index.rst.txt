@@ -15,5 +15,5 @@ Bienvenido a la documentación de Neuro-Fuzzy Toolbox.
    introduction
    installation
    usage
-   modules
    examples
+   modules

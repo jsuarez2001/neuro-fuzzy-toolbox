@@ -17,7 +17,7 @@ Se importará la clase **h_ANFIS** y la función de membresía **Gaussian_MF** p
 
     sys.path.append(os.path.abspath('../'))
 
-    from neuro_fuzzy_toolbox import h_ANFIS, Gaussian_MF
+    import neuro_fuzzy_toolbox as nft
     import torch
 
 
@@ -45,16 +45,17 @@ Se utilizarán datos de entrenamiento generados aleatoriamente para el ejemplo a
 
     # Se simulará un conjunto de datos de 200 muestras con 3 features
     x_train = 2 * torch.rand(200, 3) - 1 # la dimensión debe ser (200, 3)
+    y_train = torch.rand(200) # la dimensión debe ser (200,)
 
 A continuación se instancia un modelo h_ANFIS con 3 funciones de membresía para cada feature de los datos de entrada y con una salida. Se mostrarán todos los parámetros relevantes para instanciar la clase.
 
 .. code-block:: python
 
-    model = h_ANFIS(
+    model = nft.h_ANFIS(
         input_size=x_train.shape[1], # 3 features
         num_mfs=3, # 3 funciones de membresía
         outputs=1, # 1 salida
-        membership_function=Gaussian_MF, # Función de membresía gaussiana
+        membership_function=nft.Gaussian_MF, # Función de membresía gaussiana
         output_type='regression', # Tipo de salida: regresión
     )
 
@@ -179,6 +180,47 @@ En cuanto a los consecuentes, hay métodos análogos a los de los antecedentes: 
 
 La única diferencia es que, en el caso del método **model.consequents_structure**, se retorna una lista con los dataframe correspondientes a cada una de las salidas del modelo. En este caso, como solo hay una salida, se retorna una lista con un solo dataframe.
 
+init_consequents
+~~~~~~~~~~~~~~~~
+Al igual que con los antecedentes, los consecuentes pueden ser inicializados (se hace una estimación de mínimos cuadrados para su estimación):
+
+.. code-block:: python
+
+    model.init_consequents(x_train, y_train)
+
+    model.show_consequents_structure()
+
+.. code-block:: python
+
+    - Output 1:
+               c0 (x0)    c1 (x1)    c2 (x2)         c3
+    rule 1  -38.603622  83.139351  -4.721482  35.447437
+    rule 2   11.611960 -18.674757 -16.584797  -8.276023
+    rule 3    4.777979  12.768584 -24.019762  47.975079
+    rule 4  -13.011658  80.083794  13.818563   0.792695
+    rule 5   14.744291 -15.238177  14.997739  15.207272
+    rule 6   -8.531214  18.137932   7.622557 -17.553904
+    rule 7  -46.518402  66.189758  57.811459 -69.268761
+    rule 8   -5.500585 -13.139522  21.414112   2.256964
+    rule 9    0.178966  24.161200   1.848382 -29.489714
+    rule 10 -39.433895 -28.971519 -17.817743 -47.437130
+    rule 11   7.517597  13.991263 -17.467180  15.493506
+    rule 12  26.560833  -4.370911 -14.732899  15.440524
+    rule 13 -11.223594 -27.542837  10.466902  12.842992
+    rule 14  10.921582  20.938026  14.123129   2.535148
+    rule 15  -9.170781 -15.080878  19.803434 -21.838345
+    rule 16 -38.962158 -25.079311 -14.063742  16.590000
+    rule 17  -4.855482  26.163994  -6.663449 -23.330303
+    rule 18  -1.587998 -20.165577   0.393830  22.284754
+    rule 19 -33.708397  63.667454 -24.790689  82.564964
+    rule 20  -3.639538 -16.275009  13.400737  -8.231231
+    rule 21  59.088257   4.166258  32.328194 -77.644859
+    rule 22 -13.431444  50.953583  -6.445808  -0.670563
+    rule 23  11.838889 -17.402069 -23.034710 -14.948477
+    ...
+    rule 26  -2.833748 -13.963975 -10.615835  16.864780
+    rule 27  -1.262385  -5.599927 -22.673426  26.784224
+
 forward
 ~~~~~~~
 El método **forward** permite obtener la salida del modelo para un conjunto de datos de entrada en forma de un tensor de PyTorch. Este método genera el grafo de cómputo de PyTorch, lo que permite realizar backpropagation y entrenar el modelo.
@@ -246,7 +288,7 @@ Se inicializa el modelo con 2 funciones de membresía para cada feature de los d
 
 .. code-block:: python
 
-    model = h_ANFIS(
+    model = nft.h_ANFIS(
         input_size=x_train.shape[1], # 2 features
         num_mfs=2, # 2 funciones de membresía
         outputs=1, # 1 salida
@@ -287,7 +329,7 @@ Se inicializa el modelo con 2 funciones de membresía para cada feature de los d
 
 .. code-block:: python
 
-    model = h_ANFIS(
+    model = nft.h_ANFIS(
         input_size=x_train.shape[1], # 3 features
         num_mfs=3, # 3 funciones de membresía
         outputs=4, # 4 clases
@@ -374,7 +416,7 @@ La única diferencia en la arquitectura del modelo al trabajar con múltiples sa
 .. code-block:: python
 
     # Se instancía un modelo para un problema de regresión con 3 funciones de membresía para cada feature de los datos de entrada y con 2 salidas
-    model = h_ANFIS(
+    model = nft.h_ANFIS(
         input_size=x_train.shape[1], # 2 features
         num_mfs=3, # 3 funciones de membresía
         outputs=2, # 2 salidas
@@ -472,14 +514,14 @@ Para su instanciación, la clase h_ANFIS tiene un parámetro llamado `rule_reduc
 
 .. code-block:: python
 
-    from neuro_fuzzy_toolbox import h_ANFIS
+    import neuro_fuzzy_toolbox as nft
 
     # Se simulará un conjunto de datos de 200 muestras con 2 features
     x_train = 2 * torch.rand(200, 2) - 1 # la dimensión debe ser (200, 2)
 
 .. code-block:: python
 
-    model = h_ANFIS(
+    model = nft.h_ANFIS(
         input_size=2,
         num_mfs=3,
         outputs=1,
