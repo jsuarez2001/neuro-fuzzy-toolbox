@@ -275,7 +275,8 @@ Los conjuntos de datos se transforman a tensores de pytorch y se define el DataL
             torch.from_numpy(x_train), 
             torch.from_numpy(y_train).squeeze()), 
         batch_size = 4, 
-        shuffle = True)
+        shuffle = True
+    )
 
     x_train = loader.dataset.tensors[0]
     y_train = loader.dataset.tensors[1]
@@ -291,7 +292,7 @@ En este caso, se optará por el uso de un modelo h_ANFIS rule reduced debido a l
         num_mfs=7, 
         outputs=2,
         rule_reduced=True,
-        output_type='multiclass',
+        output_type='softnax',
         dtype=torch.float64
     )
 

@@ -50,11 +50,11 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#salida-sigmoide-y-softmax">Salida sigmoide y softmax</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../usage/models/anfis.html">ANFIS</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#instanciacion">Instanciación</a></li>
@@ -62,6 +62,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/rule_reduced_anfis.html">ANFIS de reglas reducidas</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../usage/training.html">Training</a><ul>
@@ -138,6 +139,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../examples/sonfis.html">SONFIS Examples</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../examples/sonfis.html#example-1">Example 1:</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#imports">0. Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-de-los-datos">1. Definición de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#preprocesamiento-de-los-datos">2. Preprocesamiento de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-del-dataloader">3. Definición del DataLoader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-del-modelo">4. Definición del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-del-algoritmo-de-entrenamiento">5. Definición del algoritmo de entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#instancicion-del-algoritmo-sonfis">6. Instancición del algoritmo SONFIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#entrenamiento-del-modelo">7. Entrenamiento del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#evaluacion-del-modelo">7. Evaluación del modelo</a></li>
 </ul>
 </li>
 </ul>
@@ -161,6 +170,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/fuzzification.html">Fuzzification Layers</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">FuzzificationLayer</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">h_FuzzificationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">rule_reduced_FuzzificationLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/firing_levels.html">Firing Levels Layers</a><ul>
@@ -171,6 +181,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/consequent.html">Consequent Layer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">ConsequentLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">alt_ConsequentLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/output.html">Output Layer</a><ul>
@@ -313,9 +324,9 @@
 <span class="sd">            verbose (bool): Indica si se deben imprimir mensajes de aviso (Default: True).</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_val_split</span><span class="p">(</span><span class="n">loader</span><span class="p">)</span>
+        <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_val_split</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_optimizer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_optimizer</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">_register_loss</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">)</span>
 
@@ -340,8 +351,7 @@
                     
             <span class="n">ep</span> <span class="o">+=</span> <span class="mi">1</span>
         
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Training finished&#39;</span><span class="p">)</span></div>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Training finished&#39;</span><span class="p">)</span></div>
 
             
             
@@ -367,7 +377,7 @@
         
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
     
-    <span class="k">def</span><span class="w"> </span><span class="nf">_train_val_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_train_val_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Divide los datos de entrenamiento en datos de entrenamiento y validación.</span>
 <span class="sd">        </span>
@@ -382,7 +392,12 @@
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">train_loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span>
-            <span class="n">x_train</span><span class="p">,</span> <span class="n">x_val</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">y_train</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validation</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">_output_type</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+                <span class="n">x_train</span><span class="p">,</span> <span class="n">x_val</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">y_train</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validation</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x_train</span><span class="p">,</span> <span class="n">x_val</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">y_train</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validation</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y_train</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+                
             <span class="n">x_train</span><span class="p">,</span> <span class="n">x_val</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">x_train</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">x_val</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y_train</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y_val</span><span class="p">)</span>
             
             <span class="n">train_loader</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">TensorDataset</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">),</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">train_loader</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -429,7 +444,7 @@
         <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
             <span class="n">pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loss_function</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">val_loader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">val_loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">val_loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
@@ -491,20 +506,15 @@
 
         
         
-    <span class="k">def</span><span class="w"> </span><span class="nf">_init_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Inicializa el optimizador a utilizar en el entrenamiento, utilizando los parámetros de los antececentes del modelo ANFIS y los parámetros del optimizador especificados.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            model (ANFIS | h_ANFIS): Modelo ANFIS a entrenar.</span>
-<span class="sd">            optimizer (torch.optim): Optimizador a utilizar en el entrenamiento.</span>
-<span class="sd">            optim_params (dict): Parámetros a utilizar en el optimizador.</span>
-<span class="sd">            </span>
-<span class="sd">        Returns:</span>
-<span class="sd">            torch.optim.Optimizer: Instancia del optimizador.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">optimizer</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_premises_as_parameters_list</span><span class="p">(),</span> <span class="o">**</span><span class="n">optim_params</span><span class="p">)</span>
-    
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_premises_as_parameters_list</span><span class="p">(),</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer_params</span><span class="p">)</span>
+
     
     <span class="k">def</span><span class="w"> </span><span class="nf">_premises_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -537,8 +547,139 @@
 <span class="sd">            loader (DataLoader): DataLoader con los datos de entrenamiento.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_consequents_update</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_premises_update</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_premises_update</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span>
+        
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sonfis_init_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">freezed_subnets</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inicializa el optimizador a utilizar en el entrenamiento, utilizando algunos los parámetros de los antececentes del modelo ANFIS y los parámetros del optimizador especificados.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            model (h_ANFIS [rule_reduced]): Modelo h_ANFIS que debe ser rule_reduced.</span>
+<span class="sd">            freezed_subnets (torch.tensor): Tensor booleano que indica que antecedentes no deben ser actualizados.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">premises_parameters_to_train</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="c1">###########</span>
+        <span class="c1">###########</span>
+        <span class="c1">###########</span>
+        <span class="c1">#freezed_subnets = torch.zeros_like(freezed_subnets, dtype=torch.bool)</span>
+        <span class="c1">###########</span>
+        <span class="c1">###########</span>
+        <span class="c1">###########</span>
+        
+        <span class="n">not_freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">freezed_subnets</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">not_freezed</span><span class="p">:</span>
+            <span class="n">premises_parameters_to_train</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_premises_as_parameters_list</span><span class="p">()[</span><span class="n">i</span><span class="o">.</span><span class="n">item</span><span class="p">()])</span>
+            
+        <span class="k">if</span> <span class="n">not_freezed</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">(</span><span class="n">premises_parameters_to_train</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer_params</span><span class="p">)</span>
+        
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sonfis_update_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">freezed_subnets</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Aplica el algoritmo de entrenamiento de un modelo h_ANFIS dado un conjunto de subredes que no se deben actualizar.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            model (h_ANFIS [rule_reduced]): Modelo h_ANFIS que debe ser rule_reduced.</span>
+<span class="sd">            train_loader (DataLoader): DataLoader con los datos de entrenamiento.</span>
+<span class="sd">            val_loader (DataLoader): DataLoader con los datos de validación.</span>
+<span class="sd">            freezed_subnets (torch.tensor): Tensor booleano que indica que subredes no deben ser actualizadas.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sonfis_init_optimizer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">freezed_subnets</span><span class="p">)</span>
+        
+        <span class="c1"># unfrozen parameters used to instantiate the optimizer to be empty (which is not allowed in PyTorch).</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># There is a possibility that no subnets are created or divided, but some may vanish. This would cause the list of parameters to</span>
+            <span class="k">return</span>                           <span class="c1"># be empty, which is not allowed in PyTorch.</span>
+        
 
+        <span class="n">current_consequents</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_consequents</span><span class="p">()</span>
+        
+        <span class="n">ep</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">ep</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_parameters</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">val_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loss</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">val_loss</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">_stop</span><span class="p">:</span>
+                    <span class="k">break</span>
+                
+            <span class="c1">#loss, val_loss = self._loss(model, train_loader, val_loader)</span>
+            <span class="c1">#epoch_width = len(str(self.epochs))</span>
+            <span class="c1">#if self.validation &gt; 0:</span>
+            <span class="c1">#    print(f&#39;Epoch: {ep+1:{epoch_width}}/{self.epochs} - loss: {loss:.6f} - validation loss: {val_loss:.6f}&#39;)</span>
+            <span class="c1">#else:</span>
+            <span class="c1">#    print(f&#39;Epoch: {ep+1:{epoch_width}}/{self.epochs} - loss: {loss:.6f}&#39;)</span>
+                
+            <span class="n">ep</span> <span class="o">+=</span> <span class="mi">1</span>
+        
+        <span class="n">new_consequents</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_consequents</span><span class="p">()</span>
+        <span class="n">new_consequents</span><span class="p">[:,</span> <span class="n">freezed_subnets</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">current_consequents</span><span class="p">[:,</span> <span class="n">freezed_subnets</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="n">new_consequents</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+            
+        <span class="c1">#print(ep)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        current_consequents = model.get_consequents()</span>
+<span class="sd">        current_premises = model.get_premises()</span>
+<span class="sd">        #print(model.get_premises())</span>
+<span class="sd">        ep = 0</span>
+<span class="sd">        #self._optimizer_instance = self._init_optimizer(model, self.optimizer, self.optimizer_params)</span>
+<span class="sd">        while ep &lt; self.epochs:</span>
+<span class="sd">            #---------------------Consequents update------------------------</span>
+<span class="sd">            ### current_consequents = ANFISmodel.get_consequents()</span>
+<span class="sd">            </span>
+<span class="sd">            model.set_consequents(classical_consequents_estimation_with_OLS(model, train_loader))</span>
+<span class="sd">            ### new_consequents = ANFISmodel.get_consequents()</span>
+<span class="sd">            </span>
+<span class="sd">            ### freezed_consequents = self._freezed</span>
+<span class="sd">            </span>
+<span class="sd">            ### new_consequents[:, freezed_consequents, :] = current_consequents[:, freezed_consequents, :]</span>
+<span class="sd">            ### ANFISmodel.set_consequents(new_consequents)</span>
+<span class="sd">            </span>
+<span class="sd">            # ------------------Premises update-----------------------</span>
+<span class="sd">            ### current_premises = ANFISmodel.get_premises()</span>
+<span class="sd">            optimizer_training_epoch(model, train_loader, self._optimizer_instance, self.loss_function)</span>
+<span class="sd">            ### new_premises = ANFISmodel.get_premises()</span>
+<span class="sd">            #print(model.get_premises())</span>
+<span class="sd">            ### freezed_premises = self._freezed</span>
+<span class="sd">            </span>
+<span class="sd">            ### new_premises[:, freezed_premises, :] = current_premises[:, freezed_premises, :]</span>
+<span class="sd">            ### ANFISmodel.set_premises(new_premises)</span>
+<span class="sd">            </span>
+<span class="sd">            #loss, val_loss = self._loss(ANFISmodel, train_loader, val_loader)</span>
+<span class="sd">            #epoch_width = len(str(self.trainer_epochs))</span>
+<span class="sd">            #if self.validation &gt; 0:</span>
+<span class="sd">            #    print(f&#39;    Epoch: {ep+1:{epoch_width}}/{self.trainer_epochs} - loss: {loss:.6f} - validation loss: {val_loss:.6f}&#39;)</span>
+<span class="sd">            #else:</span>
+<span class="sd">            #    print(f&#39;    Epoch: {ep+1:{epoch_width}}/{self.trainer_epochs} - loss: {loss:.6f}&#39;)</span>
+<span class="sd">            </span>
+<span class="sd">            if self.validation &gt; 0 and self.early_stopping is not None:</span>
+<span class="sd">                _, val_loss = self._loss(model, train_loader, val_loader)</span>
+<span class="sd">                self.early_stopping(model, val_loss, False)</span>
+<span class="sd">                if self.early_stopping._stop:</span>
+<span class="sd">                    break</span>
+<span class="sd">                </span>
+<span class="sd">            ep += 1</span>
+<span class="sd">            </span>
+<span class="sd">        new_consequents = model.get_consequents()</span>
+<span class="sd">        new_consequents[:, freezed_subnets, :] = current_consequents[:, freezed_subnets, :]</span>
+<span class="sd">        model.set_consequents(new_consequents)</span>
+<span class="sd">        </span>
+<span class="sd">        new_premises = model.get_premises()</span>
+<span class="sd">        new_premises[:, freezed_subnets, :] = current_premises[:, freezed_subnets, :]</span>
+<span class="sd">        model.set_premises(new_premises)</span>
+<span class="sd">        </span>
+<span class="sd">        if self.early_stopping is not None:</span>
+<span class="sd">            self.early_stopping.reset()     </span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
 
 
 
@@ -575,19 +716,14 @@
 
         
     
-    <span class="k">def</span><span class="w"> </span><span class="nf">_init_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Inicializa el optimizador a utilizar en el entrenamiento, utilizando los parámetros del modelo y los parámetros del optimizador especificados.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            model (torch.nn.Module): Modelo a entrenar.</span>
-<span class="sd">            optimizer (torch.optim): Optimizador a utilizar en el entrenamiento.</span>
-<span class="sd">            optim_params (dict): Parámetros a utilizar en el optimizador.</span>
-<span class="sd">            </span>
-<span class="sd">        Returns:</span>
-<span class="sd">            torch.optim.Optimizer: Instancia del optimizador.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">optimizer</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="o">**</span><span class="n">optim_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer_params</span><span class="p">)</span>
     
     
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
@@ -598,7 +734,59 @@
 <span class="sd">            model (torch.nn.Module): Modelo a entrenar.</span>
 <span class="sd">            loader (DataLoader): DataLoader con los datos de entrenamiento.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">optimizer_training_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">)</span></div>
+        <span class="n">optimizer_training_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">)</span>
+        
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sonfis_init_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">freezed_subnets</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inicializa el optimizador a utilizar en el entrenamiento, utilizando algunos los parámetros de los antececentes del modelo ANFIS y los parámetros del optimizador especificados.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            model (h_ANFIS [rule_reduced]): Modelo h_ANFIS que debe ser rule_reduced.</span>
+<span class="sd">            freezed_subnets (torch.tensor): Tensor booleano que indica que antecedentes no deben ser actualizados.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parameters_to_train</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">not_freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">freezed_subnets</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">not_freezed</span><span class="p">:</span>
+            <span class="n">parameters_to_train</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_premises_as_parameters_list</span><span class="p">()[</span><span class="n">i</span><span class="o">.</span><span class="n">item</span><span class="p">()])</span>
+            <span class="n">parameters_to_train</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_consequents_as_parameters_list</span><span class="p">()[</span><span class="n">i</span><span class="o">.</span><span class="n">item</span><span class="p">()])</span>
+            
+        <span class="k">if</span> <span class="n">not_freezed</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">(</span><span class="n">parameters_to_train</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer_params</span><span class="p">)</span>
+          
+            
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sonfis_update_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">freezed_subnets</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Aplica el algoritmo de entrenamiento de un modelo h_ANFIS dado un conjunto de subredes que no se deben actualizar.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            model (h_ANFIS [rule_reduced]): Modelo h_ANFIS que debe ser rule_reduced.</span>
+<span class="sd">            train_loader (DataLoader): DataLoader con los datos de entrenamiento.</span>
+<span class="sd">            val_loader (DataLoader): DataLoader con los datos de validación.</span>
+<span class="sd">            freezed_subnets (torch.tensor): Tensor booleano que indica que subredes no deben ser actualizadas.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sonfis_init_optimizer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">freezed_subnets</span><span class="p">)</span>
+        
+        <span class="c1"># unfrozen parameters used to instantiate the optimizer to be empty (which is not allowed in PyTorch).</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        
+        <span class="n">ep</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">ep</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_parameters</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">val_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loss</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">val_loss</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">_stop</span><span class="p">:</span>
+                    <span class="k">break</span>
+                
+            <span class="n">ep</span> <span class="o">+=</span> <span class="mi">1</span>
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
 
         
         
@@ -649,62 +837,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_prems_optimizer_instance</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cons_optimizer_instance</span> <span class="o">=</span> <span class="kc">None</span>
         
-    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Entrena un modelo utilizando el algoritmo de entrenamiento.</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">            model (torch.nn.Module): Modelo a entrenar.</span>
-<span class="sd">            loader (DataLoader): DataLoader con los datos de entrenamiento.</span>
-<span class="sd">            verbose (bool): Indica si se deben imprimir mensajes de aviso (Default: True).</span>
-<span class="sd">        </span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_val_split</span><span class="p">(</span><span class="n">loader</span><span class="p">)</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">_prems_optimizer_instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cons_optimizer_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_optimizers</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_params</span><span class="p">)</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">_register_loss</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">)</span>
-
-        <span class="n">ep</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">while</span> <span class="n">ep</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">:</span>
-            
-            <span class="bp">self</span><span class="o">.</span><span class="n">_update_parameters</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">)</span>
-            
-            <span class="bp">self</span><span class="o">.</span><span class="n">_register_loss</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">)</span>
-            
-            <span class="n">loss</span><span class="p">,</span> <span class="n">val_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_history</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_early_stop</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">val_loss</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
-                <span class="k">break</span>
-                
-            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="n">epoch_width</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">))</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Epoch: </span><span class="si">{</span><span class="n">ep</span><span class="o">+</span><span class="mi">1</span><span class="si">:{</span><span class="n">epoch_width</span><span class="si">}}</span><span class="s1">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="si">}</span><span class="s1"> - loss: </span><span class="si">{</span><span class="n">loss</span><span class="si">:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1"> - validation loss: </span><span class="si">{</span><span class="n">val_loss</span><span class="si">:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Epoch: </span><span class="si">{</span><span class="n">ep</span><span class="o">+</span><span class="mi">1</span><span class="si">:{</span><span class="n">epoch_width</span><span class="si">}}</span><span class="s1">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="si">}</span><span class="s1"> - loss: </span><span class="si">{</span><span class="n">loss</span><span class="si">:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                    
-            <span class="n">ep</span> <span class="o">+=</span> <span class="mi">1</span>
-        
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Training finished&#39;</span><span class="p">)</span>
-        
     
-    <span class="k">def</span><span class="w"> </span><span class="nf">_init_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">prems_optim</span><span class="p">,</span> <span class="n">prems_optim_params</span><span class="p">,</span> <span class="n">cons_optim</span><span class="p">,</span> <span class="n">cons_optim_params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Inicializa el optimizador a utilizar en el entrenamiento, utilizando los parámetros del modelo y los parámetros del optimizador especificados.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            model (torch.nn.Module): Modelo a entrenar.</span>
-<span class="sd">            optimizer (torch.optim): Optimizador a utilizar en el entrenamiento.</span>
-<span class="sd">            optim_params (dict): Parámetros a utilizar en el optimizador.</span>
-<span class="sd">            optimizer2 (torch.optim): Optimizador a utilizar en el entrenamiento.</span>
-<span class="sd">            optim_params2 (dict): Parámetros a utilizar en el optimizador.</span>
-<span class="sd">            </span>
-<span class="sd">        Returns:</span>
-<span class="sd">            torch.optim.Optimizer: Instancia del optimizador.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">prems_optim</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_premises_as_parameters_list</span><span class="p">(),</span> <span class="o">**</span><span class="n">prems_optim_params</span><span class="p">),</span> <span class="n">cons_optim</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_consequents_as_parameters_list</span><span class="p">(),</span> <span class="o">**</span><span class="n">cons_optim_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prems_optimizer_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prems_optim</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_premises_as_parameters_list</span><span class="p">(),</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">prems_optim_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cons_optimizer_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cons_optim</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_consequents_as_parameters_list</span><span class="p">(),</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">cons_optim_params</span><span class="p">)</span>
     
     
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
@@ -719,11 +861,11 @@
             <span class="n">batch_y_copy</span> <span class="o">=</span> <span class="n">batch_y</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
 
 <span class="w">            </span><span class="sd">&#39;&#39;&#39;preliminary fix for the dtype issue&#39;&#39;&#39;</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span> <span class="o">!=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">:</span> <span class="c1">#cross_entropy function only accepts torch.long (torch.int64) dtype for target indices</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span> <span class="o">!=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
                     <span class="n">batch_y_copy</span> <span class="o">=</span> <span class="n">batch_y_copy</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">batch_x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span> 
-                <span class="n">batch_y_copy</span> <span class="o">=</span> <span class="n">batch_y_copy</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+                <span class="n">batch_y_copy</span> <span class="o">=</span> <span class="n">batch_y_copy</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span> <span class="c1">#cross_entropy function only accepts torch.long (torch.int64) dtype for target indices</span>
 <span class="w">            </span><span class="sd">&#39;&#39;&#39;preliminary fix for the dtype issue&#39;&#39;&#39;</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_prems_optimizer_instance</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
@@ -745,6 +887,60 @@
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Loss is NaN&#39;</span><span class="p">)</span>
+            
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sonfis_init_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">freezed_subnets</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inicializa el optimizador a utilizar en el entrenamiento, utilizando algunos los parámetros de los antececentes del modelo ANFIS y los parámetros del optimizador especificados.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            model (h_ANFIS [rule_reduced]): Modelo h_ANFIS que debe ser rule_reduced.</span>
+<span class="sd">            freezed_subnets (torch.tensor): Tensor booleano que indica que antecedentes no deben ser actualizados.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parameters_to_train</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">not_freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">freezed_subnets</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">not_freezed</span><span class="p">:</span>
+            <span class="n">parameters_to_train</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_premises_as_parameters_list</span><span class="p">()[</span><span class="n">i</span><span class="o">.</span><span class="n">item</span><span class="p">()])</span>
+            <span class="n">parameters_to_train</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_consequents_as_parameters_list</span><span class="p">()[</span><span class="n">i</span><span class="o">.</span><span class="n">item</span><span class="p">()])</span>
+            
+        <span class="k">if</span> <span class="n">not_freezed</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_prems_optimizer_instance</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cons_optimizer_instance</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_prems_optimizer_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prems_optim</span><span class="p">(</span><span class="n">parameters_to_train</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">prems_optim_params</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cons_optimizer_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cons_optim</span><span class="p">(</span><span class="n">parameters_to_train</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">cons_optim_params</span><span class="p">)</span>
+            
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sonfis_update_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">freezed_subnets</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Aplica el algoritmo de entrenamiento de un modelo h_ANFIS dado un conjunto de subredes que no se deben actualizar.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            model (h_ANFIS [rule_reduced]): Modelo h_ANFIS que debe ser rule_reduced.</span>
+<span class="sd">            train_loader (DataLoader): DataLoader con los datos de entrenamiento.</span>
+<span class="sd">            val_loader (DataLoader): DataLoader con los datos de validación.</span>
+<span class="sd">            freezed_subnets (torch.tensor): Tensor booleano que indica que subredes no deben ser actualizadas.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sonfis_init_optimizer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">freezed_subnets</span><span class="p">)</span>
+        
+        <span class="c1"># unfrozen parameters used to instantiate the optimizer to be empty (which is not allowed in PyTorch).</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prems_optimizer_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        
+        <span class="n">ep</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">ep</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_parameters</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">val_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loss</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">val_loss</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">_stop</span><span class="p">:</span>
+                    <span class="k">break</span>
+                
+            <span class="n">ep</span> <span class="o">+=</span> <span class="mi">1</span>
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 </pre></div>
 
            </div>

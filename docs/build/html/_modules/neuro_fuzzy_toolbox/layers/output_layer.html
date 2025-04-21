@@ -50,11 +50,11 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#salida-sigmoide-y-softmax">Salida sigmoide y softmax</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../usage/models/anfis.html">ANFIS</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#instanciacion">Instanciación</a></li>
@@ -62,6 +62,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/rule_reduced_anfis.html">ANFIS de reglas reducidas</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../usage/training.html">Training</a><ul>
@@ -138,6 +139,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../examples/sonfis.html">SONFIS Examples</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../examples/sonfis.html#example-1">Example 1:</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#imports">0. Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-de-los-datos">1. Definición de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#preprocesamiento-de-los-datos">2. Preprocesamiento de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-del-dataloader">3. Definición del DataLoader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-del-modelo">4. Definición del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-del-algoritmo-de-entrenamiento">5. Definición del algoritmo de entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#instancicion-del-algoritmo-sonfis">6. Instancición del algoritmo SONFIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#entrenamiento-del-modelo">7. Entrenamiento del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#evaluacion-del-modelo">7. Evaluación del modelo</a></li>
 </ul>
 </li>
 </ul>
@@ -161,6 +170,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/fuzzification.html">Fuzzification Layers</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">FuzzificationLayer</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">h_FuzzificationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">rule_reduced_FuzzificationLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/firing_levels.html">Firing Levels Layers</a><ul>
@@ -171,6 +181,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/consequent.html">Consequent Layer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">ConsequentLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">alt_ConsequentLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/output.html">Output Layer</a><ul>
@@ -255,9 +266,9 @@
 <span class="sd">    Esta capa se encarga de calcular la salida final del modelo ANFIS a partir las salidas de cada regla.</span>
 <span class="sd">    </span>
 <span class="sd">    Tiene naturaleza dependiente del tipo de salida del modelo ANFIS, por lo que se debe especificar el tipo de salida al inicializar la capa. Los tipos de salida soportados son:</span>
-<span class="sd">        - &#39;regression&#39;: Para problemas de regresión.</span>
-<span class="sd">        - &#39;binary&#39;: Para problemas de clasificación binaria.</span>
-<span class="sd">        - &#39;multiclass&#39;: Para problemas de clasificación multiclase.</span>
+<span class="sd">        - &#39;default&#39;: Para problemas de regresión.</span>
+<span class="sd">        - &#39;sigmoid&#39;: Para problemas de clasificación binaria.</span>
+<span class="sd">        - &#39;softmax&#39;: Para problemas de clasificación multiclase.</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="OutputLayer.__init__">
@@ -267,17 +278,17 @@
 <span class="sd">        Inicializa una nueva instancia de la clase OutputLayer.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
-<span class="sd">            output_type (str): Tipo de salida del modelo ANFIS. Puede ser &#39;regression&#39;, &#39;binary&#39; o &#39;multiclass&#39;.</span>
+<span class="sd">            output_type (str): Tipo de salida del modelo ANFIS. Puede ser &#39;default&#39;, &#39;sigmoid&#39; o &#39;softmax&#39;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">OutputLayer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_output_type</span> <span class="o">=</span> <span class="n">output_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_type</span> <span class="o">==</span> <span class="s1">&#39;regression&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_type</span> <span class="o">==</span> <span class="s1">&#39;multiclass&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_type</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_type</span> <span class="o">==</span> <span class="s1">&#39;softmax&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_last_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_type</span> <span class="o">==</span> <span class="s1">&#39;binary&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_type</span> <span class="o">==</span> <span class="s1">&#39;sigmoid&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_last_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">()</span>
             
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_type</span> <span class="o">!=</span> <span class="s1">&#39;multiclass&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_type</span> <span class="o">!=</span> <span class="s1">&#39;softmax&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_output</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rules_outputs</span><span class="p">,</span> <span class="n">return_probabilities</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rules_outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">t</span><span class="p">()</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_output</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rules_outputs</span><span class="p">,</span> <span class="n">return_probabilities</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rules_outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">t</span><span class="p">()</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">return_probabilities</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rules_outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">t</span><span class="p">()</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
@@ -292,7 +303,7 @@
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            rules_outputs (torch.Tensor): Tensor de tamaño (batch_size, rules) que contiene las salidas de cada regla.</span>
-<span class="sd">            return_probabilities (bool): Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es &#39;multiclass&#39;, en caso contrario, se ignora (Default: False).</span>
+<span class="sd">            return_probabilities (bool): Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es &#39;softmax&#39;, en caso contrario, se ignora (Default: False).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_layer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_output</span><span class="p">(</span><span class="n">rules_outputs</span><span class="p">,</span> <span class="n">return_probabilities</span><span class="p">))</span></div>
 </div>

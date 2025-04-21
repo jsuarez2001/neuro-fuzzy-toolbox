@@ -50,11 +50,11 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#salida-sigmoide-y-softmax">Salida sigmoide y softmax</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../usage/models/anfis.html">ANFIS</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#instanciacion">Instanciación</a></li>
@@ -62,6 +62,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/rule_reduced_anfis.html">ANFIS de reglas reducidas</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../usage/training.html">Training</a><ul>
@@ -138,6 +139,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../examples/sonfis.html">SONFIS Examples</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../examples/sonfis.html#example-1">Example 1:</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#imports">0. Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-de-los-datos">1. Definición de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#preprocesamiento-de-los-datos">2. Preprocesamiento de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-del-dataloader">3. Definición del DataLoader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-del-modelo">4. Definición del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-del-algoritmo-de-entrenamiento">5. Definición del algoritmo de entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#instancicion-del-algoritmo-sonfis">6. Instancición del algoritmo SONFIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#entrenamiento-del-modelo">7. Entrenamiento del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#evaluacion-del-modelo">7. Evaluación del modelo</a></li>
 </ul>
 </li>
 </ul>
@@ -161,6 +170,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/fuzzification.html">Fuzzification Layers</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">FuzzificationLayer</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">h_FuzzificationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">rule_reduced_FuzzificationLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/firing_levels.html">Firing Levels Layers</a><ul>
@@ -171,6 +181,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/consequent.html">Consequent Layer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">ConsequentLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">alt_ConsequentLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/output.html">Output Layer</a><ul>
@@ -327,7 +338,174 @@
 <span class="sd">        Args:</span>
 <span class="sd">            dtype (torch.dtype): Tipo de dato al que se desea cambiar.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_consequents</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consequents</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_consequents</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consequents</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+        
+        
+<div class="viewcode-block" id="ConsequentLayer.get_consequents">
+<a class="viewcode-back" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer.get_consequents">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_consequents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna los parámetros consecuentes del modelo.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.tensor: Tensor con los parámetros consecuentes. Su forma es (outputs, rules, input_size + 1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consequents</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span></div>
+
+    
+    
+<div class="viewcode-block" id="ConsequentLayer.set_consequents">
+<a class="viewcode-back" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer.set_consequents">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_consequents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">consequents</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setea los parámetros consecuentes del modelo.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            consequents (torch.tensor): Tensor con los parámetros consecuentes. Su forma debe ser (outputs, rules, input_size + 1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_consequents</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="n">consequents</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+    
+    
+<div class="viewcode-block" id="ConsequentLayer.get_consequents_as_parameters_list">
+<a class="viewcode-back" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer.get_consequents_as_parameters_list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_consequents_as_parameters_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna los parámetros consecuentes del modelo como una lista de parámetros. Esto es útil para algoritmos de optimización.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Lista de 1 solo elemento (nn.Parameter) que contiene los parámetros consecuentes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_consequents</span><span class="p">]</span></div>
+</div>
+
+        
+
+
+<div class="viewcode-block" id="alt_ConsequentLayer">
+<a class="viewcode-back" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">alt_ConsequentLayer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clase para representar la capa consecuente de un modelo de Sistema de Inferencia Neuro-Difuso Adaptativo (ANFIS). Tiene la particularidad de las reglas se almacenan en una lista de tensores y no en un tensor único.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="alt_ConsequentLayer.__init__">
+<a class="viewcode-back" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">consequent_function</span><span class="o">=</span><span class="n">Linear_CF</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inicializa una nueva instancia de la clase alt_ConsequentLayer.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            input_size (int): Número de features de los datos de entrada (del modelo ANFIS, no de la capa).</span>
+<span class="sd">            rules (int): Número de reglas del modelo ANFIS, depende del modelo en sí.</span>
+<span class="sd">            outputs (int): Número de salidas del modelo ANFIS (Default: 1).</span>
+<span class="sd">            consequent_function (ConsequentFunction): Función consecuente a utilizar en la capa (Default: Linear_CF).</span>
+<span class="sd">            dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">alt_ConsequentLayer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="c1"># Initialize consequent function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_consequent_function</span> <span class="o">=</span> <span class="n">consequent_function</span><span class="p">()</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">_consequents</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ParameterList</span><span class="p">([</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">consequent</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">consequent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consequent_function</span><span class="o">.</span><span class="n">random_consequents</span><span class="p">(</span>
+                <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+                <span class="n">rules</span><span class="o">=</span><span class="n">rules</span><span class="p">,</span> 
+                <span class="n">input_size</span><span class="o">=</span><span class="n">input_size</span><span class="p">,</span> 
+                <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">])</span></div>
+
+        
+        
+<div class="viewcode-block" id="alt_ConsequentLayer.forward">
+<a class="viewcode-back" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer.forward">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Realiza un paso hacia adelante para calcular la salida de la capa consecuente.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            x (torch.Tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.</span>
+<span class="sd">            weights (torch.Tensor): Tensor de tamaño (batch_size, rules) que contiene los pesos de las reglas.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.Tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas del modelo ANFIS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consequent_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">consequent</span> <span class="k">for</span> <span class="n">consequent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consequents</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">weights</span><span class="p">)</span></div>
+
+    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">consequents_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna la estructura de los parámetros consecuentes.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Lista de DataFrames de pandas que contienen la estructura de los parámetros consecuentes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">consequents_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">consequent</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span> <span class="k">for</span> <span class="n">consequent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consequents</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">dfs</span> <span class="o">=</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">consequents_tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+
+        <span class="n">rules</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;rule </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">consequents_tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+
+        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">consequents_tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">consequents_tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+                <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;c</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1"> (x</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">)&#39;</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">consequents_tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;c</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="n">column</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">consequents_tensor</span><span class="p">[</span><span class="n">o</span><span class="p">,:,</span><span class="n">i</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">rules</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">dfs</span><span class="p">[</span><span class="n">o</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">column</span>
+
+        <span class="k">return</span> <span class="n">dfs</span>
+    
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_to_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Cambia el tipo de dato de los parámetros consecuentes.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            dtype (torch.dtype): Tipo de dato al que se desea cambiar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">consequent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consequents</span><span class="p">:</span>
+            <span class="n">consequent</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">consequent</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+            
+        
+<div class="viewcode-block" id="alt_ConsequentLayer.get_consequents">
+<a class="viewcode-back" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer.get_consequents">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_consequents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna los parámetros consecuentes del modelo.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.tensor: Tensor con los parámetros consecuentes. Su forma es (outputs, rules, input_size + 1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">consequent</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span> <span class="k">for</span> <span class="n">consequent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consequents</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span></div>
+
+    
+    
+<div class="viewcode-block" id="alt_ConsequentLayer.set_consequents">
+<a class="viewcode-back" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer.set_consequents">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_consequents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">consequents</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setea los parámetros consecuentes del modelo.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            consequents (torch.tensor): Tensor con los parámetros consecuentes. Su forma debe ser (outputs, rules, input_size + 1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_consequents</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ParameterList</span><span class="p">([</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">consequent</span><span class="p">)</span> <span class="k">for</span> <span class="n">consequent</span> <span class="ow">in</span> <span class="n">consequents</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">])</span></div>
+
+        
+    
+<div class="viewcode-block" id="alt_ConsequentLayer.get_consequents_as_parameters_list">
+<a class="viewcode-back" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer.get_consequents_as_parameters_list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_consequents_as_parameters_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna los parámetros consecuentes del modelo como una lista de parámetros. Esto es útil para algoritmos de optimización.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            nn.ParameterList: Lista de parámetros consecuentes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consequents</span></div>
+</div>
 
 </pre></div>
 

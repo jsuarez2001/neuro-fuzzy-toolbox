@@ -29,15 +29,14 @@ Los parámetros a tomar en cuenta para instanciar un modelo h_ANFIS son los sigu
 - **num_mfs**: Número de funciones de membresía para cada feature.
 - **outputs**: Número de salidas del modelo. Por defecto es 1.
 - **membership_function**: Función de membresía a utilizar. Puede ser Gaussian_MF, GeneralizedBell_MF. Por defecto es GeneralizedBell_MF.
-- **output_type**: Tipo de salida del modelo. Puede ser 'regression', 'binary' o 'multiclass'. Por defecto es 'regression'.
+- **output_type**: Tipo de salida del modelo. Puede ser 'default', 'sigmoid' o 'softmax'. El valor por defecto es obviamente 'default'.
 - **rule_reduced**: Booleano que indica si se quiere instanciar un modelo h_ANFIS con reglas reducidas. Por defecto es False. Más detalles en :ref:`rule-reduced ANFIS <rule-reduced ANFIS>`.
 - **dtype**: Tipo de dato de los tensores que contienen los parámetros del modelo. Por defecto es torch.float32.
 
 .. note::
 
-    Con respecto al parámetro **output_type**, se debe tener en cuenta que el modelo se comportará de manera distinta dependiendo del mismo. 
-    Por ejemplo, si se instancia un modelo con **output_type='binary'**, el modelo se comportará como un clasificador binario, mientras que si se instancía 
-    con **output_type='multiclass'**, el modelo se comportará como un clasificador multiclase. Más detalles en :ref:`Salida binaria y multiclase <Salida binaria y multiclase>`.
+    Con respecto al parámetro **output_type**: si se instancia un modelo con **output_type='sigmoid'**, el modelo incorporará una capa sigmoide a la salida, mientras que con 
+    **output_type='softmax'**, el modelo incorporará una función softmax opcional al método forward. Más detalles en :ref:`Salida sigmoide y softmax <Salida sigmoide y softmax>`.
 
 Se utilizarán datos de entrenamiento generados aleatoriamente para el ejemplo a continuación.
 
@@ -56,7 +55,7 @@ A continuación se instancia un modelo h_ANFIS con 3 funciones de membresía par
         num_mfs=3, # 3 funciones de membresía
         outputs=1, # 1 salida
         membership_function=nft.Gaussian_MF, # Función de membresía gaussiana
-        output_type='regression', # Tipo de salida: regresión
+        output_type='default'
     )
 
 Algunos métodos útiles
@@ -263,28 +262,33 @@ El método **predict** retorna la predicción del modelo para un conjunto de dat
 
     array([ 0.05152027,  0.2146402 ,  0.561749  ,  0.24923508,  0.4197383 , 0.12053609,  0.04348549,  0.28514066,  0.12556443, -0.32934883], dtype=float32)
 
-.. _Salida binaria y multiclase:
+.. _Salida sigmoide y softmax:
 
-Salida binaria y multiclase
----------------------------
+Salida sigmoide y softmax
+-------------------------
 El modelo h_ANFIS puede ser instanciado con distintos tipos de salida según el parámetro *output_type*, si es:
 
-- **'regression'**: El modelo se comportará como un regresor (modelo por defecto).
-- **'binary'**: El modelo se comportará como un clasificador binario.
-- **'multiclass'**: El modelo se comportará como un clasificador multiclase.
+- **'default'**: La salida del modelo será la que está establecida por defecto (simplemente la suma de las salidas de cada una de las reglas del modelo).
+- **'sigmoid'**: Se incorpora una capa sigmoide en la salida del modelo.
+- **'softmax'**: Las función forward del modelo incorpora una función softmax opcional (activada por un atributo booleano: **return_probs**).
+
+.. note::
+    
+    La razón por la cual se incorpora una función opcional y no una capa softmax directamente es debido a como la función de pérdida *cross entropy* está implementada en PyTorch.
+    Esta calcula la función softmax internamente, por lo que no es necesario hacerlo explícitamente en el modelo.
 
 Esto cambia la estructura del modelo y la forma en que se obtienen las predicciones. A continuación se detallará cómo instanciar el modelo para cada uno de estos casos.
 
-Salida binaria
-~~~~~~~~~~~~~~
-Si se especifica 'binary' como tipo de salida, el modelo se comportará como un clasificador binario. En este caso, se le añadirá una última capa sigmoide al modelo, por lo que su salida (método forward) será un número entre 0 y 1.
+Salida sigmoide
+~~~~~~~~~~~~~~~
+Si se especifica 'sigmoid' como tipo de salida, el modelo se comportará como un clasificador binario (si tiene una salida). En este caso, se le añadirá una última capa sigmoide al modelo, por lo que su salida (método forward) será un número entre 0 y 1.
 
 .. code-block:: python
 
     # Se simulará un conjunto de datos de 200 muestras con 2 features
     x_train = 2 * torch.rand(200, 2) - 1 # la dimensión debe ser (200, 2)
 
-Se inicializa el modelo con 2 funciones de membresía para cada feature de los datos de entrada y con una salida binaria.
+Se inicializa el modelo con 2 funciones de membresía para cada feature de los datos de entrada y con una salida sigmoide.
 
 .. code-block:: python
 
@@ -292,7 +296,7 @@ Se inicializa el modelo con 2 funciones de membresía para cada feature de los d
         input_size=x_train.shape[1], # 2 features
         num_mfs=2, # 2 funciones de membresía
         outputs=1, # 1 salida
-        output_type='binary', # Tipo de salida: clasificación binaria
+        output_type='sigmoid'
     )
 
 La salida del modelo (método forward) se vería de la siguiente manera:
@@ -315,9 +319,9 @@ El método *predict* retornará 1 si la probabilidad de la clase positiva es may
 
     array([0, 0, 1, 1, 1, 0, 0, 1, 0, 1])
 
-Salida multiclase
-~~~~~~~~~~~~~~~~~
-Si se especifica 'multiclass' como tipo de salida, el modelo se comportará como un clasificador multiclase. En este caso, el método *forward* tendrá un parámetro adicional llamado *return_probabilities* que, si es True, retornará las probabilidades de las clases (las salidas pasarán por una función softmax), en caso contrario, retornará los logits sin normalizar de las clases.
+Salida softmax
+~~~~~~~~~~~~~~
+Si se especifica 'softmax' como tipo de salida, el modelo se comportará como un clasificador multiclase (si se especifican más de 2 salidas). En este caso, el método *forward* tendrá un parámetro adicional llamado *return_probs* que, si es True, retornará las probabilidades de las clases (las salidas pasarán por una función softmax), en caso contrario, retornará los logits sin normalizar de las clases.
 En este caso, se debe especificar el número de clases en el parámetro *outputs*.
 
 .. code-block:: python
@@ -325,7 +329,7 @@ En este caso, se debe especificar el número de clases en el parámetro *outputs
     # Se simulará un conjunto de datos de 200 muestras con 3 features
     x_train = 2 * torch.rand(200, 3) - 1 # la dimensión debe ser (200, 3)
 
-Se inicializa el modelo con 2 funciones de membresía para cada feature de los datos de entrada y con una salida binaria.
+Se inicializa el modelo con 2 funciones de membresía para cada feature de los datos de entrada y con una salida softmax.
 
 .. code-block:: python
 
@@ -334,7 +338,7 @@ Se inicializa el modelo con 2 funciones de membresía para cada feature de los d
         num_mfs=3, # 3 funciones de membresía
         outputs=4, # 4 clases
         membership_function=Gaussian_MF, # Función de membresía gaussiana
-        output_type='multiclass', # Tipo de salida: clasificación multiclase
+        output_type='softmax'
     )
 
 La salida del modelo (método forward) serán los logits de cada clase:
@@ -356,11 +360,11 @@ La salida del modelo (método forward) serán los logits de cada clase:
             [ 0.4243, -0.0578,  0.3322,  0.1703],
             [ 0.5209,  0.3951,  0.3004,  0.5666]], grad_fn=<SqueezeBackward1>)
 
-Si se especifica *return_probabilities=True* en este método, se retornarán las probabilidades de las clases (pasa por una función softmax):
+Si se especifica *return_probs=True* en este método, se retornarán las probabilidades de las clases (pasa por una función softmax):
 
 .. code-block:: python
 
-    model(x_train[:10], return_probabilities=True)
+    model(x_train[:10], return_probs=True)
 
 .. code-block:: python
 
@@ -387,14 +391,14 @@ El método *predict* retornará el índice de la clase con mayor probabilidad:
 
 .. tip::
     
-    El valor 'multiclass' junto con la multiple salida se puede usar para clasificación binaria de todas maneras (con 2 outputs), la diferencia estará en la estructura interna del modelo, pues tendrá conjuntos de parámetros concecuentes distintos para cada salida:
+    El valor 'softmax' junto con la multiple salida se puede usar para clasificación binaria de todas maneras (con 2 outputs), la diferencia estará en la estructura interna del modelo, pues tendrá conjuntos de parámetros concecuentes distintos para cada salida:
 
     .. figure:: ../../_static/2_output_anfis.png
         :align: center
         :width: 600px
         :alt: binary class example 1
     
-    Si se usa 'binary' con 1 output, el modelo tendrá una capa sigmoide al final y 1 un conjunto de parámetros consecuentes para la salida en cuestión.
+    Si se usa 'sigmoid' con 1 output, el modelo tendrá una capa sigmoide al final y 1 un conjunto de parámetros consecuentes para la salida en cuestión.
 
     .. figure:: ../../_static/1_output_binary_anfis.png
         :align: center
@@ -421,7 +425,7 @@ La única diferencia en la arquitectura del modelo al trabajar con múltiples sa
         num_mfs=3, # 3 funciones de membresía
         outputs=2, # 2 salidas
         membership_function=Gaussian_MF, # Función de membresía gaussiana
-        output_type='regression', # Tipo de salida: regresión
+        output_type='default'
     )
 
 Por cada salida se generará un conjunto de parámetros concecuentes:
@@ -478,20 +482,20 @@ Ahora la salida del modelo será de dimensión (batch_size, outputs):
 
 .. tip::
 
-    El modelo también debería ser aplicable a problemas multilabel, bastaría con usar **output_type='binary'** con múltiples salidas.
+    El modelo también debería ser aplicable a problemas multilabel, bastaría con usar **output_type='sigmoid'** con múltiples salidas.
 
     .. figure:: ../../_static/multilabel_anfis.png
         :align: center
         :width: 600px
         :alt: multilabel example
 
-    De esta manera se permitirían salidas en las que más de una clase sea detectada. Pero queda a criterio del usuario decidir si usar este enfoque o varios modelos de tipo 'multiclass' paralelamente.
+    De esta manera se permitirían salidas en las que más de una clase sea detectada. Pero queda a criterio del usuario decidir si usar este enfoque o varios modelos de tipo 'sofmtax' paralelamente.
 
 
 .. _rule-reduced ANFIS:
 
 rule-reduced ANFIS
-==================
+------------------
 Modelo ANFIS con reglas reducidas. Es una variante del modelo ANFIS homogéneo que reduce el número de reglas y, por ende, el número de parámetros concecuentes en el modelo.
 
 A continuación se muestra una comparación entre el modelo ANFIS homogéneo y el modelo ANFIS con reglas reducidas, ambos con 2 features y 3 funciones de pertenencia por dimensión en los datos de entrada:
@@ -544,3 +548,8 @@ Los parámetros concecuentes generados por el modelo ANFIS con reglas reducidas 
 
 Todos los métodos y herramientas presentados con el modelo ANFIS homogéneo (:ref:`h_ANFIS <h_ANFIS usage>`) son válidos para el modelo ANFIS con reglas reducidas, como las múltiples salidas y las aplicaciones a distintos tipos de problemas.
 
+.. important::
+
+    Además de esta opción en la clase h_ANFIS, este modelo también tiene una clase propia llamada **rule_reduced_ANFIS** cuya principal diferencia es la manera en la que se almacenan
+    los parámetros. Esta clase es menos eficiente en términos de memoria y tiempo de ejecución, pero permite una mayor flexibilidad en la manipulación de los parámetros del modelo, 
+    más detalles en :ref:`rule-reduced ANFIS <rule-reduced ANFIS>`.

@@ -53,11 +53,11 @@
 <li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#salida-sigmoide-y-softmax">Salida sigmoide y softmax</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../usage/models/anfis.html">ANFIS</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../usage/models/anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../usage/models/anfis.html#instanciacion">Instanciación</a></li>
@@ -65,6 +65,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../usage/models/anfis.html#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../usage/models/rule_reduced_anfis.html">ANFIS de reglas reducidas</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../usage/training.html">Training</a><ul>
@@ -141,6 +142,14 @@
 <li class="toctree-l2"><a class="reference internal" href="sonfis.html">SONFIS Examples</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="sonfis.html#example-1">Example 1:</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="sonfis.html#imports">0. Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sonfis.html#definicion-de-los-datos">1. Definición de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sonfis.html#preprocesamiento-de-los-datos">2. Preprocesamiento de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sonfis.html#definicion-del-dataloader">3. Definición del DataLoader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sonfis.html#definicion-del-modelo">4. Definición del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sonfis.html#definicion-del-algoritmo-de-entrenamiento">5. Definición del algoritmo de entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sonfis.html#instancicion-del-algoritmo-sonfis">6. Instancición del algoritmo SONFIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sonfis.html#entrenamiento-del-modelo">7. Entrenamiento del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sonfis.html#evaluacion-del-modelo">7. Evaluación del modelo</a></li>
 </ul>
 </li>
 </ul>
@@ -164,6 +173,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../modules/layers/fuzzification.html">Fuzzification Layers</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">FuzzificationLayer</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">h_FuzzificationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">rule_reduced_FuzzificationLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/layers/firing_levels.html">Firing Levels Layers</a><ul>
@@ -174,6 +184,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/layers/consequent.html">Consequent Layer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">ConsequentLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">alt_ConsequentLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/layers/output.html">Output Layer</a><ul>
@@ -496,7 +507,8 @@
         <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">x_train</span><span class="p">),</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()),</span>
     <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
-    <span class="n">shuffle</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">shuffle</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span>
 
 <span class="n">x_train</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">y_train</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -511,7 +523,7 @@
     <span class="n">num_mfs</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
     <span class="n">outputs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">rule_reduced</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">output_type</span><span class="o">=</span><span class="s1">&#39;multiclass&#39;</span><span class="p">,</span>
+    <span class="n">output_type</span><span class="o">=</span><span class="s1">&#39;softnax&#39;</span><span class="p">,</span>
     <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span>
 <span class="p">)</span>
 </pre></div>

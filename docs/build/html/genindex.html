@@ -50,11 +50,11 @@
 <li class="toctree-l4"><a class="reference internal" href="usage/models/h_anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="usage/models/h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
-<li class="toctree-l4"><a class="reference internal" href="usage/models/h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="usage/models/h_anfis.html#salida-sigmoide-y-softmax">Salida sigmoide y softmax</a></li>
 <li class="toctree-l4"><a class="reference internal" href="usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="usage/models/anfis.html">ANFIS</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="usage/models/anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="usage/models/anfis.html#instanciacion">Instanciación</a></li>
@@ -62,6 +62,7 @@
 <li class="toctree-l4"><a class="reference internal" href="usage/models/anfis.html#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="usage/models/rule_reduced_anfis.html">ANFIS de reglas reducidas</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="usage/training.html">Training</a><ul>
@@ -138,6 +139,14 @@
 <li class="toctree-l2"><a class="reference internal" href="examples/sonfis.html">SONFIS Examples</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="examples/sonfis.html#example-1">Example 1:</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="examples/sonfis.html#imports">0. Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/sonfis.html#definicion-de-los-datos">1. Definición de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/sonfis.html#preprocesamiento-de-los-datos">2. Preprocesamiento de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/sonfis.html#definicion-del-dataloader">3. Definición del DataLoader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/sonfis.html#definicion-del-modelo">4. Definición del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/sonfis.html#definicion-del-algoritmo-de-entrenamiento">5. Definición del algoritmo de entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/sonfis.html#instancicion-del-algoritmo-sonfis">6. Instancición del algoritmo SONFIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/sonfis.html#entrenamiento-del-modelo">7. Entrenamiento del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/sonfis.html#evaluacion-del-modelo">7. Evaluación del modelo</a></li>
 </ul>
 </li>
 </ul>
@@ -161,6 +170,7 @@
 <li class="toctree-l3"><a class="reference internal" href="modules/layers/fuzzification.html">Fuzzification Layers</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">FuzzificationLayer</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">h_FuzzificationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">rule_reduced_FuzzificationLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="modules/layers/firing_levels.html">Firing Levels Layers</a><ul>
@@ -171,6 +181,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="modules/layers/consequent.html">Consequent Layer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">ConsequentLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">alt_ConsequentLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="modules/layers/output.html">Output Layer</a><ul>
@@ -281,9 +292,11 @@
         <li><a href="modules/training/training_algorithms.html#neuro_fuzzy_toolbox.training.training_algorithms.Hybrid_learning_algorithm.__call__">(neuro_fuzzy_toolbox.training.training_algorithms.Hybrid_learning_algorithm method)</a>
 </li>
       </ul></li>
-      <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer.__init__">__init__() (neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer method)</a>
+      <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer.__init__">__init__() (neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer method)</a>
 
       <ul>
+        <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer.__init__">(neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer method)</a>
+</li>
         <li><a href="modules/layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.FiringLevelsLayer.__init__">(neuro_fuzzy_toolbox.layers.firing_levels_layers.FiringLevelsLayer method)</a>
 </li>
         <li><a href="modules/layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.h_FiringLevelsLayer.__init__">(neuro_fuzzy_toolbox.layers.firing_levels_layers.h_FiringLevelsLayer method)</a>
@@ -291,6 +304,8 @@
         <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer.__init__">(neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer method)</a>
 </li>
         <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer.__init__">(neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer method)</a>
+</li>
+        <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer.__init__">(neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer method)</a>
 </li>
         <li><a href="modules/layers/output.html#neuro_fuzzy_toolbox.layers.output_layer.OutputLayer.__init__">(neuro_fuzzy_toolbox.layers.output_layer.OutputLayer method)</a>
 </li>
@@ -315,10 +330,12 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/training/sonfis.html#neuro_fuzzy_toolbox.training.sonfis.alt_SONFIS">alt_SONFIS (class in neuro_fuzzy_toolbox.training.sonfis)</a>
+      <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer">alt_ConsequentLayer (class in neuro_fuzzy_toolbox.layers.consequent_layer)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/training/sonfis.html#neuro_fuzzy_toolbox.training.sonfis.alt_SONFIS">alt_SONFIS (class in neuro_fuzzy_toolbox.training.sonfis)</a>
+</li>
       <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS">ANFIS (class in neuro_fuzzy_toolbox.models.anfis)</a>
 </li>
   </ul></td>
@@ -345,9 +362,11 @@
 </li>
       <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer">ConsequentLayer (class in neuro_fuzzy_toolbox.layers.consequent_layer)</a>
 </li>
-      <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer.consequents_structure">consequents_structure (neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer property)</a>
+      <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer.consequents_structure">consequents_structure (neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer property)</a>
 
       <ul>
+        <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer.consequents_structure">(neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer property)</a>
+</li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.consequents_structure">(neuro_fuzzy_toolbox.models.anfis.ANFIS property)</a>
 </li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS.consequents_structure">(neuro_fuzzy_toolbox.models.anfis.base_ANFIS property)</a>
@@ -378,6 +397,8 @@
 </li>
         <li><a href="modules/func/membership.html#neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF.forward">(neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF method)</a>
 </li>
+        <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer.forward">(neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer method)</a>
+</li>
         <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer.forward">(neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer method)</a>
 </li>
         <li><a href="modules/layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.FiringLevelsLayer.forward">(neuro_fuzzy_toolbox.layers.firing_levels_layers.FiringLevelsLayer method)</a>
@@ -389,6 +410,8 @@
         <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer.forward">(neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer method)</a>
 </li>
         <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer.forward">(neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer method)</a>
+</li>
+        <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer.forward">(neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer method)</a>
 </li>
         <li><a href="modules/layers/output.html#neuro_fuzzy_toolbox.layers.output_layer.OutputLayer.forward">(neuro_fuzzy_toolbox.layers.output_layer.OutputLayer method)</a>
 </li>
@@ -419,35 +442,59 @@
       </ul></li>
       <li><a href="modules/func/membership.html#neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF">GeneralizedBell_MF (class in neuro_fuzzy_toolbox.func.membership)</a>
 </li>
-      <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.get_consequents">get_consequents() (neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
+      <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer.get_consequents">get_consequents() (neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer method)</a>
 
       <ul>
+        <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer.get_consequents">(neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer method)</a>
+</li>
+        <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.get_consequents">(neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
+</li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS.get_consequents">(neuro_fuzzy_toolbox.models.anfis.base_ANFIS method)</a>
 </li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.get_consequents">(neuro_fuzzy_toolbox.models.anfis.h_ANFIS method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.get_consequents_as_parameters_list">get_consequents_as_parameters_list() (neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
+      <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer.get_consequents_as_parameters_list">get_consequents_as_parameters_list() (neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer method)</a>
 
       <ul>
+        <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer.get_consequents_as_parameters_list">(neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer method)</a>
+</li>
+        <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.get_consequents_as_parameters_list">(neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
+</li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS.get_consequents_as_parameters_list">(neuro_fuzzy_toolbox.models.anfis.base_ANFIS method)</a>
 </li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.get_consequents_as_parameters_list">(neuro_fuzzy_toolbox.models.anfis.h_ANFIS method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/evaluation.html#neuro_fuzzy_toolbox.evaluation.evaluator.get_measures">get_measures() (in module neuro_fuzzy_toolbox.evaluation.evaluator)</a>
 </li>
-      <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.get_premises">get_premises() (neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
+      <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer.get_premises">get_premises() (neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer method)</a>
 
       <ul>
+        <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer.get_premises">(neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer method)</a>
+</li>
+        <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer.get_premises">(neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer method)</a>
+</li>
+        <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.get_premises">(neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
+</li>
+        <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS.get_premises">(neuro_fuzzy_toolbox.models.anfis.base_ANFIS method)</a>
+</li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.get_premises">(neuro_fuzzy_toolbox.models.anfis.h_ANFIS method)</a>
 </li>
       </ul></li>
-      <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.get_premises_as_parameters_list">get_premises_as_parameters_list() (neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
+      <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer.get_premises_as_parameters_list">get_premises_as_parameters_list() (neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer method)</a>
 
       <ul>
+        <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer.get_premises_as_parameters_list">(neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer method)</a>
+</li>
+        <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer.get_premises_as_parameters_list">(neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer method)</a>
+</li>
+        <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.get_premises_as_parameters_list">(neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
+</li>
+        <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS.get_premises_as_parameters_list">(neuro_fuzzy_toolbox.models.anfis.base_ANFIS method)</a>
+</li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.get_premises_as_parameters_list">(neuro_fuzzy_toolbox.models.anfis.h_ANFIS method)</a>
 </li>
       </ul></li>
@@ -485,6 +532,8 @@
 
       <ul>
         <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer.init_premises">(neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer method)</a>
+</li>
+        <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer.init_premises">(neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer method)</a>
 </li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.init_premises">(neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
 </li>
@@ -582,8 +631,6 @@
         <li><a href="modules/layers/fuzzification.html#module-neuro_fuzzy_toolbox.layers.fuzzification_layer">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     neuro_fuzzy_toolbox.layers.output_layer
 
@@ -591,6 +638,8 @@
         <li><a href="modules/layers/output.html#module-neuro_fuzzy_toolbox.layers.output_layer">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     neuro_fuzzy_toolbox.training.early_stopping
 
@@ -600,9 +649,17 @@
       </ul></li>
       <li><a href="modules/layers/firing_levels.html#neuro_fuzzy_toolbox.layers.firing_levels_layers.NormalizationLayer">NormalizationLayer (class in neuro_fuzzy_toolbox.layers.firing_levels_layers)</a>
 </li>
-      <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.num_mfs">num_mfs (neuro_fuzzy_toolbox.models.anfis.ANFIS property)</a>
+      <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer.num_mfs">num_mfs (neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer property)</a>
 
       <ul>
+        <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer.num_mfs">(neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer property)</a>
+</li>
+        <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer.num_mfs">(neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer property)</a>
+</li>
+        <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.num_mfs">(neuro_fuzzy_toolbox.models.anfis.ANFIS property)</a>
+</li>
+        <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS.num_mfs">(neuro_fuzzy_toolbox.models.anfis.base_ANFIS property)</a>
+</li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.num_mfs">(neuro_fuzzy_toolbox.models.anfis.h_ANFIS property)</a>
 </li>
       </ul></li>
@@ -629,6 +686,8 @@
       <ul>
         <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer.plot_premises">(neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer method)</a>
 </li>
+        <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer.plot_premises">(neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer method)</a>
+</li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.plot_premises">(neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
 </li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS.plot_premises">(neuro_fuzzy_toolbox.models.anfis.base_ANFIS method)</a>
@@ -650,6 +709,8 @@
 
       <ul>
         <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer.premises_structure">(neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer property)</a>
+</li>
+        <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer.premises_structure">(neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer property)</a>
 </li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.premises_structure">(neuro_fuzzy_toolbox.models.anfis.ANFIS property)</a>
 </li>
@@ -682,6 +743,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/training/early_stopping.html#neuro_fuzzy_toolbox.training.early_stopping.EarlyStopping.reset">reset() (neuro_fuzzy_toolbox.training.early_stopping.EarlyStopping method)</a>
 </li>
+      <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer">rule_reduced_FuzzificationLayer (class in neuro_fuzzy_toolbox.layers.fuzzification_layer)</a>
+</li>
       <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.rules">rules (neuro_fuzzy_toolbox.models.anfis.ANFIS property)</a>
 
       <ul>
@@ -696,20 +759,34 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.set_consequents">set_consequents() (neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
+      <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer.set_consequents">set_consequents() (neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer method)</a>
 
       <ul>
+        <li><a href="modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer.set_consequents">(neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer method)</a>
+</li>
+        <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.set_consequents">(neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
+</li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS.set_consequents">(neuro_fuzzy_toolbox.models.anfis.base_ANFIS method)</a>
 </li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.set_consequents">(neuro_fuzzy_toolbox.models.anfis.h_ANFIS method)</a>
 </li>
       </ul></li>
-      <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.set_premises">set_premises() (neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
+      <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer.set_premises">set_premises() (neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer method)</a>
 
       <ul>
+        <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer.set_premises">(neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer method)</a>
+</li>
+        <li><a href="modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer.set_premises">(neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer method)</a>
+</li>
+        <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.set_premises">(neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
+</li>
+        <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.base_ANFIS.set_premises">(neuro_fuzzy_toolbox.models.anfis.base_ANFIS method)</a>
+</li>
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.set_premises">(neuro_fuzzy_toolbox.models.anfis.h_ANFIS method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.show_consequents_structure">show_consequents_structure() (neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
 
       <ul>
@@ -718,8 +795,6 @@
         <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.show_consequents_structure">(neuro_fuzzy_toolbox.models.anfis.h_ANFIS method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/models/anfis.html#neuro_fuzzy_toolbox.models.anfis.ANFIS.show_premises_structure">show_premises_structure() (neuro_fuzzy_toolbox.models.anfis.ANFIS method)</a>
 
       <ul>

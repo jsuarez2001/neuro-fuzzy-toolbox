@@ -292,7 +292,7 @@ En este caso, se optará por el uso de un modelo h_ANFIS rule reduced debido a l
         num_mfs=7, 
         outputs=2,
         rule_reduced=True,
-        output_type='multiclass',
+        output_type='softmax',
         dtype=torch.float64
     )
 

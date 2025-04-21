@@ -53,11 +53,11 @@
 <li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#salida-sigmoide-y-softmax">Salida sigmoide y softmax</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../usage/models/anfis.html">ANFIS</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../usage/models/anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../usage/models/anfis.html#instanciacion">Instanciación</a></li>
@@ -65,6 +65,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../usage/models/anfis.html#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../usage/models/rule_reduced_anfis.html">ANFIS de reglas reducidas</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../usage/training.html">Training</a><ul>
@@ -141,6 +142,14 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">SONFIS Examples</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#example-1">Example 1:</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#imports">0. Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#definicion-de-los-datos">1. Definición de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#preprocesamiento-de-los-datos">2. Preprocesamiento de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#definicion-del-dataloader">3. Definición del DataLoader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#definicion-del-modelo">4. Definición del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#definicion-del-algoritmo-de-entrenamiento">5. Definición del algoritmo de entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#instancicion-del-algoritmo-sonfis">6. Instancición del algoritmo SONFIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#entrenamiento-del-modelo">7. Entrenamiento del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#evaluacion-del-modelo">7. Evaluación del modelo</a></li>
 </ul>
 </li>
 </ul>
@@ -164,6 +173,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../modules/layers/fuzzification.html">Fuzzification Layers</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">FuzzificationLayer</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">h_FuzzificationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">rule_reduced_FuzzificationLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/layers/firing_levels.html">Firing Levels Layers</a><ul>
@@ -174,6 +184,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/layers/consequent.html">Consequent Layer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">ConsequentLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">alt_ConsequentLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/layers/output.html">Output Layer</a><ul>
@@ -253,6 +264,194 @@
 <h2>Example 1:<a class="headerlink" href="#example-1" title="Link to this heading"></a></h2>
 <section id="imports">
 <h3>0. Imports<a class="headerlink" href="#imports" title="Link to this heading"></a></h3>
+<p>Importamos las librerías necesarias para el ejemplo:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">data</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;../../&#39;</span><span class="p">))</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">neuro_fuzzy_toolbox</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nft</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MinMaxScaler</span><span class="p">,</span>
+    <span class="n">StandardScaler</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+</pre></div>
+</div>
+<p>El ejemplo consiste en un dataset de UC Irvine Machine Learning Repository llamado “Parkinsons” con 22 features y 1 target, para más detalles sobre el dataset puede consultar <a class="reference external" href="https://archive.ics.uci.edu/dataset/174/parkinsons">aquí</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ucimlrepo</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_ucirepo</span>
+
+<span class="n">parkinsons</span> <span class="o">=</span> <span class="n">fetch_ucirepo</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">174</span><span class="p">)</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">parkinsons</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">features</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">parkinsons</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">targets</span>
+</pre></div>
+</div>
+</section>
+<section id="definicion-de-los-datos">
+<h3>1. Definición de los datos<a class="headerlink" href="#definicion-de-los-datos" title="Link to this heading"></a></h3>
+<p>El 30% de los datos se usarán para testeo y el 70% restante para entrenamiento:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="preprocesamiento-de-los-datos">
+<h3>2. Preprocesamiento de los datos<a class="headerlink" href="#preprocesamiento-de-los-datos" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">scaler</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">(</span><span class="n">feature_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="n">x_train</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+
+<span class="n">x_test</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="definicion-del-dataloader">
+<h3>3. Definición del DataLoader<a class="headerlink" href="#definicion-del-dataloader" title="Link to this heading"></a></h3>
+<p>Los conjuntos de datos se transforman a tensores de pytorch y se define el DataLoader para el conjunto de entrenamiento junto con el tamaño de los batches en las iteraciones del posterior entrenamiento del modelo.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+<span class="n">x_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y_train</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+<span class="n">y_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y_test</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+
+<span class="n">loader</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">TensorDataset</span><span class="p">(</span>
+        <span class="n">x_train</span><span class="p">,</span>
+        <span class="n">y_train</span><span class="p">),</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+    <span class="n">shuffle</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="n">x_train</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="definicion-del-modelo">
+<h3>4. Definición del modelo<a class="headerlink" href="#definicion-del-modelo" title="Link to this heading"></a></h3>
+<p>SONFIS solo trabaja con modelos ANFIS rule reduced.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">nft</span><span class="o">.</span><span class="n">rule_reduced_ANFIS</span><span class="p">(</span>
+    <span class="n">input_size</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">num_mfs</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">output_type</span><span class="o">=</span><span class="s1">&#39;softmax&#39;</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span>
+<span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">init_premises</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="definicion-del-algoritmo-de-entrenamiento">
+<h3>5. Definición del algoritmo de entrenamiento<a class="headerlink" href="#definicion-del-algoritmo-de-entrenamiento" title="Link to this heading"></a></h3>
+<p>Luego, podemos definir el algoritmo de entrenamiento junto con un mecanismo <strong>EarlyStopping</strong> implementado en el toolbox:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Recordar que el parámtetro <strong>validation</strong> del algoritmo de actualización de parámetros no se toma en cuenta cuando se aplica al modelo SONFIS, pues
+este se indica al momento de instanciar el algoritmo SONFIS como tal. Si se instancia el algoritmo de actualización de parámetros con el parámetro <strong>validation</strong>,
+este no se tomará en cuenta de todas maneras.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">loss_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">cross_entropy</span>
+<span class="n">epochs</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lr&#39;</span><span class="p">:</span> <span class="mf">0.0001</span><span class="p">}</span>
+
+<span class="n">early_stopping</span> <span class="o">=</span> <span class="n">nft</span><span class="o">.</span><span class="n">EarlyStopping</span><span class="p">(</span>
+    <span class="n">patience</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">delta</span><span class="o">=</span><span class="mf">0.0001</span>
+<span class="p">)</span>
+
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">nft</span><span class="o">.</span><span class="n">Hybrid_learning_algorithm</span><span class="p">(</span>
+    <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span>
+    <span class="n">loss_function</span><span class="o">=</span><span class="n">loss_fn</span><span class="p">,</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+    <span class="n">optimizer_params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+    <span class="n">early_stopping</span><span class="o">=</span><span class="n">early_stopping</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="instancicion-del-algoritmo-sonfis">
+<h3>6. Instancición del algoritmo SONFIS<a class="headerlink" href="#instancicion-del-algoritmo-sonfis" title="Link to this heading"></a></h3>
+<p>Se instancia el algoritmo SONFIS con el modelo ANFIS previamente definido y el algoritmo de entrenamiento:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Ngrow</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">dGrow</span> <span class="o">=</span> <span class="mf">0.8</span>
+<span class="n">Nsplit</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">eSplit</span> <span class="o">=</span> <span class="mf">0.7</span>
+<span class="n">Nvanish</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">lVanish</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="n">max_iterations</span> <span class="o">=</span> <span class="mi">40</span>
+
+<span class="n">anfis_trainer</span> <span class="o">=</span> <span class="n">trainer</span>
+
+<span class="n">validation</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">sonfis_early_stopping</span> <span class="o">=</span> <span class="n">nft</span><span class="o">.</span><span class="n">EarlyStopping</span><span class="p">(</span><span class="n">patience</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">last_training_iteration</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="n">sonfis</span> <span class="o">=</span> <span class="n">nft</span><span class="o">.</span><span class="n">SONFIS</span><span class="p">(</span>
+    <span class="n">Ngrow</span><span class="o">=</span><span class="n">Ngrow</span><span class="p">,</span>
+    <span class="n">dGrow</span><span class="o">=</span><span class="n">dGrow</span><span class="p">,</span>
+    <span class="n">Nsplit</span><span class="o">=</span><span class="n">Nsplit</span><span class="p">,</span>
+    <span class="n">eSplit</span><span class="o">=</span><span class="n">eSplit</span><span class="p">,</span>
+    <span class="n">Nvanish</span><span class="o">=</span><span class="n">Nvanish</span><span class="p">,</span>
+    <span class="n">lVanish</span><span class="o">=</span><span class="n">lVanish</span><span class="p">,</span>
+    <span class="n">max_iterations</span><span class="o">=</span><span class="n">max_iterations</span><span class="p">,</span>
+    <span class="n">ANFIStrainer</span><span class="o">=</span><span class="n">anfis_trainer</span><span class="p">,</span>
+    <span class="n">validation</span><span class="o">=</span><span class="n">validation</span><span class="p">,</span>
+    <span class="n">early_stopping</span><span class="o">=</span><span class="n">sonfis_early_stopping</span><span class="p">,</span>
+    <span class="n">last_training_iteration</span><span class="o">=</span><span class="n">last_training_iteration</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="entrenamiento-del-modelo">
+<h3>7. Entrenamiento del modelo<a class="headerlink" href="#entrenamiento-del-modelo" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sonfis</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Iteration</span><span class="p">:</span>  <span class="mi">0</span><span class="o">/</span><span class="mi">40</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.613511</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.767238</span>
+ <span class="o">-&gt;</span> <span class="n">ANFIS</span> <span class="n">rules</span><span class="p">:</span> <span class="mi">1</span>
+
+<span class="n">Iteration</span><span class="p">:</span>  <span class="mi">1</span><span class="o">/</span><span class="mi">40</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.446700</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.470952</span>
+ <span class="o">-&gt;</span> <span class="n">ANFIS</span> <span class="n">rules</span><span class="p">:</span> <span class="mi">2</span>
+
+<span class="n">Iteration</span><span class="p">:</span>  <span class="mi">2</span><span class="o">/</span><span class="mi">40</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.427127</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.421758</span>
+ <span class="o">-&gt;</span> <span class="n">ANFIS</span> <span class="n">rules</span><span class="p">:</span> <span class="mi">4</span>
+
+<span class="n">No</span> <span class="n">more</span> <span class="n">updates</span>
+<span class="n">Iteration</span><span class="p">:</span>  <span class="mi">3</span><span class="o">/</span><span class="mi">40</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.427127</span> <span class="o">-</span> <span class="n">validation</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.421758</span>
+ <span class="o">-&gt;</span> <span class="n">ANFIS</span> <span class="n">rules</span><span class="p">:</span> <span class="mi">4</span>
+
+
+<span class="n">Training</span> <span class="n">finished</span>
+ <span class="o">-&gt;</span> <span class="n">ANFIS</span> <span class="n">rules</span><span class="p">:</span> <span class="mi">4</span>
+</pre></div>
+</div>
+</section>
+<section id="evaluacion-del-modelo">
+<h3>7. Evaluación del modelo<a class="headerlink" href="#evaluacion-del-modelo" title="Link to this heading"></a></h3>
+<p>Finalmente, podemos evaluar el modelo usando el conjunto de testeo y la función <strong>get_measures</strong> del toolbox si se desea:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">test_measures</span> <span class="o">=</span> <span class="n">nft</span><span class="o">.</span><span class="n">get_measures</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">measure</span> <span class="ow">in</span> <span class="n">test_measures</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">measure</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">test_measures</span><span class="p">[</span><span class="n">measure</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Accuracy</span><span class="p">:</span> <span class="mf">0.847457627118644</span>
+<span class="n">Precision</span><span class="p">:</span> <span class="mf">0.8412369275153264</span>
+<span class="n">Recall</span><span class="p">:</span> <span class="mf">0.847457627118644</span>
+<span class="n">F1</span><span class="p">:</span> <span class="mf">0.8414974855652821</span>
+<span class="n">Confusion</span> <span class="n">Matrix</span><span class="p">:</span> <span class="p">[[</span> <span class="mi">9</span>  <span class="mi">6</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mi">3</span> <span class="mi">41</span><span class="p">]]</span>
+</pre></div>
+</div>
 </section>
 </section>
 </section>

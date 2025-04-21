@@ -20,16 +20,16 @@ Instanciación
 Para instanciar el algoritmo SONFIS se deben pasar los siguientes argumentos:
 
 - `Ngrow` (int): Número mínimo de muestras para crecer una nueva subred.
-- dGrow (float): Si el nivel de disparo máximo de un conjunto de muestras mal modeladas es menor o igual a este valor elevado a la dimensión de los datos, se considera para crecer una nueva subred.
-- Nsplit (int): Número mínimo de muestras para dividir una subred.
-- eSplit (float): Error cuadrado medio mínimo de un conjunto de muestras para dividir una subred.
-- Nvanish (int): Número máximo de muestras para desvanecer una subred.
-- lVanish (int): Edad máxima para desvanecer una subred.
-- max_iterations (int): Número máximo de iteraciones.
-- ANFIStrainer (Hybrid_learning_algorithm): Instancia del algoritmo de aprendizaje híbrido. Se utiliza para obtener sus parámetros, ya que el algoritmo de actualización de parámetros híbrido del modelo ANFIS clásico es por defecto el aplicado en SONFIS.
-- validation (float): Porcentaje de división de validación. Si es 0, no se realiza validación (Default: 0).
-- early_stopping (EarlyStopping): Instancia de EarlyStopping (Default: None).
-- last_training_iteration (bool): Indica si se debe realizar una última actualización de parámetros después de que el algoritmo SONFIS finalice (Default: False).
+- `dGrow` (float): Si el nivel de disparo máximo de un conjunto de muestras mal modeladas es menor o igual a este valor elevado a la dimensión de los datos, se considera para crecer una nueva subred.
+- `Nsplit` (int): Número mínimo de muestras para dividir una subred.
+- `eSplit` (float): Error cuadrado medio mínimo de un conjunto de muestras para dividir una subred.
+- `Nvanish` (int): Número máximo de muestras para desvanecer una subred.
+- `lVanish` (int): Edad máxima para desvanecer una subred.
+- `max_iterations` (int): Número máximo de iteraciones.
+- `ANFIStrainer` (Hybrid_learning_algorithm): Instancia del algoritmo de aprendizaje híbrido. Se utiliza para obtener sus parámetros, ya que el algoritmo de actualización de parámetros híbrido del modelo ANFIS clásico es por defecto el aplicado en SONFIS.
+- `validation` (float): Porcentaje de división de validación. Si es 0, no se realiza validación (Default: 0).
+- `early_stopping` (EarlyStopping): Instancia de EarlyStopping (Default: None).
+- `last_training_iteration` (bool): Indica si se debe realizar una última actualización de parámetros después de que el algoritmo SONFIS finalice (Default: False).
 
 Llamado
 -------

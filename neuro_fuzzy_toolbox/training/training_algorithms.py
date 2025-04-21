@@ -131,7 +131,7 @@ class base_model_trainer():
         if self.validation != 0:
             x_train, y_train = train_loader.dataset.tensors
             
-            if model._output_type == 'regression':
+            if model._output_type == 'default':
                 x_train, x_val, y_train, y_val = train_test_split(x_train.numpy(), y_train.numpy(), test_size=self.validation, shuffle=True)
             else:
                 x_train, x_val, y_train, y_val = train_test_split(x_train.numpy(), y_train.numpy(), test_size=self.validation, shuffle=True, stratify=y_train.numpy())

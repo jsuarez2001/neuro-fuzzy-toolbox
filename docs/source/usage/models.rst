@@ -10,3 +10,4 @@ Esta sección contiene una guía sobre los modelos neurodifusos implementados en
 
    models/h_anfis
    models/anfis
+   models/rule_reduced_anfis

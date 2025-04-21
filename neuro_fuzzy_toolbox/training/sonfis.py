@@ -20,15 +20,15 @@ class SONFIS(base_model_trainer):
         Inicializa una nueva instancia de SONFIS.
         
         Args:
-            Ngrow (int): Número mínimo de muestras para crecer una nueva subred.
-            dGrow (float): Si el nivel de disparo máximo de un conjunto de muestras mal modeladas es menor o igual a este valor elevado a la dimensión de los datos, se considera para crecer una nueva subred.
+            Ngrow (int): Número mínimo de muestras mal modeladas para crecer una nueva subred.
+            dGrow (float): Si el nivel de disparo máximo de una muestra es menor o igual a este valor elevado a la dimensión de los datos de entrada, entonces dicha muestra se considera mal modelada.
             Nsplit (int): Número mínimo de muestras para dividir una subred.
             eSplit (float): Error cuadrado medio mínimo de un conjunto de muestras para dividir una subred.
             Nvanish (int): Número máximo de muestras para desvanecer una subred.
             lVanish (int): Edad máxima para desvanecer una subred.
             max_iterations (int): Número máximo de iteraciones.
-            ANFIStrainer (Hybrid_learning_algorithm): Instancia del algoritmo de aprendizaje híbrido. Se utiliza para obtener sus parámetros, ya que el algoritmo de actualización de parámetros híbrido del modelo ANFIS clásico es por defecto el aplicado en SONFIS.
-            validation (float): Porcentaje de división de validación. Si es 0, no se realiza validación (Default: 0).
+            ANFIStrainer (ANFIS learning algorithm instance): Instancia de algún algoritmo de entrenamiento para los modelos ANFIS. Básicamente define la manera en la se actualizarán los parámetros del modelo.
+            validation (float): Porcentaje de los datos destinados a validación. Si es 0, no se realiza validación (Default: 0).
             early_stopping (EarlyStopping): Instancia de EarlyStopping (Default: None).
             last_training_iteration (bool): Indica si se debe realizar una última actualización de parámetros después de que el algoritmo SONFIS finalice (Default: False).
         """
@@ -295,12 +295,12 @@ class SONFIS(base_model_trainer):
             unique_rules = torch.unique(best_rules)
             
             """
-            premilinary fix for multiclass output
+            premilinary fix for softmax output
             """
             if targets.shape != model_outputs.shape:
                 targets = torch.nn.functional.one_hot(targets.to(torch.long), ANFISmodel._outputs)
             """
-            premilinary fix for multiclass output
+            premilinary fix for softmax output
             """
             mse_values = torch.stack([((targets[best_rules == rule] - model_outputs[best_rules == rule])**2).mean() for rule in unique_rules])
             
@@ -501,12 +501,12 @@ class alt_SONFIS(SONFIS):
             related_rules = torch.cat((related_rules, torch.nn.functional.one_hot(max_fl.indices, ANFISmodel.rules).bool()))
         
         """
-        premilinary fix for multiclass output
+        premilinary fix for softmax output
         """
         if y.shape != model_outputs.shape:
             y = torch.nn.functional.one_hot(y.to(torch.long), ANFISmodel._outputs)
         """
-        premilinary fix for multiclass output
+        premilinary fix for softmax output
         """
         
         expanded_related_rules = related_rules.t().unsqueeze(-1)

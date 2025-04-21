@@ -2,8 +2,6 @@ __pycache__/
 *.ipynb_checkpoints/
 .vscode/
 env/
-neurofuzzy_toolbox_esp/
-EXP_neuro_fuzzy_toolbox/
 test_notebooks_old/
 pendiente.txt
 tests/

@@ -50,11 +50,11 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#salida-sigmoide-y-softmax">Salida sigmoide y softmax</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../usage/models/anfis.html">ANFIS</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#instanciacion">Instanciación</a></li>
@@ -62,6 +62,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../usage/models/anfis.html#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../usage/models/rule_reduced_anfis.html">ANFIS de reglas reducidas</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../usage/training.html">Training</a><ul>
@@ -138,6 +139,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../examples/sonfis.html">SONFIS Examples</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../examples/sonfis.html#example-1">Example 1:</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#imports">0. Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-de-los-datos">1. Definición de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#preprocesamiento-de-los-datos">2. Preprocesamiento de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-del-dataloader">3. Definición del DataLoader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-del-modelo">4. Definición del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#definicion-del-algoritmo-de-entrenamiento">5. Definición del algoritmo de entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#instancicion-del-algoritmo-sonfis">6. Instancición del algoritmo SONFIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#entrenamiento-del-modelo">7. Entrenamiento del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/sonfis.html#evaluacion-del-modelo">7. Evaluación del modelo</a></li>
 </ul>
 </li>
 </ul>
@@ -161,6 +170,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/fuzzification.html">Fuzzification Layers</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">FuzzificationLayer</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">h_FuzzificationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">rule_reduced_FuzzificationLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/firing_levels.html">Firing Levels Layers</a><ul>
@@ -171,6 +181,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/consequent.html">Consequent Layer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">ConsequentLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../modules/layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">alt_ConsequentLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../modules/layers/output.html">Output Layer</a><ul>
@@ -250,9 +261,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">neuro_fuzzy_toolbox.training</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">base_model_trainer</span><span class="p">,</span>
-    <span class="n">classical_consequents_estimation_with_OLS</span><span class="p">,</span>
-    <span class="n">optimizer_training_epoch</span>
+    <span class="n">base_model_trainer</span>
 <span class="p">)</span>
 
 <div class="viewcode-block" id="SONFIS">
@@ -272,15 +281,15 @@
 <span class="sd">        Inicializa una nueva instancia de SONFIS.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
-<span class="sd">            Ngrow (int): Número mínimo de muestras para crecer una nueva subred.</span>
-<span class="sd">            dGrow (float): Si el nivel de disparo máximo de un conjunto de muestras mal modeladas es menor o igual a este valor elevado a la dimensión de los datos, se considera para crecer una nueva subred.</span>
+<span class="sd">            Ngrow (int): Número mínimo de muestras mal modeladas para crecer una nueva subred.</span>
+<span class="sd">            dGrow (float): Si el nivel de disparo máximo de una muestra es menor o igual a este valor elevado a la dimensión de los datos de entrada, entonces dicha muestra se considera mal modelada.</span>
 <span class="sd">            Nsplit (int): Número mínimo de muestras para dividir una subred.</span>
 <span class="sd">            eSplit (float): Error cuadrado medio mínimo de un conjunto de muestras para dividir una subred.</span>
 <span class="sd">            Nvanish (int): Número máximo de muestras para desvanecer una subred.</span>
 <span class="sd">            lVanish (int): Edad máxima para desvanecer una subred.</span>
 <span class="sd">            max_iterations (int): Número máximo de iteraciones.</span>
-<span class="sd">            ANFIStrainer (Hybrid_learning_algorithm): Instancia del algoritmo de aprendizaje híbrido. Se utiliza para obtener sus parámetros, ya que el algoritmo de actualización de parámetros híbrido del modelo ANFIS clásico es por defecto el aplicado en SONFIS.</span>
-<span class="sd">            validation (float): Porcentaje de división de validación. Si es 0, no se realiza validación (Default: 0).</span>
+<span class="sd">            ANFIStrainer (ANFIS learning algorithm instance): Instancia de algún algoritmo de entrenamiento para los modelos ANFIS. Básicamente define la manera en la se actualizarán los parámetros del modelo.</span>
+<span class="sd">            validation (float): Porcentaje de los datos destinados a validación. Si es 0, no se realiza validación (Default: 0).</span>
 <span class="sd">            early_stopping (EarlyStopping): Instancia de EarlyStopping (Default: None).</span>
 <span class="sd">            last_training_iteration (bool): Indica si se debe realizar una última actualización de parámetros después de que el algoritmo SONFIS finalice (Default: False).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -297,7 +306,7 @@
         
         <span class="c1"># Early stopping</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">=</span> <span class="n">validation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span> <span class="o">=</span> <span class="n">early_stopping</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sonfis_early_stopping</span> <span class="o">=</span> <span class="n">early_stopping</span>
         
         <span class="c1"># history</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="p">[]}</span>
@@ -305,17 +314,13 @@
         
         
         <span class="c1"># --------- ANFIS trainer ---------</span>
-        <span class="c1"># Training parameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">trainer_epochs</span> <span class="o">=</span> <span class="n">ANFIStrainer</span><span class="o">.</span><span class="n">epochs</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span> <span class="o">=</span> <span class="n">ANFIStrainer</span><span class="o">.</span><span class="n">loss_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span> <span class="o">=</span> <span class="n">ANFIStrainer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">loss_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">validation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span>
         
         <span class="c1"># Optimizer</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">ANFIStrainer</span><span class="o">.</span><span class="n">optimizer</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_params</span> <span class="o">=</span> <span class="n">ANFIStrainer</span><span class="o">.</span><span class="n">optimizer_params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span> <span class="o">=</span> <span class="kc">None</span>
         
-        <span class="c1"># Early stopping</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">trainer_early_stopping</span> <span class="o">=</span> <span class="n">ANFIStrainer</span><span class="o">.</span><span class="n">early_stopping</span>
         
         <span class="c1"># ------ Internal variables ------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
@@ -346,7 +351,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_ages</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update_parameters</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">_sonfis_update_parameters</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_freezed</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="n">iter_width</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span><span class="p">))</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -355,8 +360,6 @@
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Iteration: </span><span class="si">{</span><span class="mi">0</span><span class="si">:{</span><span class="n">iter_width</span><span class="si">}}</span><span class="s1">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span><span class="si">}</span><span class="s1"> - loss: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; -&gt; ANFIS rules: </span><span class="si">{</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         
-        <span class="c1">#previous_prems = ANFISmodel.get_premises()</span>
-        <span class="c1">#previous_cons = ANFISmodel.get_consequents()</span>
         <span class="n">model_updated</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span><span class="p">(</span><span class="n">model_updated</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span><span class="p">):</span>
@@ -366,10 +369,8 @@
             <span class="n">model_updated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_structure</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">)</span>
             
             <span class="k">if</span> <span class="n">model_updated</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_update_parameters</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">_sonfis_update_parameters</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_freezed</span><span class="p">)</span>
 
-                <span class="c1">#print(&quot;premises_updated: &quot;, not torch.equal(ANFISmodel.get_premises(), previous_prems))</span>
-                <span class="c1">#print(&quot;consequents_updated: &quot;, not torch.equal(ANFISmodel.get_consequents(), previous_cons))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No more updates&#39;</span><span class="p">)</span>
@@ -392,7 +393,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_unfreeze_subnets</span><span class="p">()</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_training_iteration</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_update_parameters</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">_sonfis_update_parameters</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_freezed</span><span class="p">)</span>
             
             <span class="bp">self</span><span class="o">.</span><span class="n">_register_loss</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
@@ -408,36 +409,6 @@
 
         
     
-    <span class="k">def</span><span class="w"> </span><span class="nf">_train_val_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Divide los datos de entrenamiento en datos de entrenamiento y validación.</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">            ANFISmodel (h_ANFIS): Instancia del modelo ANFIS reducido en reglas.</span>
-<span class="sd">            train_loader (DataLoader): DataLoader con los datos de entrenamiento.</span>
-<span class="sd">            </span>
-<span class="sd">        Returns:</span>
-<span class="sd">            DataLoader: DataLoader con los datos de entrenamiento.</span>
-<span class="sd">            DataLoader: DataLoader con los datos de validación.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">val_loader</span> <span class="o">=</span> <span class="kc">None</span>
-        
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">train_loader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">tensors</span>
-            
-            <span class="k">if</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">_output_type</span> <span class="o">==</span> <span class="s1">&#39;regression&#39;</span><span class="p">:</span>
-                <span class="n">x_train</span><span class="p">,</span> <span class="n">x_val</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">y_train</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validation</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">x_train</span><span class="p">,</span> <span class="n">x_val</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">y_train</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validation</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y_train</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
-                
-            <span class="n">x_train</span><span class="p">,</span> <span class="n">x_val</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">x_train</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">x_val</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y_train</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y_val</span><span class="p">)</span>
-            
-            <span class="n">train_loader</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">TensorDataset</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">),</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">train_loader</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">val_loader</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">TensorDataset</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">),</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">train_loader</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span>
-        
-    
     <span class="k">def</span><span class="w"> </span><span class="nf">_freeze_subnets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Congela todas las subredes.</span>
@@ -449,85 +420,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Descongela todas las subredes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_freezed</span><span class="p">)</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_freezed</span><span class="p">)</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>  
     
-    
-    <span class="k">def</span><span class="w"> </span><span class="nf">_init_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">optimizer_params</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Inicializa el optimizador.</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">            ANFISmodel (h_ANFIS): Instancia del modelo ANFIS reducido en reglas.</span>
-<span class="sd">            optimizer (torch.optim): Optimizador a utilizar en el entrenamiento</span>
-<span class="sd">            optimizer_params (dict): Parámetros del optimizador.</span>
-<span class="sd">        </span>
-<span class="sd">        Returns:</span>
-<span class="sd">            torch.optim.Optimizer: Instancia del optimizador.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">optimizer</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">get_premises_as_parameters_list</span><span class="p">(),</span> <span class="o">**</span><span class="n">optimizer_params</span><span class="p">)</span>
-    
-    
-    <span class="k">def</span><span class="w"> </span><span class="nf">_update_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Ejecuta el algoritmo de actualización de parámetros del modelo. Utiliza el enfoque de algoritmo de aprendizaje híbrido ANFIS.</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">            ANFISmodel (h_ANFIS): Instancia del modelo ANFIS reducido en reglas.</span>
-<span class="sd">            train_loader (DataLoader): DataLoader de entrenamiento.</span>
-<span class="sd">            val_loader (DataLoader): DataLoader de validación.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">current_consequents</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">get_consequents</span><span class="p">()</span>
-        <span class="n">current_premises</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">get_premises</span><span class="p">()</span>
-        
-        <span class="n">ep</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_optimizer</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_params</span><span class="p">)</span>
-        <span class="k">while</span> <span class="n">ep</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer_epochs</span><span class="p">:</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Consequents update&quot;&quot;&quot;</span> 
-            <span class="c1">### current_consequents = ANFISmodel.get_consequents()</span>
-            
-            <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="n">classical_consequents_estimation_with_OLS</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">))</span>
-            <span class="c1">### new_consequents = ANFISmodel.get_consequents()</span>
-            
-            <span class="c1">### freezed_consequents = self._freezed</span>
-            
-            <span class="c1">### new_consequents[:, freezed_consequents, :] = current_consequents[:, freezed_consequents, :]</span>
-            <span class="c1">### ANFISmodel.set_consequents(new_consequents)</span>
-<span class="w">            </span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Premises update&quot;&quot;&quot;</span>
-            <span class="c1">### current_premises = ANFISmodel.get_premises()</span>
-            <span class="n">optimizer_training_epoch</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">)</span>
-            <span class="c1">### new_premises = ANFISmodel.get_premises()</span>
-        
-            <span class="c1">### freezed_premises = self._freezed</span>
-            
-            <span class="c1">### new_premises[:, freezed_premises, :] = current_premises[:, freezed_premises, :]</span>
-            <span class="c1">### ANFISmodel.set_premises(new_premises)</span>
-            
-            <span class="c1">#loss, val_loss = self._loss(ANFISmodel, train_loader, val_loader)</span>
-            <span class="c1">#epoch_width = len(str(self.trainer_epochs))</span>
-            <span class="c1">#if self.validation &gt; 0:</span>
-            <span class="c1">#    print(f&#39;    Epoch: {ep+1:{epoch_width}}/{self.trainer_epochs} - loss: {loss:.6f} - validation loss: {val_loss:.6f}&#39;)</span>
-            <span class="c1">#else:</span>
-            <span class="c1">#    print(f&#39;    Epoch: {ep+1:{epoch_width}}/{self.trainer_epochs} - loss: {loss:.6f}&#39;)</span>
-            
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer_early_stopping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">_</span><span class="p">,</span> <span class="n">val_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loss</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">trainer_early_stopping</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">val_loss</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer_early_stopping</span><span class="o">.</span><span class="n">_stop</span><span class="p">:</span>
-                    <span class="k">break</span>
-                
-            <span class="n">ep</span> <span class="o">+=</span> <span class="mi">1</span>
-            
-        <span class="n">new_consequents</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">get_consequents</span><span class="p">()</span>
-        <span class="n">new_consequents</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_freezed</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">current_consequents</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_freezed</span><span class="p">,</span> <span class="p">:]</span>
-        <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_consequents</span><span class="p">(</span><span class="n">new_consequents</span><span class="p">)</span>
-        
-        <span class="n">new_premises</span> <span class="o">=</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">get_premises</span><span class="p">()</span>
-        <span class="n">new_premises</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_freezed</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">current_premises</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_freezed</span><span class="p">,</span> <span class="p">:]</span>
-        <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">set_premises</span><span class="p">(</span><span class="n">new_premises</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer_early_stopping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">trainer_early_stopping</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>        
     
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -542,10 +436,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">did_Grow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GrowNet</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">)</span>
         
+        <span class="n">did_Split</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">did_Grow</span><span class="p">:</span>
             <span class="n">did_Split</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SplitSubNet</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">)</span>
         
         <span class="n">did_Vanish</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_VanishNet</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">)</span>
+        
+        <span class="c1">#print(&quot;did_Grow: &quot;, did_Grow)</span>
+        <span class="c1">#print(&quot;did_Split: &quot;, did_Split)</span>
+        <span class="c1">#print(&quot;did_Vanish: &quot;, did_Vanish)</span>
         
         <span class="k">return</span> <span class="n">did_Grow</span> <span class="ow">or</span> <span class="n">did_Split</span> <span class="ow">or</span> <span class="n">did_Vanish</span>
     
@@ -561,9 +460,9 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: Indica si se debe detener el entrenamiento.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">stop</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sonfis_early_stopping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sonfis_early_stopping</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sonfis_early_stopping</span><span class="o">.</span><span class="n">stop</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_ages</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_freezed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
                 <span class="k">return</span> <span class="kc">True</span>
@@ -661,12 +560,12 @@
             <span class="n">unique_rules</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">best_rules</span><span class="p">)</span>
 <span class="w">            </span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            premilinary fix for multiclass output</span>
+<span class="sd">            premilinary fix for softmax output</span>
 <span class="sd">            &quot;&quot;&quot;</span>
             <span class="k">if</span> <span class="n">targets</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">model_outputs</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
                 <span class="n">targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">targets</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">),</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">_outputs</span><span class="p">)</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            premilinary fix for multiclass output</span>
+<span class="sd">            premilinary fix for softmax output</span>
 <span class="sd">            &quot;&quot;&quot;</span>
             <span class="n">mse_values</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([((</span><span class="n">targets</span><span class="p">[</span><span class="n">best_rules</span> <span class="o">==</span> <span class="n">rule</span><span class="p">]</span> <span class="o">-</span> <span class="n">model_outputs</span><span class="p">[</span><span class="n">best_rules</span> <span class="o">==</span> <span class="n">rule</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">unique_rules</span><span class="p">])</span>
             
@@ -873,12 +772,12 @@
             <span class="n">related_rules</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">related_rules</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">max_fl</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">rules</span><span class="p">)</span><span class="o">.</span><span class="n">bool</span><span class="p">()))</span>
 <span class="w">        </span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        premilinary fix for multiclass output</span>
+<span class="sd">        premilinary fix for softmax output</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">model_outputs</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">),</span> <span class="n">ANFISmodel</span><span class="o">.</span><span class="n">_outputs</span><span class="p">)</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        premilinary fix for multiclass output</span>
+<span class="sd">        premilinary fix for softmax output</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
         <span class="n">expanded_related_rules</span> <span class="o">=</span> <span class="n">related_rules</span><span class="o">.</span><span class="n">t</span><span class="p">()</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>

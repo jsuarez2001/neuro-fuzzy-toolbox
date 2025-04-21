@@ -92,7 +92,7 @@ SONFIS solo trabaja con modelos ANFIS rule reduced.
         input_size = x_train.shape[1],
         num_mfs = 1,
         outputs = 2,
-        output_type='multiclass',
+        output_type='softmax',
         dtype=torch.float64
     )
 

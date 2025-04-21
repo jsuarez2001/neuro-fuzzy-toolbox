@@ -53,11 +53,11 @@
 <li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#instanciacion">Instanciación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#algunos-metodos-utiles">Algunos métodos útiles</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#salida-binaria-y-multiclase">Salida binaria y multiclase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#salida-sigmoide-y-softmax">Salida sigmoide y softmax</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#multiples-salidas">Múltiples salidas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../usage/models/h_anfis.html#rule-reduced-anfis">rule-reduced ANFIS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../usage/models/anfis.html">ANFIS</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#importacion">Importación</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#instanciacion">Instanciación</a></li>
@@ -65,6 +65,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../usage/models/anfis.html#otros-metodos-y-herramientas">Otros métodos y herramientas</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../usage/models/rule_reduced_anfis.html">ANFIS de reglas reducidas</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../usage/training.html">Training</a><ul>
@@ -141,6 +142,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../../examples/sonfis.html">SONFIS Examples</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/sonfis.html#example-1">Example 1:</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../examples/sonfis.html#imports">0. Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/sonfis.html#definicion-de-los-datos">1. Definición de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/sonfis.html#preprocesamiento-de-los-datos">2. Preprocesamiento de los datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/sonfis.html#definicion-del-dataloader">3. Definición del DataLoader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/sonfis.html#definicion-del-modelo">4. Definición del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/sonfis.html#definicion-del-algoritmo-de-entrenamiento">5. Definición del algoritmo de entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/sonfis.html#instancicion-del-algoritmo-sonfis">6. Instancición del algoritmo SONFIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/sonfis.html#entrenamiento-del-modelo">7. Entrenamiento del modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/sonfis.html#evaluacion-del-modelo">7. Evaluación del modelo</a></li>
 </ul>
 </li>
 </ul>
@@ -164,6 +173,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../layers/fuzzification.html">Fuzzification Layers</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">FuzzificationLayer</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.h_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">h_FuzzificationLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../layers/fuzzification.html#neuro_fuzzy_toolbox.layers.fuzzification_layer.rule_reduced_FuzzificationLayer"><code class="docutils literal notranslate"><span class="pre">rule_reduced_FuzzificationLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../layers/firing_levels.html">Firing Levels Layers</a><ul>
@@ -174,6 +184,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../layers/consequent.html">Consequent Layer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">ConsequentLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../layers/consequent.html#neuro_fuzzy_toolbox.layers.consequent_layer.alt_ConsequentLayer"><code class="docutils literal notranslate"><span class="pre">alt_ConsequentLayer</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../layers/output.html">Output Layer</a><ul>
@@ -254,7 +265,7 @@
 <p>Todas las clases aquí presentes heredan de la clase base llamada <em>base_ANFIS</em>, la cual define la estructura general de los modelos ANFIS y ciertos métodos comunes.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="neuro_fuzzy_toolbox.models.anfis.h_ANFIS">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neuro_fuzzy_toolbox.models.anfis.</span></span><span class="sig-name descname"><span class="pre">h_ANFIS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_mfs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">membership_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consequent_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.consequent.Linear_CF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type='regression'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rule_reduced=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=torch.float32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/models/anfis.html#h_ANFIS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.h_ANFIS" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neuro_fuzzy_toolbox.models.anfis.</span></span><span class="sig-name descname"><span class="pre">h_ANFIS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_mfs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">membership_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consequent_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.consequent.Linear_CF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type='default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rule_reduced=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=torch.float32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/models/anfis.html#h_ANFIS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.h_ANFIS" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#neuro_fuzzy_toolbox.models.anfis.base_ANFIS" title="neuro_fuzzy_toolbox.models.anfis.base_ANFIS"><code class="xref py py-class docutils literal notranslate"><span class="pre">base_ANFIS</span></code></a></p>
 <p>Clase para un sistema de inferencia neuro-difuso adaptativo (ANFIS) homogéneo, es decir, con la misma cantidad de funciones de membresía para cada feature de los datos de entrada,
 limitando a que cada uno con el mismo número de variables lingüisticas.</p>
@@ -262,7 +273,7 @@ limitando a que cada uno con el mismo número de variables lingüisticas.</p>
 El procedimiento en este caso se realizaría solo multiplicando entre sí los valores de pertenencia <em>i</em> de cada feature, dando como resultado una cantidad de reglas igual al número de funciones de membresía de cada feature. (esto se detalla de mejor manera en <a class="reference internal" href="../../usage/models/h_anfis.html#rule-reduced-anfis"><span class="std std-ref">rule-reduced ANFIS</span></a>).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="neuro_fuzzy_toolbox.models.anfis.h_ANFIS.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_mfs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">membership_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consequent_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.consequent.Linear_CF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type='regression'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rule_reduced=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=torch.float32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/models/anfis.html#h_ANFIS.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.__init__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_mfs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">membership_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consequent_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.consequent.Linear_CF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type='default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rule_reduced=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=torch.float32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/models/anfis.html#h_ANFIS.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.__init__" title="Link to this definition"></a></dt>
 <dd><p>Inicializa un modelo ANFIS homogéneo.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -272,7 +283,7 @@ El procedimiento en este caso se realizaría solo multiplicando entre sí los va
 <li><p><strong>outputs</strong> (<em>int</em>) – Número de salidas del modelo (Default: 1).</p></li>
 <li><p><strong>membership_function</strong> (<em>MembershipFunction</em>) – Función de membresía a utilizar (Default: GeneralizedBell_MF).</p></li>
 <li><p><strong>consequent_function</strong> (<em>ConsequentFunction</em>) – Función consecuente a utilizar (Default: Linear_CF).</p></li>
-<li><p><strong>output_type</strong> (<em>str</em>) – Tipo de salida del modelo (Default: ‘regression’).</p></li>
+<li><p><strong>output_type</strong> (<em>str</em>) – Tipo de salida del modelo (Default: ‘default’).</p></li>
 <li><p><strong>rule_reduced</strong> (<em>bool</em>) – True si se desea instanciar un ANFIS de reglas reducidas, False en caso contrario (Default: False).</p></li>
 <li><p><strong>dtype</strong> (<em>torch.dtype</em>) – Tipo de dato a utilizar en el modelo (Default: torch.float32).</p></li>
 </ul>
@@ -302,7 +313,7 @@ El procedimiento en este caso se realizaría solo multiplicando entre sí los va
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>torch.Tensor</em>) – Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).</p></li>
-<li><p><strong>return_probabilities</strong> (<em>bool</em>) – Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es ‘multiclass’, en caso contrario, se ignora (Default: False).</p></li>
+<li><p><strong>return_probabilities</strong> (<em>bool</em>) – Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es ‘softmax’, en caso contrario, se ignora (Default: False).</p></li>
 </ul>
 </dd>
 </dl>
@@ -338,7 +349,7 @@ El procedimiento en este caso se realizaría solo multiplicando entre sí los va
 
 <dl class="py method">
 <dt class="sig sig-object py" id="neuro_fuzzy_toolbox.models.anfis.h_ANFIS.get_premises">
-<span class="sig-name descname"><span class="pre">get_premises</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/models/anfis.html#h_ANFIS.get_premises"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.get_premises" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_premises</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.get_premises" title="Link to this definition"></a></dt>
 <dd><p>Retorna los antecedentes del modelo.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -352,7 +363,7 @@ El procedimiento en este caso se realizaría solo multiplicando entre sí los va
 
 <dl class="py method">
 <dt class="sig sig-object py" id="neuro_fuzzy_toolbox.models.anfis.h_ANFIS.get_premises_as_parameters_list">
-<span class="sig-name descname"><span class="pre">get_premises_as_parameters_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/models/anfis.html#h_ANFIS.get_premises_as_parameters_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.get_premises_as_parameters_list" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_premises_as_parameters_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.get_premises_as_parameters_list" title="Link to this definition"></a></dt>
 <dd><p>Retorna los antecedentes del modelo como una lista de parámetros. Esto es útil para algoritmos de optimización.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -516,7 +527,7 @@ El procedimiento en este caso se realizaría solo multiplicando entre sí los va
 
 <dl class="py method">
 <dt class="sig sig-object py" id="neuro_fuzzy_toolbox.models.anfis.h_ANFIS.set_premises">
-<span class="sig-name descname"><span class="pre">set_premises</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">premises</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/models/anfis.html#h_ANFIS.set_premises"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.set_premises" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_premises</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">premises</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.h_ANFIS.set_premises" title="Link to this definition"></a></dt>
 <dd><p>Setea los parámetros de las funciones de membresía de la capa de fuzzificación del modelo.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -541,21 +552,21 @@ El procedimiento en este caso se realizaría solo multiplicando entre sí los va
 
 <dl class="py class">
 <dt class="sig sig-object py" id="neuro_fuzzy_toolbox.models.anfis.ANFIS">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neuro_fuzzy_toolbox.models.anfis.</span></span><span class="sig-name descname"><span class="pre">ANFIS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mf_distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">membership_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consequent_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.consequent.Linear_CF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type='regression'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=torch.float32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/models/anfis.html#ANFIS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.ANFIS" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neuro_fuzzy_toolbox.models.anfis.</span></span><span class="sig-name descname"><span class="pre">ANFIS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mf_distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">membership_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consequent_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.consequent.Linear_CF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type='default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=torch.float32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/models/anfis.html#ANFIS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.ANFIS" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#neuro_fuzzy_toolbox.models.anfis.base_ANFIS" title="neuro_fuzzy_toolbox.models.anfis.base_ANFIS"><code class="xref py py-class docutils literal notranslate"><span class="pre">base_ANFIS</span></code></a></p>
 <p>Clase para un sistema de inferencia neuro-difuso adaptativo (ANFIS) con una cantidad de funciones de membresía arbitraria para cada feature de los datos de entrada.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="neuro_fuzzy_toolbox.models.anfis.ANFIS.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mf_distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">membership_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consequent_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.consequent.Linear_CF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type='regression'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=torch.float32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/models/anfis.html#ANFIS.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.ANFIS.__init__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mf_distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">membership_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.membership.GeneralizedBell_MF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consequent_function=&lt;class</span> <span class="pre">'neuro_fuzzy_toolbox.func.consequent.Linear_CF'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type='default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=torch.float32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/models/anfis.html#ANFIS.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.ANFIS.__init__" title="Link to this definition"></a></dt>
 <dd><p>Inicializa un modelo ANFIS.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mf_distribution</strong> (<em>list</em>) – Distribución de funciones de membresía por feature. Debe ser una lista con la cantidad de funciones de membresía por feature.</p></li>
+<li><p><strong>mf_distribution</strong> (<em>list</em>) – Lista con la cantidad de funciones de membresía por feature de los datos de entrada.</p></li>
 <li><p><strong>outputs</strong> (<em>int</em>) – Número de salidas del modelo (Default: 1).</p></li>
 <li><p><strong>membership_function</strong> (<em>MembershipFunction</em>) – Función de membresía a utilizar (Default: GeneralizedBell_MF).</p></li>
 <li><p><strong>consequent_function</strong> (<em>ConsequentFunction</em>) – Función consecuente a utilizar (Default: Linear_CF).</p></li>
-<li><p><strong>output_type</strong> (<em>str</em>) – Tipo de salida del modelo (Default: ‘regression’).</p></li>
+<li><p><strong>output_type</strong> (<em>str</em>) – Tipo de salida del modelo (Default: ‘default’).</p></li>
 <li><p><strong>dtype</strong> (<em>torch.dtype</em>) – Tipo de dato a utilizar en el modelo (Default: torch.float32).</p></li>
 </ul>
 </dd>
@@ -584,7 +595,7 @@ El procedimiento en este caso se realizaría solo multiplicando entre sí los va
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>torch.Tensor</em>) – Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).</p></li>
-<li><p><strong>return_probabilities</strong> (<em>bool</em>) – Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es ‘multiclass’, en caso contrario, se ignora (Default: False).</p></li>
+<li><p><strong>return_probabilities</strong> (<em>bool</em>) – Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es ‘softmax’, en caso contrario, se ignora (Default: False).</p></li>
 </ul>
 </dd>
 </dl>
@@ -853,7 +864,7 @@ Las clases ANFIS y h_ANFIS heredan de esta clase y añaden funcionalidades espec
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>torch.Tensor</em>) – Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).</p></li>
-<li><p><strong>return_probabilities</strong> (<em>bool</em>) – Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es ‘multiclass’, en caso contrario, se ignora (Default: False).</p></li>
+<li><p><strong>return_probabilities</strong> (<em>bool</em>) – Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es ‘softmax’, en caso contrario, se ignora (Default: False).</p></li>
 </ul>
 </dd>
 </dl>
@@ -880,6 +891,34 @@ Las clases ANFIS y h_ANFIS heredan de esta clase y añaden funcionalidades espec
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Lista de 1 solo elemento (nn.Parameter) que contiene los parámetros consecuentes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.models.anfis.base_ANFIS.get_premises">
+<span class="sig-name descname"><span class="pre">get_premises</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/models/anfis.html#base_ANFIS.get_premises"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.base_ANFIS.get_premises" title="Link to this definition"></a></dt>
+<dd><p>Retorna los antecedentes del modelo.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tensor con los antecedentes del modelo. Su forma es (input_size, num_mfs, mf_params).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.models.anfis.base_ANFIS.get_premises_as_parameters_list">
+<span class="sig-name descname"><span class="pre">get_premises_as_parameters_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/models/anfis.html#base_ANFIS.get_premises_as_parameters_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.base_ANFIS.get_premises_as_parameters_list" title="Link to this definition"></a></dt>
+<dd><p>Retorna los antecedentes del modelo como una lista de parámetros. Esto es útil para algoritmos de optimización.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Lista de 1 solo elemento (nn.Parameter) que contiene los parámetros de los antecedentes.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>list</p>
@@ -937,6 +976,20 @@ Las clases ANFIS y h_ANFIS heredan de esta clase y añaden funcionalidades espec
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.models.anfis.base_ANFIS.num_mfs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_mfs</span></span><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.base_ANFIS.num_mfs" title="Link to this definition"></a></dt>
+<dd><p>Retorna la cantidad de funciones de membresía por feature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Cantidad de funciones de membresía que tiene cada feature.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1008,6 +1061,17 @@ Las clases ANFIS y h_ANFIS heredan de esta clase y añaden funcionalidades espec
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>consequents</strong> (<em>torch.tensor</em>) – Tensor con los parámetros consecuentes. Su forma debe ser (outputs, rules, input_size + 1).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neuro_fuzzy_toolbox.models.anfis.base_ANFIS.set_premises">
+<span class="sig-name descname"><span class="pre">set_premises</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">premises</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/neuro_fuzzy_toolbox/models/anfis.html#base_ANFIS.set_premises"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#neuro_fuzzy_toolbox.models.anfis.base_ANFIS.set_premises" title="Link to this definition"></a></dt>
+<dd><p>Setea los parámetros de las funciones de membresía de la capa de fuzzificación del modelo.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>premises</strong> (<em>torch.tensor</em>) – Tensor con los parámetros de las funciones de membresía. Su forma debe ser (input_size, num_mfs, mf_params), donde mf_params es el número de parámetros de la función de membresía.</p>
 </dd>
 </dl>
 </dd></dl>

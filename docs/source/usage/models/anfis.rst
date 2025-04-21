@@ -25,7 +25,7 @@ Los parámetros a tomar en cuenta para instanciar un modelo ANFIS son los siguie
 - **mf_distribution**: Lista que contiene el número de funciones de membresía para cada feature de los datos de entrada.
 - **outputs**: Número de salidas del modelo. Por defecto es 1.
 - **membership_function**: Función de membresía a utilizar. Puede ser Gaussian_MF, GeneralizedBell_MF. Por defecto es GeneralizedBell_MF.
-- **output_type**: Tipo de salida del modelo. Puede ser 'regression', 'binary' o 'multiclass'. Por defecto es 'regression'.
+- **output_type**: Tipo de salida del modelo. Puede ser 'default', 'simgoid' o 'softmax'. Por defecto es 'default'.
 - **dtype**: Tipo de dato de los tensores que contienen los parámetros del modelo. Por defecto es torch.float32.
 
 Considerando que se tiene datos con 3 features por ejemplo:
@@ -150,7 +150,7 @@ Considerando que se tienen datos con 3 features:
 
     model = nft.ANFIS(
         mf_distribution=mf_distribution,
-        output_type='binary'
+        output_type='sigmoid'
     )
 
 .. code-block:: python
@@ -179,7 +179,7 @@ Considerando que se tienen datos con 3 features:
     model = nft.ANFIS(
         mf_distribution=mf_distribution,
         outputs=3,
-        output_type='multiclass'
+        output_type='softmax'
     )
 
 .. code-block:: python
@@ -201,7 +201,7 @@ Considerando que se tienen datos con 3 features:
 
 .. code-block:: python
 
-    model(x_train[:10], return_probabilities=True)
+    model(x_train[:10], return_probs=True)
 
 .. code-block:: python
 
