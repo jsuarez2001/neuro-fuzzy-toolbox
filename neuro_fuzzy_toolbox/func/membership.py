@@ -173,7 +173,7 @@ class Gaussian_MF(MembershipFunction):
             torch.tensor: Parámetros aleatorios de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
         """
         random_premises = 2 * torch.rand(input_size, num_mfs, len(self._params), dtype=dtype) - 1
-        random_premises[:, :, 1] = torch.abs(random_premises[:, :, 1])
+        random_premises[:, :, 1] = torch.abs(random_premises[:, :, 1]) + 0.1
         return random_premises
     
     def random_single_feature_mfs(self, n_mfs, dtype):
@@ -188,7 +188,7 @@ class Gaussian_MF(MembershipFunction):
             torch.tensor: Parámetros aleatorios de las premisas. La forma de salida es (n_mfs, len(self._params)).
         """
         single_feature_mf = 2 * torch.rand(n_mfs, len(self._params), dtype=dtype) - 1
-        single_feature_mf[:, 1] = torch.abs(single_feature_mf[:, 1])
+        single_feature_mf[:, 1] = torch.abs(single_feature_mf[:, 1]) + 0.1
         return single_feature_mf
 
     def _grow_new_premise_parameters(self, means, stds):
@@ -251,6 +251,16 @@ class GeneralizedBell_MF(MembershipFunction):
     def _simple_numpy_implementation(self, x, a, b, c):
         """
         Implementación simple de la función de membresía Generalized Bell en numpy. Este método se define para poder graficar las funciones de membresía.
+        
+        Args:
+            x (numpy.ndarray): Tensor de entrada.
+            a (float): Parámetro a (ancho).
+            b (float): Parámetro b (pendiente).
+            c (float): Parámetro c (centro).
+        
+        Returns:
+            numpy.ndarray: Salida de la función de membresía Gaussiana.
+        
         """
         return 1/(1 + np.power(np.abs((x - c)/a), 2*b))
         
@@ -298,23 +308,6 @@ class GeneralizedBell_MF(MembershipFunction):
                 
         return premises
     
-    def random_premises(self, input_size, num_mfs, dtype):
-        """
-        Genera parámetros aleatorios para las premisas en el rango [-1, 1], restringiendo a los parámetros de ancho y pendiente (**a** y **b**) a valores positivos. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
-        
-        Args:
-            input_size (int): Número de características de entrada.
-            num_mfs (int): Número de funciones de membresía por característica de entrada.
-            dtype (torch.dtype): Tipo de dato de las premisas.
-            
-        Returns:
-            torch.tensor: Parámetros aleatorios de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
-        """
-        random_premises = 2 * torch.rand(input_size, num_mfs, len(self._params), dtype=dtype) - 1
-        random_premises[:, :, :2] = torch.abs(random_premises[:, :, :2])
-        random_premises[:, :, 1] += 1.
-        return random_premises
-    
     def general_initialize_premises(self, x_train, mf_distribution):
         """
         Inicializa los parámetros de la función de membresía Generalized Bell basándose en los datos de entrada. Este método considera que cada característica de entrada puede tener un número distinto de funciones de membresía.
@@ -351,6 +344,23 @@ class GeneralizedBell_MF(MembershipFunction):
             
         return premises
     
+    def random_premises(self, input_size, num_mfs, dtype):
+        """
+        Genera parámetros aleatorios para las premisas en el rango [-1, 1], restringiendo a los parámetros de ancho y pendiente (**a** y **b**) a valores positivos. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        
+        Args:
+            input_size (int): Número de características de entrada.
+            num_mfs (int): Número de funciones de membresía por característica de entrada.
+            dtype (torch.dtype): Tipo de dato de las premisas.
+            
+        Returns:
+            torch.tensor: Parámetros aleatorios de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+        """
+        random_premises = 2 * torch.rand(input_size, num_mfs, len(self._params), dtype=dtype) - 1
+        random_premises[:, :, :2] = torch.abs(random_premises[:, :, :2]) + 0.1
+        random_premises[:, :, 1] += 2.
+        return random_premises
+    
     def random_single_feature_mfs(self, n_mfs, dtype):
         """
         Genera parámetros aleatorios para una sola función de membresía Generalized Bell en el rango [-1, 1], restringiendo a los parámetros de ancho y pendiente (**a** y **b**) a valores positivos.
@@ -363,8 +373,8 @@ class GeneralizedBell_MF(MembershipFunction):
             torch.tensor: Parámetros aleatorios de las premisas. La forma de salida es (n_mfs, len(self._params)).
         """
         random_premise = 2 * torch.rand(n_mfs, len(self._params), dtype=dtype) - 1
-        random_premise[:, :2] = torch.abs(random_premise[:, :2])
-        random_premise[:, 1] += 1.
+        random_premise[:, :2] = torch.abs(random_premise[:, :2]) + 0.1
+        random_premise[:, 1] += 2.
         return random_premise
     
     def _grow_new_premise_parameters(self, means, stds):

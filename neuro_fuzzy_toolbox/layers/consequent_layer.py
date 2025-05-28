@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from torch.nn import Parameter
+import numpy as np
 import pandas as pd
 
 from neuro_fuzzy_toolbox.func import Linear_CF
@@ -9,7 +10,7 @@ class ConsequentLayer(nn.Module):
     """
     Clase para representar la capa consecuente de un modelo de Sistema de Inferencia Neuro-Difuso Adaptativo (ANFIS).
     """
-    def __init__(self, input_size, rules, outputs=1, consequent_function=Linear_CF, dtype=torch.float32):
+    def __init__(self, input_size, rules, outputs=1, consequent_function=Linear_CF, features=None, dtype=torch.float32):
         """
         Inicializa una nueva instancia de la clase ConsequentLayer.
         
@@ -18,9 +19,15 @@ class ConsequentLayer(nn.Module):
             rules (int): Número de reglas del modelo ANFIS, depende del modelo en sí.
             outputs (int): Número de salidas del modelo ANFIS (Default: 1).
             consequent_function (ConsequentFunction): Función consecuente a utilizar en la capa (Default: Linear_CF).
+            features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
             dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).
         """
         super(ConsequentLayer, self).__init__()
+        # Input data info
+        self.features = [f"x{i}" for i in range(input_size)]
+        if features != None and len(features) == input_size:
+            self.features = features
+            
         # Initialize consequent function
         self._consequent_function = consequent_function()
             
@@ -42,26 +49,44 @@ class ConsequentLayer(nn.Module):
             torch.Tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas del modelo ANFIS.
         """
         return self._consequent_function(x, self._consequents, weights)
-    
+
     
     @property
-    def consequents_structure(self):
+    def get_consequents_structure(self):
         """
         Retorna la estructura de los parámetros consecuentes.
         
         Returns:
             list: Lista de DataFrames de pandas que contienen la estructura de los parámetros consecuentes
         """
-        dfs = [pd.DataFrame() for _ in range(self._consequents.data.shape[0])]
+        consequents_tensor = self.get_consequents()
+        dfs = []
+        num_outputs = consequents_tensor.shape[0]
+        num_rules = consequents_tensor.shape[1]
+        num_params = consequents_tensor.shape[2]
 
-        rules = ['rule {}'.format(i) for i in range(1, self._consequents.data.shape[1]+1)]
+        rules = [f'rule {i}' for i in range(1, num_rules + 1)]
 
-        for o in range(self._consequents.data.shape[0]):
-            for i in range(self._consequents.data.shape[2]):
-                name=f'c{i} (x{i})'
-                if (i == self._consequents.data.shape[2]-1): name=f'c{i}'
-                column = pd.Series(self._consequents.data[o,:,i], index=rules, name=name)
-                dfs[o][name] = column
+        for o in range(num_outputs):
+            data = []
+            column_tuples = []
+
+            for i in range(num_params):
+                input_var = self.features[i] if i < num_params - 1 else ""
+                c_name = f'c{i}'
+
+                column_tuples.append((input_var, c_name))
+
+                data.append(consequents_tensor[o, :, i].cpu().numpy())
+
+            df = pd.DataFrame(
+                data=np.array(data).T,
+                index=rules,
+                columns=pd.MultiIndex.from_tuples(
+                    tuples=column_tuples
+                )
+            )
+            dfs.append(df)
 
         return dfs
     
@@ -111,7 +136,7 @@ class alt_ConsequentLayer(nn.Module):
     """
     Clase para representar la capa consecuente de un modelo de Sistema de Inferencia Neuro-Difuso Adaptativo (ANFIS). Tiene la particularidad de las reglas se almacenan en una lista de tensores y no en un tensor único.
     """
-    def __init__(self, input_size, rules, outputs=1, consequent_function=Linear_CF, dtype=torch.float32):
+    def __init__(self, input_size, rules, outputs=1, consequent_function=Linear_CF, features=None, dtype=torch.float32):
         """
         Inicializa una nueva instancia de la clase alt_ConsequentLayer.
         
@@ -123,6 +148,11 @@ class alt_ConsequentLayer(nn.Module):
             dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).
         """
         super(alt_ConsequentLayer, self).__init__()
+        # Input data info
+        self.features = [f"x{i}" for i in range(input_size)]
+        if features != None and len(features) == input_size:
+            self.features = features
+        
         # Initialize consequent function
         self._consequent_function = consequent_function()
             
@@ -151,24 +181,43 @@ class alt_ConsequentLayer(nn.Module):
     
     
     @property
-    def consequents_structure(self):
+    def get_consequents_structure(self):
         """
         Retorna la estructura de los parámetros consecuentes.
         
         Returns:
             list: Lista de DataFrames de pandas que contienen la estructura de los parámetros consecuentes
         """
-        consequents_tensor = torch.stack([consequent.data.clone().detach() for consequent in self._consequents], 1)
-        dfs = [pd.DataFrame() for _ in range(consequents_tensor.shape[0])]
+        consequents_tensor = torch.stack(
+            [consequent.data.clone().detach() for consequent in self._consequents], 1
+        )
+        dfs = []
+        num_outputs = consequents_tensor.shape[0]
+        num_rules = consequents_tensor.shape[1]
+        num_params = consequents_tensor.shape[2]
 
-        rules = ['rule {}'.format(i) for i in range(1, consequents_tensor.shape[1]+1)]
+        rules = [f'rule {i}' for i in range(1, num_rules + 1)]
 
-        for o in range(consequents_tensor.shape[0]):
-            for i in range(consequents_tensor.shape[2]):
-                name=f'c{i} (x{i})'
-                if (i == consequents_tensor.shape[2]-1): name=f'c{i}'
-                column = pd.Series(consequents_tensor[o,:,i], index=rules, name=name)
-                dfs[o][name] = column
+        for o in range(num_outputs):
+            data = []
+            column_tuples = []
+
+            for i in range(num_params):
+                input_var = self.features[i] if i < num_params - 1 else ""
+                c_name = f'c{i}'
+
+                column_tuples.append((input_var, c_name))
+
+                data.append(consequents_tensor[o, :, i].cpu().numpy())
+
+            df = pd.DataFrame(
+                data=np.array(data).T,
+                index=rules,
+                columns=pd.MultiIndex.from_tuples(
+                    tuples=column_tuples
+                )
+            )
+            dfs.append(df)
 
         return dfs
     

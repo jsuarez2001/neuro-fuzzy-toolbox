@@ -28,17 +28,17 @@ class OutputLayer(nn.Module):
             self._last_layer = nn.Sigmoid()
             
         if self._output_type != 'softmax':
-            self._get_output = lambda rules_outputs, return_probabilities: torch.sum(rules_outputs, dim=-1).t().squeeze(1)
+            self._get_output = lambda rules_outputs, return_probs: torch.sum(rules_outputs, dim=-1).t().squeeze(1)
         else:
-            self._get_output = lambda rules_outputs, return_probabilities: nn.functional.softmax(torch.sum(rules_outputs, dim=-1).t().squeeze(1), dim=1) if return_probabilities else torch.sum(rules_outputs, dim=-1).t().squeeze(1)
+            self._get_output = lambda rules_outputs, return_probs: nn.functional.softmax(torch.sum(rules_outputs, dim=-1).t().squeeze(1), dim=1) if return_probs else torch.sum(rules_outputs, dim=-1).t().squeeze(1)
         
 
-    def forward(self, rules_outputs, return_probabilities=False):
+    def forward(self, rules_outputs, return_probs=False):
         """
         Realiza un paso hacia adelante para calcular la salida de la capa de salida.
         
         Args:
             rules_outputs (torch.Tensor): Tensor de tamaño (batch_size, rules) que contiene las salidas de cada regla.
-            return_probabilities (bool): Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es 'softmax', en caso contrario, se ignora (Default: False).
+            return_probs (bool): Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es 'softmax', en caso contrario, se ignora (Default: False).
         """
-        return self._last_layer(self._get_output(rules_outputs, return_probabilities))
+        return self._last_layer(self._get_output(rules_outputs, return_probs))

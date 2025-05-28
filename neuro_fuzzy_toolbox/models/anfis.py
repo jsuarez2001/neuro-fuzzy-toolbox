@@ -1,20 +1,27 @@
 import torch
 import torch.nn as nn
-import numpy as np
-from torch.nn import Parameter
 
 from neuro_fuzzy_toolbox.func import GeneralizedBell_MF, Linear_CF
 from neuro_fuzzy_toolbox.layers import (
-    h_FuzzificationLayer, 
-    h_FiringLevelsLayer, 
     FuzzificationLayer,
+    h_FuzzificationLayer, 
     rule_reduced_FuzzificationLayer,
+    
     FiringLevelsLayer,
+    h_FiringLevelsLayer,
+    rule_reduced_FiringLevelsLayer,
+    
     NormalizationLayer, 
+    
     ConsequentLayer,
     alt_ConsequentLayer,
+    
     OutputLayer
     )
+
+import pandas as pd
+
+import itertools
 
 
 class base_ANFIS(nn.Module):
@@ -27,18 +34,18 @@ class base_ANFIS(nn.Module):
     
     """
     
-    def forward(self, x, return_probabilities=False):
+    def forward(self, x, return_probs=False):
         """
         Realiza un paso hacia adelante a través del modelo.
         
         Args:
             x (torch.Tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
-            return_probabilities (bool): Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es 'softmax', en caso contrario, se ignora (Default: False).
+            return_probs (bool): Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es 'softmax', en caso contrario, se ignora (Default: False).
         
         """
         output = self._fuzzification_layer(x)
         output = self._consequent_layer(x, self._normalization_layer(self._firing_levels_layer(output)))
-        output = self._output_layer(output, return_probabilities)
+        output = self._output_layer(output, return_probs)
         return output
     
     
@@ -53,20 +60,20 @@ class base_ANFIS(nn.Module):
         self._dtype = x.dtype
         self._consequent_layer._to_dtype(x.dtype) # Set dtype to consequents
         self._fuzzification_layer.init_premises(x)
-        self._fuzzification_layer._membership_function._max_val_plot = x.max().item()
-        self._fuzzification_layer._membership_function._min_val_plot = x.min().item()
         
     
-    def init_consequents(self, x, y):
+    def init_consequents(self, x, y, driver=None, ridge_lambda=0.):
         """
         Inicializa los parámetros consecuentes del modelo usando una estimación de mínimos cuadrados.
         
         Note:
-            Específicamente, se usa la descomposición QR con pivoteo para resolver el problema de mínimos cuadrados. Para más información, ver: https://pytorch.org/docs/stable/generated/torch.linalg.lstsq.html.
+            Específicamente, el método utilizado se indica con el parámetro "driver". Para más información, ver: https://pytorch.org/docs/stable/generated/torch.linalg.lstsq.html.
         
         Args:
             x (torch.Tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
             y (torch.Tensor): Tensor con los datos de salida. Es de tamaño (batch_size, outputs).
+            driver (string): Chooses the backend function that will be used, vaild values are: 'gels', 'gelsy', 'gelsd', 'gelss'. If None, then uses 'gels' (Default: None)
+            ridge_lambda (float): Lambda usado para utilizar "Regularización Ridge" en la estimación de consecuentes con mínimos cuadrados. Si es 0, no se realiza regularización (Default: 0.).
         """
         _, w_norm, _ = self.intermediate_values(x)
         xe = torch.cat([x, torch.ones(x.shape[0], 1, dtype=self._dtype)], dim=1)
@@ -75,16 +82,31 @@ class base_ANFIS(nn.Module):
         
         '''preliminary fix for the dtype issue'''
         if self._output_type == 'softmax':
+            if not torch.equal(torch.unique(y), torch.arange(self._outputs)):
+                self.classes = torch.unique(y)
+                y = torch.searchsorted(torch.unique(y), y)
             y = torch.nn.functional.one_hot(y, self._outputs)
         if y.dtype != X.dtype:
             y = y.to(X.dtype)
         '''preliminary fix for the dtype issue'''
         
+        A = X * fs
+        
+        if ridge_lambda > 0.:
+            p = A.shape[1]
+            I = torch.eye(p, dtype=A.dtype) * torch.sqrt(torch.tensor(ridge_lambda, dtype=A.dtype))
+            A = torch.cat([A, I], dim=0)
+            if y.dim() > 1:
+                m = y.shape[1]
+                zeros = torch.zeros((p, m), dtype=A.dtype)
+            else:
+                zeros = torch.zeros(p, dtype=A.dtype)
+            y  = torch.cat([y, zeros], dim=0)
+        
         # Solve least squares problem using QR decomposition with pivoting
-        C, _, _, _ = torch.linalg.lstsq(X * fs, y)
+        C, _, _, _ = torch.linalg.lstsq(A, y, driver=driver)
         new_consequents = C.t().reshape(self._outputs, self.rules, xe.shape[1])
         
-        # Update consequents
         self.set_consequents(new_consequents)
         
     
@@ -99,16 +121,26 @@ class base_ANFIS(nn.Module):
         Returns:
             np.ndarray: Predicciones del modelo.
         """
-        with torch.no_grad():
-            output = self.forward(x).detach().numpy()
-        
-        if self._output_type == 'softmax':
+        if self._output_type == 'default':
             with torch.no_grad():
-                output = self.forward(x, return_probabilities=True)
-            output = torch.argmax(output, dim=1).detach().numpy()
-            
+                output = self.forward(x).detach()
+                
         elif self._output_type == 'sigmoid':
-            output = (output > 0.5).astype(int)
+            with torch.no_grad():
+                output = self.forward(x).detach()
+            output = (output > 0.5).to(int)
+        
+        elif self._output_type == 'softmax':
+            with torch.no_grad():
+                output = self.forward(x, return_probs=True)
+            output = torch.argmax(output, dim=1).detach()
+            
+            """
+            if not torch.equal(self.classes, torch.arange(self._outputs)):
+                output = self.classes[output].numpy()
+            else:
+                output = output.numpy()
+            """
             
         return output
     
@@ -123,9 +155,9 @@ class base_ANFIS(nn.Module):
             
         Returns:
             tuple: Tupla con los valores intermedios de las capas del modelo. Contiene:
-                - w: Niveles de disparo.
-                - w_norm: Niveles de disparo normalizados.
-                - outputs: Salidas individuales de las reglas del modelo.
+                - w (torch.Tensor): Niveles de disparo.
+                - w_norm (torch.Tensor): Niveles de disparo normalizados.
+                - outputs (torch.Tensor): Salidas individuales de las reglas del modelo.
         """
         with torch.no_grad():
             w = self._fuzzification_layer(x)
@@ -135,7 +167,7 @@ class base_ANFIS(nn.Module):
         return w, w_norm, outputs
     
     
-    # ---- ANFIS parameters info ----
+    # ---- ANFIS structure info ----
     @property
     def num_mfs(self):
         """
@@ -216,43 +248,23 @@ class base_ANFIS(nn.Module):
     
     
     # ----- Parameters dataframes -----
-    @property
-    def premises_structure(self):
+    def get_premises_structure(self):
         """
         Retorna la estructura de los parámetros de las funciones de membresía.
         
         Returns:
             pandas.DataFrame: DataFrame con la estructura de los parámetros de las funciones de membresía.
         """
-        return self._fuzzification_layer.premises_structure
+        return self._fuzzification_layer.get_premises_structure
     
-    @property
-    def consequents_structure(self):
+    def get_consequents_structure(self):
         """
         Retorna la estructura de los parámetros consecuentes.
         
         Returns:
             list: Lista de DataFrames de pandas que contienen la estructura de los parámetros consecuentes.
         """
-        return self._consequent_layer.consequents_structure
-    
-    def show_premises_structure(self):
-        """
-        Impresión de la estructura de los parámetros de las funciones de membresía.
-        
-        """
-        print(self.premises_structure)
-        
-    def show_consequents_structure(self):
-        """
-        Impresión de la estructura de los parámetros consecuentes.
-        """
-        output = 1
-        for df in self.consequents_structure:
-            print(f'- Output {output}:')
-            print(df)
-            print('\n')
-            output += 1
+        return self._consequent_layer.get_consequents_structure
     
     
     # ----- Plot premises -----
@@ -278,7 +290,7 @@ class h_ANFIS(base_ANFIS):
     El procedimiento en este caso se realizaría solo multiplicando entre sí los valores de pertenencia *i* de cada feature, dando como resultado una cantidad de reglas igual al número de funciones de membresía de cada feature. (esto se detalla de mejor manera en :ref:`rule-reduced ANFIS <rule-reduced ANFIS>`).
     """
     
-    def __init__(self, input_size, num_mfs, outputs=1, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, output_type="default", rule_reduced=False, dtype=torch.float32):
+    def __init__(self, input_size, num_mfs, outputs=1, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, output_type="default", rule_reduced=False, features=None, dtype=torch.float32):
         """
         Inicializa un modelo ANFIS homogéneo.
         
@@ -290,10 +302,10 @@ class h_ANFIS(base_ANFIS):
             consequent_function (ConsequentFunction): Función consecuente a utilizar (Default: Linear_CF).
             output_type (str): Tipo de salida del modelo (Default: 'default').
             rule_reduced (bool): True si se desea instanciar un ANFIS de reglas reducidas, False en caso contrario (Default: False).
+            features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
             dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).
         """
         super(h_ANFIS, self).__init__()
-        
         if rule_reduced:
             rules = num_mfs
         else:
@@ -303,6 +315,9 @@ class h_ANFIS(base_ANFIS):
         # Input data info
         self._input_size = input_size
         self._dtype = dtype
+        self.features = [f"x{i}" for i in range(input_size)]
+        if features != None and len(features) == input_size:
+            self.features = features
         
         
         # ANFIS structure info
@@ -312,13 +327,15 @@ class h_ANFIS(base_ANFIS):
         # Output info
         self._output_type = output_type
         self._outputs = outputs
+        self.classes = torch.arange(outputs)
         
         
         # Layers
         self._fuzzification_layer = h_FuzzificationLayer(
             input_size=input_size,
             num_mfs=num_mfs, 
-            membership_function=membership_function, 
+            membership_function=membership_function,
+            features=features,
             dtype=dtype
             )
         
@@ -330,7 +347,8 @@ class h_ANFIS(base_ANFIS):
             input_size=input_size,
             rules=rules,
             outputs=outputs,
-            consequent_function=consequent_function, 
+            consequent_function=consequent_function,
+            features=features,
             dtype=dtype
             )
         
@@ -348,14 +366,52 @@ class h_ANFIS(base_ANFIS):
         self.set_premises(state_dict['_fuzzification_layer._premises'])
         self.set_consequents(state_dict['_consequent_layer._consequents'])
         
+        
+    # ----- Rules -----
+    def get_rules_structure(self):
+        premises_df = self.get_premises_structure()
+        
+        variables = premises_df.columns.get_level_values(0).unique()
+        params = premises_df.columns.get_level_values(1).unique()
+        idxs = premises_df.index.tolist()
+        
+        combs = itertools.product(idxs, repeat=len(variables))
+        
+        records = []
+        for comb in combs:
+            row = {}
+            for var, sel in zip(variables, comb):
+                for param in params:
+                    row[(var, param)] = premises_df.loc[sel, (var, param)]
+            records.append(row)
 
+        premises_df = pd.DataFrame.from_records(records)
+        premises_df.columns = pd.MultiIndex.from_tuples(premises_df.columns)
+        premises_df = premises_df[premises_df.columns]
+        premises_df.index = [f"rule {i+1}" for i in range(len(premises_df))]
+        
+        premises_df.columns = pd.MultiIndex.from_tuples(
+            [("premises", *col) for col in premises_df.columns]
+        )
+        
+        rules_dfs = self.get_consequents_structure()
+        for i, df in enumerate(rules_dfs):
+            df.columns = pd.MultiIndex.from_tuples(
+                [(f"output {i+1} consequents", *col) for col in df.columns]
+            )
+
+        rules_dfs.insert(0, premises_df)
+
+        return pd.concat(rules_dfs, axis=1)
+        
+        
 
 class ANFIS(base_ANFIS):
     """
     Clase para un sistema de inferencia neuro-difuso adaptativo (ANFIS) con una cantidad de funciones de membresía arbitraria para cada feature de los datos de entrada.
     """
     
-    def __init__(self, mf_distribution, outputs=1, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, output_type="default", dtype=torch.float32):
+    def __init__(self, mf_distribution, outputs=1, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, output_type="default", features=None, dtype=torch.float32):
         """
         Inicializa un modelo ANFIS.
         
@@ -365,6 +421,7 @@ class ANFIS(base_ANFIS):
             membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
             consequent_function (ConsequentFunction): Función consecuente a utilizar (Default: Linear_CF).
             output_type (str): Tipo de salida del modelo (Default: 'default').
+            features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
             dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).
             
         """
@@ -372,20 +429,28 @@ class ANFIS(base_ANFIS):
         # Input data info
         self._input_size = len(mf_distribution)
         self._dtype = dtype
+        self.features = [f"x{i}" for i in range(self._input_size)]
+        if features != None and len(features) == self._input_size:
+            self.features = features
+        
         
         # ANFIS structure info
         self._mf_distribution = torch.tensor(mf_distribution)
         self._rules = self._mf_distribution.prod().item()
         self._mfs = self._mf_distribution.sum().item()
         
+        
         # Output info
         self._output_type = output_type
         self._outputs = outputs
+        self.classes = torch.arange(outputs)
+        
         
         # Layers
         self._fuzzification_layer = FuzzificationLayer(
             mf_distribution=mf_distribution, 
             membership_function=membership_function,
+            features=features,
             dtype=dtype)
         
         self._firing_levels_layer = FiringLevelsLayer(
@@ -399,6 +464,7 @@ class ANFIS(base_ANFIS):
             rules=self._rules,
             outputs=outputs,
             consequent_function=consequent_function,
+            features=features,
             dtype=dtype)
         
         self._output_layer = OutputLayer(output_type=output_type)
@@ -430,7 +496,7 @@ class ANFIS(base_ANFIS):
         Returns:
             nn.ParameterList: Lista de parámetros que contiene los antecedentes.
         """
-        super().get_premises_as_parameters_list()
+        return super().get_premises_as_parameters_list()
 
 
     # ---- ANFIS parameters info ----
@@ -443,6 +509,7 @@ class ANFIS(base_ANFIS):
             torch.tensor: Tensor con la cantidad de funciones de membresía por feature.
         """
         super().num_mfs
+    
     
     # ----- Load state dict -----
     def load_state_dict(self, state_dict):
@@ -459,16 +526,59 @@ class ANFIS(base_ANFIS):
         self.set_consequents(state_dict['_consequent_layer._consequents'])
         
         
+    # ----- Rules -----
+    def get_rules_structure(self):
+        premises_df = self.get_premises_structure()
         
+        variables = premises_df.columns.get_level_values(0).unique()
+        params = premises_df.columns.get_level_values(1).unique()
+
+        mf_dist = self._mf_distribution.tolist()
+
+        combs = itertools.product(*(range(n) for n in mf_dist))
+
+        records = []
+        for comb in combs:
+            row = {}
+            for var, sel in zip(variables, comb):
+                for param in params:
+                    row[(var, param)] = premises_df.iloc[sel][(var, param)]
+            records.append(row)
+
+        premises_df = pd.DataFrame.from_records(records)
+        premises_df.columns = pd.MultiIndex.from_tuples(premises_df.columns)
+        premises_df = premises_df[premises_df.columns]
+        premises_df.index = [f"rule {i+1}" for i in range(len(premises_df))]
+
+        premises_df.columns = pd.MultiIndex.from_tuples(
+            [("premises", *col) for col in premises_df.columns]
+        )
+
+        rules_dfs = self.get_consequents_structure()
+
+        for i, df in enumerate(rules_dfs):
+            df.index = premises_df.index
+            df.columns = pd.MultiIndex.from_tuples(
+                [(f"output {i+1} consequents", *col) for col in df.columns]
+            )
+
+        rules_dfs.insert(0, premises_df)
+        return pd.concat(rules_dfs, axis=1)
+    
+
+    
 class rule_reduced_ANFIS(base_ANFIS):
     """
     Clase para un sistema de inferencia neuro-difuso adaptativo (ANFIS) homogéneo, es decir, con la misma cantidad de funciones de membresía para cada feature de los datos de entrada, 
     limitando a que cada uno con el mismo número de variables lingüisticas. Tiene la particularidad de que el número de reglas generadas en el cálculo de los niveles de disparo es reducido. 
     En vez de hacer la combinatoria completa para las multiplicaciones de los valores de pertenencia, el procedimiento se realizaría solo multiplicando entre sí los valores de pertenencia *i* 
     entre los features, dando como resultado una cantidad de reglas igual al número de funciones de membresía (en cada feature). Esto se detalla de mejor manera en :ref:`rule-reduced ANFIS <rule-reduced ANFIS>`.
+    
+    Cuenta con un parámetro especial 'default_rule' que permite agregar un nivel de disparo extra para capturar todas las combinaciones que el conjunto de reglas del modelo 
+    en sí no captura (por el hecho de estar reducido).
     """
     
-    def __init__(self, input_size, num_mfs, outputs=1, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, output_type="default", dtype=torch.float32):
+    def __init__(self, input_size, num_mfs, outputs=1, default_rule=False, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, output_type="default", features=None, dtype=torch.float32):
         """
         Inicializa un modelo ANFIS homogéneo.
         
@@ -479,40 +589,48 @@ class rule_reduced_ANFIS(base_ANFIS):
             membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
             consequent_function (ConsequentFunction): Función consecuente a utilizar (Default: Linear_CF).
             output_type (str): Tipo de salida del modelo (Default: 'default').
-            rule_reduced (bool): True si se desea instanciar un ANFIS de reglas reducidas, False en caso contrario (Default: False).
+            default_rule (bool): True si se desea agregar la regla por defecto, False en caso contrario (Default: False).
+            features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
             dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).
         """
         super(rule_reduced_ANFIS, self).__init__()
         self._rule_reduced = True
+        self._default_rule = default_rule
+        
         
         # Input data info
         self._input_size = input_size
         self._dtype = dtype
-        
+        self.features = [f"x{i}" for i in range(input_size)]
+        if features != None and len(features) == input_size:
+            self.features = features
+            
         
         # Output info
         self._output_type = output_type
         self._outputs = outputs
+        self.classes = torch.arange(outputs)
         
         
         # Layers
-        mf_distribution = [num_mfs] * input_size
         self._fuzzification_layer = rule_reduced_FuzzificationLayer(
             input_size=input_size,
             num_mfs=num_mfs,
-            membership_function=membership_function, 
+            membership_function=membership_function,
+            features=features,
             dtype=dtype
             )
         
-        self._firing_levels_layer = h_FiringLevelsLayer(rule_reduced=True)
+        self._firing_levels_layer = rule_reduced_FiringLevelsLayer(default_rule=default_rule)
         
-        self._normalization_layer = NormalizationLayer()
+        self._normalization_layer = NormalizationLayer(default_rule=default_rule)
         
         self._consequent_layer = alt_ConsequentLayer(
             input_size=input_size,
             rules=num_mfs,
             outputs=outputs,
-            consequent_function=consequent_function, 
+            consequent_function=consequent_function,
+            features=features,
             dtype=dtype
             )
         
@@ -540,10 +658,31 @@ class rule_reduced_ANFIS(base_ANFIS):
         """
         prems = []
         cons = []
-        for i in state_dict:
-            if 'premises' in i:
-                prems.append(state_dict[i])
+        for element in state_dict:
+            if 'premises' in element:
+                prems.append(state_dict[element])
             else:
-                cons.append(state_dict[i])
+                cons.append(state_dict[element])
         self.set_premises(torch.stack(prems, dim=1))
         self.set_consequents(torch.stack(cons, dim=1))
+    
+    
+    # ----- Rules -----
+    def get_rules_structure(self):
+        premises_df = self.get_premises_structure()
+        premises_df.index = [f"rule {i+1}" for i in range(len(premises_df))]
+        
+        premises_df.columns = pd.MultiIndex.from_tuples(
+            [("premises", *col) for col in premises_df.columns]
+        )
+        
+        rules_dfs = self.get_consequents_structure()
+        for i, df in enumerate(rules_dfs):
+            df.columns = pd.MultiIndex.from_tuples(
+                [(f"output {i+1} consequents", *col) for col in df.columns]
+            )
+
+        rules_dfs.insert(0, premises_df)
+
+        return pd.concat(rules_dfs, axis=1)
+    

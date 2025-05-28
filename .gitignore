@@ -9,7 +9,9 @@ consideraciones.md
 old/
 img/
 dev_notebooks/
-test_notebooks/
+test/
 test_env/
 util.txt
 EXP_neuro_fuzzy_toolbox/
+examples/0-EXP
+old_neuro_fuzzy_toolbox/

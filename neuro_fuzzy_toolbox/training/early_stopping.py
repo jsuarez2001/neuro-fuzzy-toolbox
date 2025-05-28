@@ -41,7 +41,7 @@ class EarlyStopping():
             if self._counter >= self.patience:
                 self._stop = True
                 if verbose:
-                    print('Early stopping')
+                    print('\nEARLY STOPPING')
                 if self.last_state == False:
                     model.load_state_dict(self._best_state_dict)
 

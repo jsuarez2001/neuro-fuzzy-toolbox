@@ -14,13 +14,14 @@ class FuzzificationLayer(nn.Module):
 
     Esta diseñada para un modelo ANFIS general, es decir, para manejar diferentes cantidades de funciones de membresía para cada feature de los datos de entrada.
     """
-    def __init__(self, mf_distribution, membership_function=GeneralizedBell_MF, dtype=torch.float32):
+    def __init__(self, mf_distribution, membership_function=GeneralizedBell_MF, features=None, dtype=torch.float32):
         """
         Inicializa una nueva instancia de FuzzificationLayer.
         
         Args:
             mf_distribution (list): Lista de enteros que representan la cantidad de funciones de membresía para cada feature de entrada.
             membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
+            features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
             dtype (torch.dtype): Tipo de dato de los datos de entrada (Default: torch.float32).
         
         """
@@ -29,6 +30,9 @@ class FuzzificationLayer(nn.Module):
         # Input data info
         self._input_size = len(mf_distribution)
         self._dtype = dtype
+        self.features = [f"x{i}" for i in range(self._input_size)]
+        if features != None and len(features) == self._input_size:
+            self.features = features
         
         # Membership function
         self._membership_function = membership_function()
@@ -76,7 +80,8 @@ class FuzzificationLayer(nn.Module):
         """
         self._dtype = x_train.dtype
         self._premises = nn.ParameterList(self._membership_function.general_initialize_premises(x_train, self._mf_distribution))
-    
+        self._membership_function._max_val_plot = x_train.max().item()
+        self._membership_function._min_val_plot = x_train.min().item()
     
     def get_premises(self):
         """
@@ -121,22 +126,30 @@ class FuzzificationLayer(nn.Module):
     
     
     @property
-    def premises_structure(self):
+    def get_premises_structure(self):
         """
         Retorna la estructura de los antecedentes.
         
         Returns:
             pd.DataFrame: DataFrame de pandas que contiene la estructura de los antecedentes.
         """
-        df = pd.DataFrame()
-        mfs = ['MF {}'.format(i) for i in range(0, self._max_n_mfs)]
         
+        columns = pd.MultiIndex.from_product(
+            [self.features, self._membership_function._params]
+        )
+
+        df = pd.DataFrame(columns=columns)
+
+        mfs = [f'rule {i + 1}' for i in range(self._max_n_mfs)]
+
         for i in range(self._input_size):
             num_mfs = self._mf_distribution[i]
-            for j, param_name in enumerate(self._membership_function._params):
-                column_data = [self._premises[i][mf_idx, j].item() if mf_idx < num_mfs else None for mf_idx in range(self._max_n_mfs)]
-                column = pd.Series(column_data, index=mfs, name=param_name + f' (x{i})')
-                df[param_name + f' (x{i})'] = column
+            for param_name in self._membership_function._params:
+                column_data = [self._premises[i][mf_idx, self._membership_function._params.index(param_name)].item() 
+                               if mf_idx < num_mfs else None 
+                               for mf_idx in range(self._max_n_mfs)]
+
+                df[(self.features[i], param_name)] = pd.Series(column_data, index=mfs)
 
         return df
     
@@ -150,17 +163,17 @@ class FuzzificationLayer(nn.Module):
             input_dim (int): Dimensión de entrada a plotear. Si es None, se plotean todas las dimensiones de entrada (Default: None).
             group_by_dim (bool): Si es True, agrupa las funciones de membresía en un solo gráfico por cada dimensión de entrada. (Default: False)
         """
-        variables = [f'x{i}' for i in range(self._input_size)]
-        dataframe = self.premises_structure
+        variables = self.features
+        dataframe = self.get_premises_structure
         
         x = np.linspace(self._membership_function._max_val_plot, self._membership_function._min_val_plot, 500)
         
         # Determine which mfs and dimensions to plot
         if mf is not None:
-            mf = f'MF {mf}'
+            mf = f'{mf}'
             # Validate that the mf exists
             if mf not in dataframe.index:
-                raise ValueError(f"MF '{mf}' not found in premises. Available mfs: {dataframe.index.tolist()}")
+                raise ValueError(f"'{mf}'index not found in premises. Available mfs: {dataframe.index.tolist()}")
             mfs_to_plot = [mf]
         else:
             mfs_to_plot = dataframe.index
@@ -182,7 +195,8 @@ class FuzzificationLayer(nn.Module):
                     try:
                         params = []
                         for param in self._membership_function._params:
-                            value = dataframe.loc[mf, f'{param} ({var})']
+                            value = dataframe.loc[mf, (var, param)]
+                            #value = dataframe.loc[mf, f'{param} ({var})']
                             if pd.isna(value):
                                 break
                             params.append(value)
@@ -217,7 +231,8 @@ class FuzzificationLayer(nn.Module):
                     try:
                         params = []
                         for param in self._membership_function._params:
-                            value = dataframe.loc[mf, f'{param} ({var})']
+                            #value = dataframe.loc[mf, f'{param} ({var})']
+                            value = dataframe.loc[mf, (var, param)]
                             if pd.isna(value):
                                 break
                             params.append(value)
@@ -246,7 +261,7 @@ class h_FuzzificationLayer(nn.Module):
     con la misma cantidad de funciones de membresía para cada feature de los datos de entrada, limitando a que cada uno tenga el mismo 
     número de variables lingüisticas.
     """
-    def __init__(self, input_size, num_mfs=1, membership_function=GeneralizedBell_MF, dtype=torch.float32):
+    def __init__(self, input_size, num_mfs=1, membership_function=GeneralizedBell_MF, features=None, dtype=torch.float32):
         """
         Inicializa una nueva instancia de h_FuzzificationLayer.
         
@@ -254,6 +269,7 @@ class h_FuzzificationLayer(nn.Module):
             input_size (int): Número de features de entrada.
             num_mfs (int): Número de funciones de membresía para cada feature (Default: 1).
             membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
+            features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
             dtype (torch.dtype): Tipo de dato de los datos de entrada (Default: torch.float32).
         """
         super(h_FuzzificationLayer, self).__init__()
@@ -261,6 +277,9 @@ class h_FuzzificationLayer(nn.Module):
         # Input data info
         self._input_size = input_size
         self._dtype = dtype
+        self.features = [f"x{i}" for i in range(input_size)]
+        if features != None and len(features) == input_size:
+            self.features = features
         
         # Membership function
         self._membership_function = membership_function()
@@ -291,7 +310,8 @@ class h_FuzzificationLayer(nn.Module):
         """
         self._dtype = x_train.dtype
         self._premises = Parameter(self._membership_function.initialize_premises(x_train=x_train, num_mfs=self._premises.data.shape[1]), requires_grad=True)
-    
+        self._membership_function._max_val_plot = x_train.max().item()
+        self._membership_function._min_val_plot = x_train.min().item()
 
     def get_premises(self):
         """
@@ -335,17 +355,24 @@ class h_FuzzificationLayer(nn.Module):
     
 
     @property
-    def premises_structure(self):
+    def get_premises_structure(self):
         """
         Retorna la estructura de los antecedentes en un DataFrame de pandas.
         """
-        df = pd.DataFrame()
-        mfs = ['MF {}'.format(i) for i in range(0, self._premises.data.clone().detach().shape[1])]
+        premises = self.get_premises()
         
+        mfs = [f"rule {i + 1}" for i in range(premises.shape[1])]
+
+        columns = pd.MultiIndex.from_product(
+            (self.features, self._membership_function._params),
+        )
+
+        df = pd.DataFrame(index=mfs, columns=columns)
+
         for i in range(self._input_size):
-            for j in range(len(self._membership_function._params)):
-                column = pd.Series(self._premises.data[i,:,j], index=mfs, name=self._membership_function._params[j] + f' (x{i})', )
-                df[self._membership_function._params[j] + f' (x{i})'] = column
+            for j, param in enumerate(self._membership_function._params):
+                column_data = premises[i, :, j].tolist()
+                df[(self.features[i], param)] = pd.Series(column_data, index=mfs)
 
         return df
     
@@ -360,17 +387,17 @@ class h_FuzzificationLayer(nn.Module):
             input_dim (int): Dimensión de entrada a plotear. Si es None, se plotean todas las dimensiones de entrada (Default: None).
             group_by_dim (bool): Si es True, agrupa las funciones de membresía en un solo gráfico por cada dimensión de entrada. (Default: False)
         """
-        variables = [f'x{i}' for i in range(self._input_size)]
-        dataframe = self.premises_structure
+        variables = [f'{self.features[i]}' for i in range(self._input_size)]
+        dataframe = self.get_premises_structure
 
         x = np.linspace(self._membership_function._max_val_plot, self._membership_function._min_val_plot, 500)
 
         # Determine which mfs and dimensions to plot
         if mf is not None:
-            mf = f'MF {mf}'
+            mf = f'{mf}'
             # Validate that the mf exists
             if mf not in dataframe.index:
-                raise ValueError(f"MF '{mf}' not found in premises. Available mfs: {dataframe.index.tolist()}")
+                raise ValueError(f"'{mf}' index not found in premises. Available mfs: {dataframe.index.tolist()}")
             mfs_to_plot = [mf]
         else:
             mfs_to_plot = dataframe.index
@@ -392,7 +419,8 @@ class h_FuzzificationLayer(nn.Module):
                     try:
                         params = []
                         for param in self._membership_function._params:
-                            value = dataframe.loc[mf, f'{param} ({var})']
+                            value = dataframe.loc[mf, (var, param)]
+                            #value = dataframe.loc[mf, f'{param} ({var})']
                             if pd.isna(value):
                                 break
                             params.append(value)
@@ -425,8 +453,8 @@ class h_FuzzificationLayer(nn.Module):
                 for j, dim in enumerate(dims_to_plot):
                     var = variables[dim]
                     try:
-                        params = [dataframe.loc[mf, f'{param} ({var})'] for param in self._membership_function._params]
-    
+                        params = [dataframe.loc[mf, (var, param)] for param in self._membership_function._params]
+                        
                         y = self._membership_function._simple_numpy_implementation(x, *params)
     
                         ax = axes[i, j]
@@ -452,7 +480,7 @@ class rule_reduced_FuzzificationLayer(nn.Module):
     con la misma cantidad de funciones de membresía para cada feature de los datos de entrada, limitando a que cada uno tenga el mismo 
     número de variables lingüisticas.
     """
-    def __init__(self, input_size, num_mfs=1, membership_function=GeneralizedBell_MF, dtype=torch.float32):
+    def __init__(self, input_size, num_mfs=1, membership_function=GeneralizedBell_MF, features=None, dtype=torch.float32):
         """
         Inicializa una nueva instancia de rule_reduced_FuzzificationLayer.
         
@@ -460,6 +488,7 @@ class rule_reduced_FuzzificationLayer(nn.Module):
             input_size (int): Número de features de entrada.
             num_mfs (int): Número de funciones de membresía para cada feature (Default: 1).
             membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
+            features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
             dtype (torch.dtype): Tipo de dato de los datos de entrada (Default: torch.float32).
         """
         super(rule_reduced_FuzzificationLayer, self).__init__()
@@ -467,6 +496,9 @@ class rule_reduced_FuzzificationLayer(nn.Module):
         # Input data info
         self._input_size = input_size
         self._dtype = dtype
+        self.features = [f"x{i}" for i in range(input_size)]
+        if features != None and len(features) == input_size:
+            self.features = features
         
         # Membership function
         self._membership_function = membership_function()
@@ -505,6 +537,8 @@ class rule_reduced_FuzzificationLayer(nn.Module):
         self._premises = nn.ParameterList([
             nn.Parameter(premise, requires_grad=True) for premise in self._membership_function.initialize_premises(x_train=x_train, num_mfs=len(self._premises)).unbind(1)
         ])
+        self._membership_function._max_val_plot = x_train.max().item()
+        self._membership_function._min_val_plot = x_train.min().item()
         
         
     def get_premises(self):
@@ -551,18 +585,25 @@ class rule_reduced_FuzzificationLayer(nn.Module):
         
     
     @property
-    def premises_structure(self):
+    def get_premises_structure(self):
         """
         Retorna la estructura de los antecedentes en un DataFrame de pandas.
         """
         premises_tensor = torch.stack([premise.data.clone().detach() for premise in self._premises], 1)
-        df = pd.DataFrame()
-        mfs = ['MF {}'.format(i) for i in range(0, premises_tensor.shape[1])]
+        n_mfs = premises_tensor.shape[1]
+
+        mfs = [f"rule {i + 1}" for i in range(n_mfs)]
         
+        multi_columns = pd.MultiIndex.from_product(
+            (self.features, self._membership_function._params)
+        )
+
+        df = pd.DataFrame(index=mfs, columns=multi_columns)
+
         for i in range(self._input_size):
-            for j in range(len(self._membership_function._params)):
-                column = pd.Series(premises_tensor[i,:,j], index=mfs, name=self._membership_function._params[j] + f' (x{i})', )
-                df[self._membership_function._params[j] + f' (x{i})'] = column
+            for j, param in enumerate(self._membership_function._params):
+                column_data = premises_tensor[i, :, j].tolist()
+                df.loc[:, (self.features[i], param)] = pd.Series(column_data, index=mfs)
 
         return df
     
@@ -576,24 +617,20 @@ class rule_reduced_FuzzificationLayer(nn.Module):
             input_dim (int): Dimensión de entrada a plotear. Si es None, se plotean todas las dimensiones de entrada (Default: None).
             group_by_dim (bool): Si es True, agrupa las funciones de membresía en un solo gráfico por cada dimensión de entrada. (Default: False)
         """
-        variables = [f'x{i}' for i in range(self._input_size)]
-        dataframe = self.premises_structure
+        variables = [f'{self.features[i]}' for i in range(self._input_size)]
+        dataframe = self.get_premises_structure
 
         x = np.linspace(self._membership_function._max_val_plot, self._membership_function._min_val_plot, 500)
 
-        # Determine which mfs and dimensions to plot
         if mf is not None:
-            # Convert numeric index to string format if necessary
             if isinstance(mf, (int, float)):
-                mf = f'MF {mf}'
-            # Validate that the mf exists
+                mf = f'{mf}'
             if mf not in dataframe.index:
-                raise ValueError(f"MF '{mf}' not found in premises. Available mfs: {dataframe.index.tolist()}")
+                raise ValueError(f"'{mf}' index not found in premises. Available mfs: {dataframe.index.tolist()}")
             mfs_to_plot = [mf]
         else:
             mfs_to_plot = dataframe.index
 
-        # Validate input dimension
         if input_dim is not None:
             if not isinstance(input_dim, int) or input_dim < 0 or input_dim >= len(variables):
                 raise ValueError(f"input_dim must be between 0 and {len(variables)-1}")
@@ -610,7 +647,8 @@ class rule_reduced_FuzzificationLayer(nn.Module):
                     try:
                         params = []
                         for param in self._membership_function._params:
-                            value = dataframe.loc[mf, f'{param} ({var})']
+                            value = dataframe.loc[mf, (var, param)]
+                            
                             if pd.isna(value):
                                 break
                             params.append(value)
@@ -628,11 +666,9 @@ class rule_reduced_FuzzificationLayer(nn.Module):
                 ax.legend()
 
         else:
-            # Calculate subplot dimensions
             n_mfs = len(mfs_to_plot)
             n_dims = len(dims_to_plot)
     
-            # Create subplots based on the number of mfs and dimensions
             if n_mfs == 1 and n_dims == 1:
                 fig, ax = plt.subplots(figsize=(8, 6))
                 axes = np.array([[ax]])
@@ -643,7 +679,7 @@ class rule_reduced_FuzzificationLayer(nn.Module):
                 for j, dim in enumerate(dims_to_plot):
                     var = variables[dim]
                     try:
-                        params = [dataframe.loc[mf, f'{param} ({var})'] for param in self._membership_function._params]
+                        params = [dataframe.loc[mf, (var, param)] for param in self._membership_function._params]
     
                         y = self._membership_function._simple_numpy_implementation(x, *params)
     

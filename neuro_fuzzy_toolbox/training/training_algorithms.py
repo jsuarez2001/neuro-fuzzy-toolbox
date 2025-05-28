@@ -1,7 +1,4 @@
 import torch
-import torch.utils.data as data
-
-from sklearn.model_selection import train_test_split
 
 from neuro_fuzzy_toolbox.training import (
     classical_consequents_estimation_with_OLS,
@@ -22,14 +19,13 @@ class base_model_trainer():
         
     """
     
-    def __init__(self, epochs, loss_function, validation=0, early_stopping=None, optimizer=torch.optim.Adam, optimizer_params={}):
+    def __init__(self, epochs, loss_function, early_stopping=None, optimizer=torch.optim.Adam, optimizer_params={}):
         """
         Inicializa una nueva instancia de la clase base_model_trainer.
         
         Args:
             epochs (int): Número de épocas de entrenamiento.
             loss_function (torch.nn.functional): Función de pérdida a utilizar en el entrenamiento.
-            validation (float): Proporción de los datos de entrenamiento a utilizar como datos de validación (Default: 0).
             early_stopping (EarlyStopping): Mecanismo de Early Stopping a utilizar en el entrenamiento (Default: None).
             optimizer (torch.optim): Optimizador a utilizar en el entrenamiento (Default: torch.optim.Adam).
             optimizer_params (dict): Parámetros a utilizar en el optimizador (Default: {}).
@@ -45,15 +41,15 @@ class base_model_trainer():
         self._optimizer_instance = None
         
         # Early stopping
-        self.validation = validation
         self.early_stopping = early_stopping
         
         # History
         self.history = {"loss": []}
         self.val_history = {"loss": []}
+        
 
         
-    def __call__(self, model, loader, verbose=True):
+    def __call__(self, model, train_loader, val_loader=None, verbose=True):
         """
         Entrena un modelo utilizando el algoritmo de entrenamiento.
         
@@ -63,8 +59,6 @@ class base_model_trainer():
             verbose (bool): Indica si se deben imprimir mensajes de aviso (Default: True).
         
         """
-        train_loader, val_loader = self._train_val_split(model, loader)
-        
         self._init_optimizer(model)
         
         self._register_loss(model, train_loader, val_loader)
@@ -76,14 +70,16 @@ class base_model_trainer():
             
             self._register_loss(model, train_loader, val_loader)
             
-            loss, val_loss = self.history["loss"][-1], self.val_history["loss"][-1]
+            loss, val_loss = self.history["loss"][-1], None
             
-            if self.validation > 0 and self._check_early_stop(model, val_loss, verbose):
-                break
+            if (val_loader is not None):
+                val_loss = self.val_history["loss"][-1]
+                if self._check_early_stop(model, val_loss, verbose):
+                    break
                 
             if verbose:
                 epoch_width = len(str(self.epochs))
-                if self.validation > 0:
+                if not (val_loader is None):
                     print(f'Epoch: {ep+1:{epoch_width}}/{self.epochs} - loss: {loss:.6f} - validation loss: {val_loss:.6f}')
                 else:
                     print(f'Epoch: {ep+1:{epoch_width}}/{self.epochs} - loss: {loss:.6f}')
@@ -115,34 +111,6 @@ class base_model_trainer():
         
         return self.loss_function(pred, y)
     
-    def _train_val_split(self, model, train_loader):
-        """
-        Divide los datos de entrenamiento en datos de entrenamiento y validación.
-        
-        Args:
-            train_loader (DataLoader): DataLoader con los datos de entrenamiento.
-            
-        Returns:
-            DataLoader: DataLoader con los datos de entrenamiento.
-            DataLoader: DataLoader con los datos de validación.
-        """
-        val_loader = None
-        
-        if self.validation != 0:
-            x_train, y_train = train_loader.dataset.tensors
-            
-            if model._output_type == 'default':
-                x_train, x_val, y_train, y_val = train_test_split(x_train.numpy(), y_train.numpy(), test_size=self.validation, shuffle=True)
-            else:
-                x_train, x_val, y_train, y_val = train_test_split(x_train.numpy(), y_train.numpy(), test_size=self.validation, shuffle=True, stratify=y_train.numpy())
-                
-            x_train, x_val, y_train, y_val = torch.from_numpy(x_train), torch.from_numpy(x_val), torch.from_numpy(y_train), torch.from_numpy(y_val)
-            
-            train_loader = data.DataLoader(data.TensorDataset(x_train, y_train), batch_size=train_loader.batch_size, shuffle=True)
-            val_loader = data.DataLoader(data.TensorDataset(x_val, y_val), batch_size=train_loader.batch_size, shuffle=False)
-
-        return train_loader, val_loader
-    
     
     def _check_early_stop(self, model, loss, verbose):
         """
@@ -159,6 +127,7 @@ class base_model_trainer():
         if self.early_stopping is not None:
             self.early_stopping(model, loss, verbose)
             if self.early_stopping.stop:
+                self.early_stopping.reset()
                 return True
         return False
     
@@ -182,7 +151,7 @@ class base_model_trainer():
         with torch.no_grad():
             pred = model(x)
             loss = self._loss_function(pred, y)
-        if self.validation > 0 and val_loader is not None:
+        if val_loader is not None:
             x = val_loader.dataset.tensors[0]
             y = val_loader.dataset.tensors[1]
             with torch.no_grad():
@@ -203,7 +172,7 @@ class base_model_trainer():
         """
         loss, val_loss = self._loss(model, train_loader, val_loader)
         self.history["loss"].append(loss.item())
-        if self.validation > 0:
+        if not (val_loader is None):
             self.val_history["loss"].append(val_loss.item())
 
 
@@ -222,20 +191,23 @@ class Hybrid_learning_algorithm(base_model_trainer):
         :align: center
         :width: 600px
     """
-    def __init__(self, epochs, loss_function, validation=0, early_stopping=None, optimizer=torch.optim.Adam, optimizer_params={}):
+    def __init__(self, epochs, loss_function, driver=None, ridge_lambda=0., early_stopping=None, optimizer=torch.optim.Adam, optimizer_params={}):
         """
         Inicializa una nueva instancia de la clase Hybrid_learning_algorithm.
         
         Args:
             epochs (int): Número de épocas de entrenamiento.
             loss_function (torch.nn.functional): Función de pérdida a utilizar en el entrenamiento.
-            validation (float): Proporción de los datos de entrenamiento a utilizar como datos de validación (Default: 0).
+            driver (string): Chooses the backend function that will be used, vaild values are: 'gels', 'gelsy', 'gelsd', 'gelss'. If None, then uses 'gels' (Default: None)
+            ridge_lambda (float): Lambda usado para utilizar "Regularización Ridge" en la estimación de consecuentes con mínimos cuadrados. Si es 0, no se realiza regularización (Default: 0.).
             early_stopping (EarlyStopping): Mecanismo de Early Stopping a utilizar en el entrenamiento (Default: None).
             optimizer (torch.optim): Optimizador a utilizar en el entrenamiento (Default: torch.optim.Adam).
             optimizer_params (dict): Parámetros a utilizar en el optimizador (Default: {}).
         
         """
-        super().__init__(epochs, loss_function, validation, early_stopping, optimizer, optimizer_params)
+        super().__init__(epochs, loss_function, early_stopping, optimizer, optimizer_params)
+        self.driver = driver
+        self.ridge_lambda = ridge_lambda
         
         
     def _init_optimizer(self, model):
@@ -267,7 +239,7 @@ class Hybrid_learning_algorithm(base_model_trainer):
             ANFISmodel (ANFIS | h_ANFIS): Modelo ANFIS a entrenar.
             loader (DataLoader): DataLoader con los datos de entrenamiento.
         """
-        ANFISmodel.set_consequents(classical_consequents_estimation_with_OLS(ANFISmodel, loader))
+        ANFISmodel.set_consequents(classical_consequents_estimation_with_OLS(ANFISmodel, loader, self.driver, self.ridge_lambda))
     
 
     def _update_parameters(self, ANFISmodel, loader):
@@ -292,14 +264,6 @@ class Hybrid_learning_algorithm(base_model_trainer):
         """
         premises_parameters_to_train = []
         
-        ###########
-        ###########
-        ###########
-        #freezed_subnets = torch.zeros_like(freezed_subnets, dtype=torch.bool)
-        ###########
-        ###########
-        ###########
-        
         not_freezed = torch.where(~freezed_subnets)[0]
         for i in not_freezed:
             premises_parameters_to_train.append(model.get_premises_as_parameters_list()[i.item()])
@@ -323,29 +287,20 @@ class Hybrid_learning_algorithm(base_model_trainer):
         
         self._sonfis_init_optimizer(model, freezed_subnets)
         
-        # unfrozen parameters used to instantiate the optimizer to be empty (which is not allowed in PyTorch).
-        if self._optimizer_instance is None: # There is a possibility that no subnets are created or divided, but some may vanish. This would cause the list of parameters to
-            return                           # be empty, which is not allowed in PyTorch.
+        if self._optimizer_instance is None: # There is a possibility that no subnets are created or divided, but some may vanish. 
+            return                           # This would cause the list of parameters to be empty, which is not allowed in PyTorch.
         
-
         current_consequents = model.get_consequents()
         
         ep = 0
         while ep < self.epochs:
             self._update_parameters(model, train_loader)
             
-            if self.validation > 0 and self.early_stopping is not None:
+            if (val_loader is not None) and (self.early_stopping is not None):
                 _, val_loss = self._loss(model, train_loader, val_loader)
                 self.early_stopping(model, val_loss, False)
                 if self.early_stopping._stop:
                     break
-                
-            #loss, val_loss = self._loss(model, train_loader, val_loader)
-            #epoch_width = len(str(self.epochs))
-            #if self.validation > 0:
-            #    print(f'Epoch: {ep+1:{epoch_width}}/{self.epochs} - loss: {loss:.6f} - validation loss: {val_loss:.6f}')
-            #else:
-            #    print(f'Epoch: {ep+1:{epoch_width}}/{self.epochs} - loss: {loss:.6f}')
                 
             ep += 1
         
@@ -355,63 +310,6 @@ class Hybrid_learning_algorithm(base_model_trainer):
         
         if self.early_stopping is not None:
             self.early_stopping.reset()
-            
-        #print(ep)
-        """
-        
-        current_consequents = model.get_consequents()
-        current_premises = model.get_premises()
-        #print(model.get_premises())
-        ep = 0
-        #self._optimizer_instance = self._init_optimizer(model, self.optimizer, self.optimizer_params)
-        while ep < self.epochs:
-            #---------------------Consequents update------------------------
-            ### current_consequents = ANFISmodel.get_consequents()
-            
-            model.set_consequents(classical_consequents_estimation_with_OLS(model, train_loader))
-            ### new_consequents = ANFISmodel.get_consequents()
-            
-            ### freezed_consequents = self._freezed
-            
-            ### new_consequents[:, freezed_consequents, :] = current_consequents[:, freezed_consequents, :]
-            ### ANFISmodel.set_consequents(new_consequents)
-            
-            # ------------------Premises update-----------------------
-            ### current_premises = ANFISmodel.get_premises()
-            optimizer_training_epoch(model, train_loader, self._optimizer_instance, self.loss_function)
-            ### new_premises = ANFISmodel.get_premises()
-            #print(model.get_premises())
-            ### freezed_premises = self._freezed
-            
-            ### new_premises[:, freezed_premises, :] = current_premises[:, freezed_premises, :]
-            ### ANFISmodel.set_premises(new_premises)
-            
-            #loss, val_loss = self._loss(ANFISmodel, train_loader, val_loader)
-            #epoch_width = len(str(self.trainer_epochs))
-            #if self.validation > 0:
-            #    print(f'    Epoch: {ep+1:{epoch_width}}/{self.trainer_epochs} - loss: {loss:.6f} - validation loss: {val_loss:.6f}')
-            #else:
-            #    print(f'    Epoch: {ep+1:{epoch_width}}/{self.trainer_epochs} - loss: {loss:.6f}')
-            
-            if self.validation > 0 and self.early_stopping is not None:
-                _, val_loss = self._loss(model, train_loader, val_loader)
-                self.early_stopping(model, val_loss, False)
-                if self.early_stopping._stop:
-                    break
-                
-            ep += 1
-            
-        new_consequents = model.get_consequents()
-        new_consequents[:, freezed_subnets, :] = current_consequents[:, freezed_subnets, :]
-        model.set_consequents(new_consequents)
-        
-        new_premises = model.get_premises()
-        new_premises[:, freezed_subnets, :] = current_premises[:, freezed_subnets, :]
-        model.set_premises(new_premises)
-        
-        if self.early_stopping is not None:
-            self.early_stopping.reset()     
-        """
 
 
 class Basic_optimizer_training_algorithm(base_model_trainer):
@@ -426,20 +324,19 @@ class Basic_optimizer_training_algorithm(base_model_trainer):
         :width: 600px
     """
     
-    def __init__(self, epochs, loss_function, validation=0, early_stopping=None, optimizer=torch.optim.Adam, optimizer_params={}):
+    def __init__(self, epochs, loss_function, early_stopping=None, optimizer=torch.optim.Adam, optimizer_params={}):
         """
         Inicializa una nueva instancia de la clase Basic_optimizer_training_algorithm.
         
         Args:
             epochs (int): Número de épocas de entrenamiento.
             loss_function (torch.nn.functional): Función de pérdida a utilizar en el entrenamiento.
-            validation (float): Proporción de los datos de entrenamiento a utilizar como datos de validación (Default: 0).
             early_stopping (EarlyStopping): Mecanismo de Early Stopping a utilizar en el entrenamiento (Default: None).
             optimizer (torch.optim): Optimizador a utilizar en el entrenamiento (Default: torch.optim.Adam).
             optimizer_params (dict): Parámetros a utilizar en el optimizador (Default: {}).
         
         """
-        super().__init__(epochs, loss_function, validation, early_stopping, optimizer, optimizer_params)
+        super().__init__(epochs, loss_function, early_stopping, optimizer, optimizer_params)
         
     
     def _init_optimizer(self, model):
@@ -503,7 +400,7 @@ class Basic_optimizer_training_algorithm(base_model_trainer):
         while ep < self.epochs:
             self._update_parameters(model, train_loader)
             
-            if self.validation > 0 and self.early_stopping is not None:
+            if (val_loader is not None) and (self.early_stopping is not None):
                 _, val_loss = self._loss(model, train_loader, val_loader)
                 self.early_stopping(model, val_loss, False)
                 if self.early_stopping._stop:
@@ -540,7 +437,7 @@ class Double_optimizer_training_algorithm(base_model_trainer):
     
     """
     
-    def __init__(self, epochs, loss_function, validation=0, early_stopping=None, prems_optim=torch.optim.Adam, prems_optim_params={}, cons_optim=torch.optim.Adam, cons_optim_params={}):
+    def __init__(self, epochs, loss_function, early_stopping=None, prems_optim=torch.optim.Adam, prems_optim_params={}, cons_optim=torch.optim.Adam, cons_optim_params={}):
         """
         Inicializa una nueva instancia de la clase Basic_optimizer_training_algorithm.
         
@@ -553,7 +450,7 @@ class Double_optimizer_training_algorithm(base_model_trainer):
             optimizer_params1 (dict): Parámetros a utilizar en el optimizador (Default: {}).
         
         """
-        super().__init__(epochs, loss_function, validation, early_stopping, optimizer=None, optimizer_params={})
+        super().__init__(epochs, loss_function, early_stopping, optimizer=None, optimizer_params={})
         self.prems_optim = prems_optim
         self.prems_optim_params = prems_optim_params
         self.cons_optim = cons_optim
@@ -602,15 +499,6 @@ class Double_optimizer_training_algorithm(base_model_trainer):
             self._cons_optimizer_instance.step()
 
             if torch.isnan(loss):
-                print("--- prem grads --- prem grads --- prem grads ----")
-                for i in range (model._input_size):
-                    print(model._fuzzification_layer._premises[i].grad)
-
-                print("")
-                print("--- prem param --- prem param --- prem param ----")
-                print(model.premises_structure)
-                print("")
-
                 raise ValueError('Loss is NaN')
             
     
@@ -656,7 +544,7 @@ class Double_optimizer_training_algorithm(base_model_trainer):
         while ep < self.epochs:
             self._update_parameters(model, train_loader)
             
-            if self.validation > 0 and self.early_stopping is not None:
+            if (val_loader is not None) and (self.early_stopping is not None):
                 _, val_loss = self._loss(model, train_loader, val_loader)
                 self.early_stopping(model, val_loss, False)
                 if self.early_stopping._stop:

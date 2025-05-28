@@ -1,6 +1,6 @@
 import torch
 
-def classical_consequents_estimation_with_OLS(ANFISmodel, loader):
+def classical_consequents_estimation_with_OLS(ANFISmodel, loader, driver, ridge_lambda):
     """
     Estima los parámetros consecuentes de un modelo ANFIS utilizando mínimos cuadrados ordinarios.
     
@@ -10,6 +10,8 @@ def classical_consequents_estimation_with_OLS(ANFISmodel, loader):
     Args:
         ANFISmodel (ANFIS | h_ANFIS): Modelo ANFIS a entrenar.
         loader (DataLoader): DataLoader con los datos de entrenamiento.
+        driver (string): Chooses the backend function that will be used, vaild values are: 'gels', 'gelsy', 'gelsd', 'gelss'. If None, then uses 'gels' (Default: None)
+        ridge_lambda (float): Lambda usado para utilizar "Regularización Ridge" en la estimación de consecuentes con mínimos cuadrados. Si es 0, no se realiza regularización.
         
     Returns:
         torch.tensor: Tensor con los nuevos parámetros consecuentes.
@@ -31,8 +33,21 @@ def classical_consequents_estimation_with_OLS(ANFISmodel, loader):
         y = y.to(X.dtype)
     '''preliminary fix for the dtype issue'''
     
+    A = X * fs
+    
+    if ridge_lambda > 0.:
+        p = A.shape[1]
+        I = torch.eye(p, dtype=A.dtype) * torch.sqrt(torch.tensor(ridge_lambda, dtype=A.dtype))
+        A = torch.cat([A, I], dim=0)
+        if y.dim() > 1:
+            m = y.shape[1]
+            zeros = torch.zeros((p, m), dtype=A.dtype)
+        else:
+            zeros = torch.zeros(p, dtype=A.dtype)
+        y  = torch.cat([y, zeros], dim=0)
+    
     # Solve least squares problem using QR decomposition with pivoting
-    C, _, _, _ = torch.linalg.lstsq(X * fs, y, rcond=None, driver=None)
+    C, _, _, _ = torch.linalg.lstsq(A, y, rcond=None, driver=driver)
     new_consequents = C.t().reshape(ANFISmodel._outputs, ANFISmodel.rules, xe.shape[1])
     
     return new_consequents
@@ -49,11 +64,6 @@ def optimizer_training_epoch(model, loader, optimizer, loss_function):
         loss_function (callable): Función de pérdida a utilizar.
     
     """
-    #print("-----------------------------")
-    #print("premises grads")
-    #print(model._fuzzification_layer._premises.grad)
-    #print("premises")
-    #print(model.get_premises())
     for batch_x, batch_y in loader:
         batch_y_copy = batch_y.clone().detach()
         
@@ -68,36 +78,10 @@ def optimizer_training_epoch(model, loader, optimizer, loss_function):
         optimizer.zero_grad()
         pred = model(batch_x)
         
-        #print("pred")
-        #print(pred.max())
-        #print(pred.min())
-        #print("")
-        #print("batch_y_copy")
-        #print(batch_y_copy.max())
-        #print(batch_y_copy.min())
-        #print("")
-        
         loss = loss_function(pred, batch_y_copy)
         loss.backward()
         
-        #print("-----------------------------")
-        #print("premises grads")
-        #print(model._fuzzification_layer._premises.grad)
-        
         optimizer.step()
         
-        #print("premises")
-        #print(model.get_premises())
-        
         if torch.isnan(loss):
-            print("--- prem grads --- prem grads --- prem grads ----")
-            for i in range (model._input_size):
-                print(model._fuzzification_layer._premises[i].grad)
-                
-            print("")
-            print("--- prem param --- prem param --- prem param ----")
-            print(model.premises_structure)
-            print("")
-            
             raise ValueError('Loss is NaN')
-        
