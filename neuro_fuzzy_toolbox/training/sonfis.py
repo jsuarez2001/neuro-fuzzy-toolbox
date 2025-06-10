@@ -144,7 +144,7 @@ class SONFIS(base_model_trainer):
                     print(f'\n\tloss: {self.history["loss"][-1]:.6f}')
                 print(f'\t --> ANFIS rules: {ANFISmodel.rules}\n')
             
-                if (val_loader is not None):
+                if (val_loader is not None) and (self.sonfis_early_stopping is not None):
                     if self._check_early_stop(ANFISmodel, self.val_history["loss"][-1]):
                         print(f'found on the {self._best_rules_dataframe_iter}° iteration.')
                         early_stop_flag = True
@@ -540,10 +540,12 @@ class SONFIS(base_model_trainer):
                     subnets = rules_to_split.tolist()
                     if rules_to_split[rules_to_split == True].size(0) == 1:
                         subnets = [subnets]
-                    if isinstance(self._rules_dataframe.index[subnets[0]], int):
-                        print(f"\t-> Splitting {rules_to_split.shape[0]} subnets: {[self._rules_dataframe.index[i] for i in subnets]}")
-                    else:
-                        print(f"\t-> Splitting {rules_to_split.shape[0]} subnets: {[self._rules_dataframe.index[i].item() for i in subnets]}")
+                    #if isinstance(self._rules_dataframe.index[subnets[0]], int):
+                    #    #print(f"\t-> self._rules_dataframe.index[i]: {self._rules_dataframe.index[subnets[0]]}")
+                    #    print(f"\t-> Splitting {rules_to_split.shape[subnets[0]]} subnets: {[self._rules_dataframe.index[i] for i in subnets]}")
+                    #else:
+                    #    print(f"\t-> Splitting {rules_to_split.shape[0]} subnets: {[self._rules_dataframe.index[i].item() for i in subnets]}")
+                    print(f"\t-> Splitting {rules_to_split.shape[0]} subnets: {subnets}")
                     
                     self._drop_subnets_on_rules_dataframe_by_idxs(rules_to_split)
                     self._add_subnets_on_rules_dataframe(all_new_premises, all_new_consequents)
