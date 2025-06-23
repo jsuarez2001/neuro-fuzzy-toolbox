@@ -442,7 +442,6 @@ class HighSlopeBellMF(MembershipFunction):
         Args:
             x (numpy.ndarray): Tensor de entrada.
             a (float): Parámetro a (ancho).
-            b (float): Parámetro b (pendiente).
             c (float): Parámetro c (centro).
         
         Returns:
