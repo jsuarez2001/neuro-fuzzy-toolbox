@@ -437,7 +437,7 @@ class Double_optimizer_training_algorithm(base_model_trainer):
     
     """
     
-    def __init__(self, epochs, loss_function, early_stopping=None, prems_optim=torch.optim.Adam, prems_optim_params={}, cons_optim=torch.optim.Adam, cons_optim_params={}):
+    def __init__(self, epochs, loss_function, early_stopping=None, mode=0, prems_optim=torch.optim.Adam, prems_optim_params={}, cons_optim=torch.optim.Adam, cons_optim_params={}):
         """
         Inicializa una nueva instancia de la clase Basic_optimizer_training_algorithm.
         
@@ -446,9 +446,11 @@ class Double_optimizer_training_algorithm(base_model_trainer):
             loss_function (torch.nn.functional): Función de pérdida a utilizar en el entrenamiento.
             validation (float): Proporción de los datos de entrenamiento a utilizar como datos de validación (Default: 0).
             early_stopping (EarlyStopping): Mecanismo de Early Stopping a utilizar en el entrenamiento (Default: None).
-            optimizer1 (torch.optim): Optimizador a utilizar en el entrenamiento (Default: torch.optim.Adam).
-            optimizer_params1 (dict): Parámetros a utilizar en el optimizador (Default: {}).
-        
+            mode (int):
+            prems_optim (torch.optim):
+            prems_optim_params (dict):
+            cons_optim (torch.optim):
+            cons_optim_params (dict):
         """
         super().__init__(epochs, loss_function, early_stopping, optimizer=None, optimizer_params={})
         self.prems_optim = prems_optim
@@ -458,6 +460,11 @@ class Double_optimizer_training_algorithm(base_model_trainer):
         
         self._prems_optimizer_instance = None
         self._cons_optimizer_instance = None
+        
+        if mode == 0:
+            self._update_parameters = self._update_parameters_0
+        else:
+            self._update_parameters = self._update_parameters_1
         
     
     def _init_optimizer(self, model):
@@ -471,7 +478,7 @@ class Double_optimizer_training_algorithm(base_model_trainer):
         self._cons_optimizer_instance = self.cons_optim(model.get_consequents_as_parameters_list(), **self.cons_optim_params)
     
     
-    def _update_parameters(self, model, loader):
+    def _update_parameters_0(self, model, loader):
         """
         Actualiza los parámetros del modelo (época única).
         
@@ -497,6 +504,54 @@ class Double_optimizer_training_algorithm(base_model_trainer):
             loss.backward()
             self._prems_optimizer_instance.step()
             self._cons_optimizer_instance.step()
+
+            if torch.isnan(loss):
+                raise ValueError('Loss is NaN')
+            
+    def _update_parameters_1(self, model, loader):
+        """
+        Actualiza los parámetros del modelo (época única).
+        
+        Args:
+            model (torch.nn.Module): Modelo a entrenar.
+            loader (DataLoader): DataLoader con los datos de entrenamiento.
+        """
+        for batch_x, batch_y in loader:
+            batch_y_copy = batch_y.clone().detach()
+
+            '''preliminary fix for the dtype issue'''
+            if self.loss_function != torch.nn.functional.cross_entropy:
+                if loader.dataset.tensors[0].dtype != loader.dataset.tensors[1].dtype:
+                    batch_y_copy = batch_y_copy.to(batch_x.dtype)
+            else: 
+                batch_y_copy = batch_y_copy.to(torch.int64) #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
+            '''preliminary fix for the dtype issue'''
+
+            self._cons_optimizer_instance.zero_grad()
+            pred = model(batch_x)
+            loss = self.loss_function(pred, batch_y_copy)
+            loss.backward()
+            self._cons_optimizer_instance.step()
+
+            if torch.isnan(loss):
+                raise ValueError('Loss is NaN')
+            
+        for batch_x, batch_y in loader:
+            batch_y_copy = batch_y.clone().detach()
+
+            '''preliminary fix for the dtype issue'''
+            if self.loss_function != torch.nn.functional.cross_entropy:
+                if loader.dataset.tensors[0].dtype != loader.dataset.tensors[1].dtype:
+                    batch_y_copy = batch_y_copy.to(batch_x.dtype)
+            else: 
+                batch_y_copy = batch_y_copy.to(torch.int64) #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
+            '''preliminary fix for the dtype issue'''
+
+            self._prems_optimizer_instance.zero_grad()
+            pred = model(batch_x)
+            loss = self.loss_function(pred, batch_y_copy)
+            loss.backward()
+            self._prems_optimizer_instance.step()
 
             if torch.isnan(loss):
                 raise ValueError('Loss is NaN')
