@@ -1,14 +1,12 @@
 .. _h_ANFIS usage:
 
-ANFIS homogéneo
-================
+h_ANFIS
+=======
 
 Modelo ANFIS cuyo número de funciones de membresía es igual para todos los features de los datos de entrada.
 
 Importación
 -----------
-
-Se importará la clase **h_ANFIS** y la función de membresía **Gaussian_MF** para los ejemplos a continuación.
 
 .. code-block:: python
 
@@ -29,14 +27,15 @@ Los parámetros a tomar en cuenta para instanciar un modelo h_ANFIS son los sigu
 - **num_mfs**: Número de funciones de membresía para cada feature.
 - **outputs**: Número de salidas del modelo. Por defecto es 1.
 - **membership_function**: Función de membresía a utilizar. Puede ser Gaussian_MF, GeneralizedBell_MF. Por defecto es GeneralizedBell_MF.
-- **output_type**: Tipo de salida del modelo. Puede ser 'default', 'sigmoid' o 'softmax'. El valor por defecto es obviamente 'default'.
+- **output_type**: Tipo de salida del modelo. Puede ser 'default', 'sigmoid' o 'softmax'. El valor por defecto es 'default'.
 - **rule_reduced**: Booleano que indica si se quiere instanciar un modelo h_ANFIS con reglas reducidas. Por defecto es False. Más detalles en :ref:`rule-reduced ANFIS <rule-reduced ANFIS>`.
+- **features**: Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Por defecto es la lista: *[x0, x1, ...]*.
 - **dtype**: Tipo de dato de los tensores que contienen los parámetros del modelo. Por defecto es torch.float32.
 
 .. note::
 
     Con respecto al parámetro **output_type**: si se instancia un modelo con **output_type='sigmoid'**, el modelo incorporará una capa sigmoide a la salida, mientras que con 
-    **output_type='softmax'**, el modelo incorporará una función softmax opcional al método forward. Más detalles en :ref:`Salida sigmoide y softmax <Salida sigmoide y softmax>`.
+    **output_type='softmax'**, se añade una función softmax opcional al método forward. Más detalles en :ref:`Salida sigmoide y softmax <Salida sigmoide y softmax>`.
 
 Se utilizarán datos de entrenamiento generados aleatoriamente para el ejemplo a continuación.
 

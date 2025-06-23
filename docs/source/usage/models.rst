@@ -8,6 +8,6 @@ Esta sección contiene una guía sobre los modelos neurodifusos implementados en
 .. toctree::
    :maxdepth: 2
 
-   models/h_anfis
    models/anfis
+   models/h_anfis
    models/rule_reduced_anfis

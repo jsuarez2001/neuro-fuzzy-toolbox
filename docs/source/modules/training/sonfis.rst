@@ -29,12 +29,3 @@ SONFIS
    :inherited-members:
    :show-inheritance:
    :special-members: __call__
-
-alternative SONFIS
-------------------
-
-.. autoclass:: neuro_fuzzy_toolbox.training.sonfis.alt_SONFIS
-   :members:
-   :inherited-members:
-   :show-inheritance:
-   :special-members: __call__

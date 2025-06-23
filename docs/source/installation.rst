@@ -22,7 +22,7 @@ Puedes instalar Neuro-Fuzzy Toolbox de la siguiente manera:
    python3 -m venv env_name
    source env_name/bin/activate
 
-- e instala las dependencias del proyecto en el entorno virtual.
+- instala las dependencias del proyecto en el entorno virtual.
 
 .. code-block:: bash
 
