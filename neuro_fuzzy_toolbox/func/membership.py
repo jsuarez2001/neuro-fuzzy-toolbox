@@ -413,7 +413,7 @@ class GeneralizedBell_MF(MembershipFunction):
 
 
 
-class HighSlopeBellMF(MembershipFunction):
+class HighSlopeBell_MF(MembershipFunction):
     """
     Función de membresía de tipo generalized bell-shaped, pero el parámetro "b" relacionado con la "pendiente" de la campana está definido a 8.0 para establecer una forma determinada y estricta a las funciones de membresía. Está definida como:  
     
@@ -428,7 +428,7 @@ class HighSlopeBellMF(MembershipFunction):
     
     """
     def __init__(self):
-        super(HighSlopeBellMF, self).__init__()
+        super(HighSlopeBell_MF, self).__init__()
         self._params = ["width", "center"] # ["width", "slope", "center"]
 
         self._min_val_plot = -2
@@ -448,6 +448,8 @@ class HighSlopeBellMF(MembershipFunction):
             numpy.ndarray: Salida de la función de membresía Gaussiana.
         
         """
+        if a == 0:
+            a = 1e-6
         return 1/(1 + np.power(np.abs((x - c)/a), 2*8.0))
         
     def forward(self, x, premises):
