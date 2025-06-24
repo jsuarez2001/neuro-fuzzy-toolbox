@@ -1,2 +1,2 @@
-from .membership import Gaussian_MF, GeneralizedBell_MF, HighSlopeBellMF
+from .membership import Gaussian_MF, GeneralizedBell_MF, HighSlopeBell_MF
 from .consequent import Linear_CF
