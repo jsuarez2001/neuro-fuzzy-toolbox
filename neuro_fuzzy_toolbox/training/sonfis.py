@@ -65,7 +65,6 @@ class SONFIS(base_model_trainer):
         # ------ Internal variables & methods ------
         self._freezed = torch.tensor([], dtype=torch.int)
         self._ages = torch.tensor([], dtype=torch.int)
-        self._last_best_rules = torch.tensor([-1])
         
         self._get_max_firing_level = None
         
@@ -341,7 +340,7 @@ class SONFIS(base_model_trainer):
             bad_targets = torch.cat((bad_targets, batch_y[dGrowMask]), dim=0)
             best_bs_rules = torch.cat((best_bs_rules, max_fl.indices[dGrowMask]), dim=0) # & the associated subnet
             
-        unique_rules, counts = torch.unique(best_bs_rules, return_counts=True) # how many "max firing levels" do each of the subnets get?
+        unique_rules, counts = torch.unique(best_bs_rules, return_counts=True) # how many "max firing levels" do each of the subnets get considering only the "bad_samples"?
         Ngrow_mask = counts > self.Ngrow
         
         indices_to_keep = torch.isin(best_bs_rules, unique_rules[Ngrow_mask]).nonzero().squeeze()  # using Ngrow
@@ -627,21 +626,10 @@ class SONFIS(base_model_trainer):
         total_counts = torch.zeros(ANFISmodel.rules, dtype=torch.int64)
         total_counts[unique_rules] = counts
         
-        if torch.equal(best_rules, self._last_best_rules) or torch.equal(self._last_best_rules, torch.tensor([-1])): # if the "best_rule" for each sample is the same
-            self._ages += 1 # add 1 age to all subnets
-        else: # if the "best_rule" for each sample is different in this SONFIS iteration --> # only add 1 age to the subnets that NOT improved (have less "associated" samples than before)
-            last_unique_rules, last_counts = torch.unique(self._last_best_rules, return_counts=True)
-            self._last_best_rules = best_rules
-            
-            last_total_counts = torch.zeros(ANFISmodel.rules, dtype=torch.int64)
-            last_total_counts[last_unique_rules[last_unique_rules < ANFISmodel.rules]] = last_counts[last_unique_rules < ANFISmodel.rules]
-            
-            improved_rules = all_rules[(total_counts < last_total_counts)]
-            
-            self._ages[improved_rules] = 0
-            self._ages[~improved_rules] += 1
-        
-        mask = ((self._ages > self.lVanish) & (total_counts < self.Nvanish)) # using Nvanish & lVanish --> to filter by age 6 by number of "associated" samples
+        self._ages[all_rules[(total_counts < self.Nvanish)]] += 1 # add 1 age to the subnets that have less than Nvanish "associated" samples
+        self._ages[all_rules[(total_counts >= self.Nvanish)]] = 0 # reset age to 0 for the subnets that have more than Nvanish "associated" samples
+
+        mask = ((self._ages >= self.lVanish) & (total_counts < self.Nvanish)) # using Nvanish & lVanish --> to filter by age 6 by number of "associated" samples
         rules_to_eliminate = all_rules[mask]
         
         if torch.equal(rules_to_eliminate, torch.tensor([], dtype=torch.int64)): # if there ARE NOT rules to eliminate
