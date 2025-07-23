@@ -655,3 +655,242 @@ class SONFIS(base_model_trainer):
                 self._drop_subnets_on_rules_dataframe(mask)
             
             return True
+        
+        
+
+
+class alt_SONFIS(SONFIS):
+    def __init__(self, Ngrow, dGrow, Nsplit, eSplit, Nvanish, lVanish, max_iterations, ANFIStrainer, early_stopping=None, lse_for_new_consequents=False, lse_for_new_consequents_lambda=0, last_training_iteration=False):
+        super().__init__(Ngrow, dGrow, Nsplit, eSplit, Nvanish, lVanish, max_iterations, ANFIStrainer, early_stopping, lse_for_new_consequents, lse_for_new_consequents_lambda, last_training_iteration)
+        
+    def _GrowNet(self, ANFISmodel, train_loader, verbose):
+        """
+        Ejecuta el operador GrowNet para generar nuevas subredes.
+        
+        Args:
+            ANFISmodel (rule_reduced_ANFIS): Instancia del modelo ANFIS reducido en reglas.
+            train_loader (DataLoader): DataLoader de entrenamiento.
+        
+        Returns:
+            bool: Indica si se generó alguna nueva subred.
+        """
+        X = train_loader.dataset.tensors[0]
+        y = train_loader.dataset.tensors[1]
+        
+        firing_levels, _, _ = ANFISmodel.intermediate_values(X)
+        max_fl = self._get_max_firing_level(firing_levels)
+        
+        dGrowMask = max_fl.values <= self.dGrow**ANFISmodel._input_size # using dGrow
+        
+        bad_samples = X[dGrowMask]
+        bad_targets = y[dGrowMask]
+        best_bs_rules = max_fl.indices[dGrowMask]
+          
+        unique_rules, counts = torch.unique(best_bs_rules, return_counts=True) # how many "max firing levels" do each of the subnets get considering only the "bad_samples"?
+        Ngrow_mask = counts > self.Ngrow
+        
+        indices_to_keep = torch.isin(best_bs_rules, unique_rules[Ngrow_mask]).nonzero().squeeze()  # using Ngrow
+        
+        bad_samples = bad_samples[indices_to_keep] # getting which samples will be considered
+        bad_targets = bad_targets[indices_to_keep]
+        best_bs_rules = best_bs_rules[indices_to_keep] # & the associated subnet
+        
+        if bad_samples.size(0) == 0:
+            return False
+        
+        else:
+            rules = [best_bs_rules == rule for rule in torch.unique(best_bs_rules)] # list of boolean masks (lenght: current number of subnets), each one with shape: (bad_samples.shape[0], ) 
+            
+            means = torch.stack([bad_samples[rule].mean(dim=0) for rule in rules]) # shape = (new_subnets, input_dim)
+            stds = torch.stack([bad_samples[rule].std(dim=0) for rule in rules]) # shape = (new_subnets, input_dim)
+            
+            new_premises = ANFISmodel._fuzzification_layer._membership_function._grow_new_premise_parameters(means, stds)
+            ANFISmodel.set_premises(torch.cat((ANFISmodel.get_premises(), new_premises), dim=1))
+            
+            n_new_rules = new_premises.shape[1]
+            new_consequents = ANFISmodel._consequent_layer._consequent_function.random_consequents(ANFISmodel._outputs, n_new_rules, ANFISmodel._input_size, ANFISmodel._dtype)
+            ANFISmodel.set_consequents(torch.cat((ANFISmodel.get_consequents(), new_consequents), dim=1))
+            
+            if self.lse_for_new_consequents: # if True, consequents are init with LSE
+                new_consequents = self._lse_after_GrowNet(ANFISmodel, bad_samples, bad_targets, rules, n_new_rules)
+                ANFISmodel.set_consequents(torch.cat((ANFISmodel.get_consequents()[:, :-n_new_rules, :], new_consequents), dim=1))
+            
+            if verbose:
+                self._add_subnets_on_rules_dataframe(new_premises, new_consequents)
+                print(f"\t-> Growing {n_new_rules} new subnets: {[i for i in range(self._current_max_idx - new_premises.shape[1] + 1, self._current_max_idx + 1)]}")
+            
+            self._ages = torch.cat((self._ages, torch.zeros(new_premises.shape[1], dtype=torch.int)))
+            self._freezed = torch.cat((self._freezed, torch.zeros(new_premises.shape[1], dtype=torch.int).bool()))
+            
+            return True
+        
+    def _SplitSubNet(self, ANFISmodel, train_loader, verbose):
+        """
+        Ejecuta el operador SplitSubNetwork para dividir subredes.
+        
+        Args:
+            ANFISmodel (h_ANFIS): Instancia del modelo ANFIS reducido en reglas.
+            train_loader (DataLoader): DataLoader de entrenamiento.
+            
+        Returns:
+            bool: Indica si se dividió alguna subred.
+        """
+        samples = train_loader.dataset.tensors[0]
+        targets = train_loader.dataset.tensors[1]
+        
+        firing_levels, _, _ = ANFISmodel.intermediate_values(samples)
+        max_fl = self._get_max_firing_level(firing_levels)
+        
+        best_rules = max_fl.indices
+         
+        with torch.no_grad():
+            model_outputs = ANFISmodel(samples, return_probs=False) # get model preds
+            
+        unique_rules, counts = torch.unique(best_rules, return_counts=True) # how many "max firing levels" do each of the subnets get?
+        Nsplit_mask = counts > self.Nsplit
+        
+        indices_to_keep = torch.isin(best_rules, unique_rules[Nsplit_mask]).nonzero().squeeze()  # using Nsplit
+        
+        if indices_to_keep.size(0) == 0:
+            return False
+        
+        else:
+            # collect the samples, targets, outputs and the "best rule associated" (based on the max firing level) to be considered
+            model_outputs = model_outputs[indices_to_keep]
+            samples = samples[indices_to_keep]
+            targets = targets[indices_to_keep]
+            best_rules = best_rules[indices_to_keep]
+            
+            unique_rules = torch.unique(best_rules)
+            
+            if targets.dtype != train_loader.dataset.tensors[1].dtype:
+                targets = targets.to(train_loader.dataset.tensors[1].dtype)
+                
+            rules = [best_rules == rule for rule in unique_rules] # list of boolean masks (lenght: current number of subnets), each one with shape: (bad_samples.shape[0], ) 
+            
+            model_outputs_list = [model_outputs[rule] for rule in rules]
+            targets_list = [targets[rule] for rule in rules]
+                
+            # compute loss 
+            loss_values = torch.stack([self.loss_function(model_outputs_list[i], targets_list[i]) for i in range(len(rules))]) # for each of the considered subnets with ONLY its associated samples
+            
+            eSplit_mask = loss_values > self.eSplit
+            
+            rules_to_split = unique_rules[eSplit_mask]
+            
+            if ((targets.shape[0] == 0) or (rules_to_split.shape[0] == 0)): # using eSplit
+                return False
+            
+            else:
+                if self.lse_for_new_consequents:
+                    to_split_samples_list, to_split_targets_list = self._group_samples_for_lse_in_order(eSplit_mask, targets_list, samples, rules)
+                    
+                new_premises = ANFISmodel.get_premises()
+                new_consequents = ANFISmodel.get_consequents()
+                
+                all_new_premises = torch.tensor([])
+                all_new_consequents = torch.tensor([])
+                
+                idx = 0
+                for rule in list(torch.flip(rules_to_split, [0]).long()): # using eSplit
+                    new_premises = torch.cat((new_premises[:, :rule,:], new_premises[:, rule+1:, :]), dim=1)
+                    to_split = ANFISmodel.get_premises()[:, rule:rule+1, :]
+                    split = ANFISmodel._fuzzification_layer._membership_function._split_premise_parameters(to_split)
+                    
+                    new_premises = torch.cat((new_premises, split), dim=1)
+                    
+                    new_consequents = torch.cat((new_consequents[:, :rule, :], new_consequents[:, rule+1:, :]), dim=1)
+                    new_consequent_to_add = ANFISmodel._consequent_layer._consequent_function.random_consequents(ANFISmodel._outputs, 2, ANFISmodel._input_size, ANFISmodel._dtype)
+                    
+                    new_consequents = torch.cat((new_consequents, new_consequent_to_add), dim=1)
+                    
+                    self._ages = torch.cat((self._ages[:rule], self._ages[rule+1:]))
+                    self._freezed = torch.cat((self._freezed[:rule], self._freezed[rule+1:]))
+                    self._ages = torch.cat((self._ages, torch.zeros(2, dtype=torch.int)))
+                    self._freezed = torch.cat((self._freezed, torch.zeros(2, dtype=torch.int).bool()))
+                    
+                    if verbose:
+                        all_new_premises = torch.cat((all_new_premises, split), dim=1)
+                        all_new_consequents = torch.cat((all_new_consequents, new_consequent_to_add), dim=1)
+                    
+                    ANFISmodel.set_premises(new_premises)
+                    ANFISmodel.set_consequents(new_consequents)
+                    
+                    if self.lse_for_new_consequents:
+                        new_2_last_consequents_to_replace = self._lse_while_SplitSubNet(ANFISmodel, to_split_samples_list[idx], to_split_targets_list[idx])
+                        ANFISmodel.set_consequents(torch.cat((ANFISmodel.get_consequents()[:, :-2, :], new_2_last_consequents_to_replace), dim=1))
+                        
+                    new_premises = ANFISmodel.get_premises()
+                    new_consequents = ANFISmodel.get_consequents()
+                        
+                    idx += 1
+                
+                if verbose:
+                    subnets = rules_to_split.tolist()
+                    if rules_to_split[rules_to_split == True].size(0) == 1:
+                        subnets = [subnets]
+                    #if isinstance(self._rules_dataframe.index[subnets[0]], int):
+                    #    #print(f"\t-> self._rules_dataframe.index[i]: {self._rules_dataframe.index[subnets[0]]}")
+                    #    print(f"\t-> Splitting {rules_to_split.shape[subnets[0]]} subnets: {[self._rules_dataframe.index[i] for i in subnets]}")
+                    #else:
+                    #    print(f"\t-> Splitting {rules_to_split.shape[0]} subnets: {[self._rules_dataframe.index[i].item() for i in subnets]}")
+                    print(f"\t-> Splitting {rules_to_split.shape[0]} subnets: {subnets}")
+                    
+                    self._drop_subnets_on_rules_dataframe_by_idxs(rules_to_split)
+                    self._add_subnets_on_rules_dataframe(all_new_premises, all_new_consequents)
+                
+                return True
+            
+    def _VanishNet(self, ANFISmodel, train_loader, verbose):
+        """
+        Ejecuta el operador VanishNet para desvanecer subredes.
+        
+        Args:
+            ANFISmodel (h_ANFIS): Instancia del modelo ANFIS reducido en reglas.
+            train_loader (DataLoader): DataLoader de entrenamiento.
+            
+        Returns:
+            bool: Indica si se desvaneció alguna subred.
+        """
+        X = train_loader.dataset.tensors[0]
+        
+        firing_levels, _, _ = ANFISmodel.intermediate_values(X)
+        max_fl = self._get_max_firing_level(firing_levels)
+        
+        best_rules = max_fl.indices
+        
+        unique_rules, counts = torch.unique(best_rules, return_counts=True) # how many "max firing levels" do each of the subnets get?
+        all_rules = torch.arange(ANFISmodel.rules)
+        
+        total_counts = torch.zeros(ANFISmodel.rules, dtype=torch.int64)
+        total_counts[unique_rules] = counts
+        
+        self._ages[all_rules[(total_counts < self.Nvanish)]] += 1 # add 1 age to the subnets that have less than Nvanish "associated" samples
+        self._ages[all_rules[(total_counts >= self.Nvanish)]] = 0 # reset age to 0 for the subnets that have more than Nvanish "associated" samples
+
+        mask = ((self._ages >= self.lVanish) & (total_counts < self.Nvanish)) # using Nvanish & lVanish --> to filter by age 6 by number of "associated" samples
+        rules_to_eliminate = all_rules[mask]
+        
+        if torch.equal(rules_to_eliminate, torch.tensor([], dtype=torch.int64)): # if there ARE NOT rules to eliminate
+            return False
+        else: # if there ARE rules to eliminate
+            new_premises = ANFISmodel.get_premises()
+            new_consequents = ANFISmodel.get_consequents()
+            for rule in torch.flip(rules_to_eliminate, dims=(0,)):
+                new_premises = torch.cat((new_premises[:, :rule, :], new_premises[:, rule+1:, :]), dim=1)
+                new_consequents = torch.cat((new_consequents[:, :rule, :], new_consequents[:, rule+1:, :]), dim=1)
+                
+                self._ages = torch.cat((self._ages[:rule], self._ages[rule+1:]))
+                self._freezed = torch.cat((self._freezed[:rule], self._freezed[rule+1:]))
+            
+            ANFISmodel.set_premises(new_premises)
+            ANFISmodel.set_consequents(new_consequents)
+            
+            if verbose:
+                subnets = (mask.nonzero().squeeze()).tolist()
+                if mask[mask == True].size(0) == 1:
+                    subnets = [subnets]
+                print(f"\t-> Vanishing {rules_to_eliminate.size(0)} subnets: {[self._rules_dataframe.index[i].item() for i in subnets]}")
+                self._drop_subnets_on_rules_dataframe(mask)
+            
+            return True
