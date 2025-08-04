@@ -337,22 +337,22 @@ class SONFIS(base_model_trainer):
         
         bad_samples = X[dGrowMask]
         bad_targets = y[dGrowMask]
-        best_bs_rules = max_fl.indices[dGrowMask]
-          
-        unique_rules, counts = torch.unique(best_bs_rules, return_counts=True) # how many "max firing levels" do each of the subnets get considering only the "bad_samples"?
+        clusters = max_fl.indices[dGrowMask] # clusters are the associated "bad samples" to each subnet based on the max firing level
+        
+        unique_rules, counts = torch.unique(clusters, return_counts=True) # how many "max firing levels" do each of the subnets get considering only the "bad_samples"?
         Ngrow_mask = counts > self.Ngrow
         
-        indices_to_keep = torch.isin(best_bs_rules, unique_rules[Ngrow_mask]).nonzero().squeeze()  # using Ngrow
+        indices_to_keep = torch.isin(clusters, unique_rules[Ngrow_mask]).nonzero().squeeze()  # using Ngrow
         
         bad_samples = bad_samples[indices_to_keep] # getting which samples will be considered
         bad_targets = bad_targets[indices_to_keep]
-        best_bs_rules = best_bs_rules[indices_to_keep] # & the associated subnet
+        clusters = clusters[indices_to_keep] # & the associated subnet
         
         if bad_samples.size(0) == 0:
             return False
         
         else:
-            rules = [best_bs_rules == rule for rule in torch.unique(best_bs_rules)] # list of boolean masks (lenght: current number of subnets), each one with shape: (bad_samples.shape[0], ) 
+            rules = [clusters == rule for rule in torch.unique(clusters)] # list of boolean masks (lenght: current number of subnets), each one with shape: (bad_samples.shape[0], ) 
             
             means = torch.stack([bad_samples[rule].mean(dim=0) for rule in rules]) # shape = (new_subnets, input_dim)
             stds = torch.stack([bad_samples[rule].std(dim=0) for rule in rules]) # shape = (new_subnets, input_dim)
