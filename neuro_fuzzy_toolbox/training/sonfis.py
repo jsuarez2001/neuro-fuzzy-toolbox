@@ -1,4 +1,5 @@
 import torch
+import os
 
 from neuro_fuzzy_toolbox.training import (
     base_model_trainer
@@ -76,7 +77,7 @@ class SONFIS(base_model_trainer):
         self._best_rules_dataframe_iter = None
     
     
-    def __call__(self, ANFISmodel, train_loader, val_loader=None, verbose=True):
+    def __call__(self, ANFISmodel, train_loader, val_loader=None, verbose=True, path=None):
         """
         Ejecuta el algoritmo SONFIS.
         
@@ -100,7 +101,30 @@ class SONFIS(base_model_trainer):
         iter_width = len(str(self.max_iterations))
         print(f'ITERATION: {0:{iter_width}}/{self.max_iterations}')
         
+        iter_path = None
+        if path is not None:
+            iter_path = os.path.join(path, f"iter 0")
+            os.makedirs(iter_path, exist_ok=True)
+            
+        X_train = train_loader.dataset.tensors[0]
+        y_train = train_loader.dataset.tensors[1]
+        
+        X_val = val_loader.dataset.tensors[0]
+        y_val = val_loader.dataset.tensors[1]
+        
+        if iter_path is not None:
+            torch.save(X_train, os.path.join(iter_path, "X_train.pth"))
+            torch.save(y_train, os.path.join(iter_path, "y_train.pth"))
+            torch.save(X_val, os.path.join(iter_path, "X_val.pth"))
+            torch.save(y_val, os.path.join(iter_path, "y_val.pth"))
+
+        if iter_path is not None:
+            torch.save(ANFISmodel.get_premises(), os.path.join(iter_path, "pre_MF.pth"))
+        
         self.trainer._sonfis_update_parameters(ANFISmodel, train_loader, val_loader, self._freezed)
+        
+        if iter_path is not None:
+            torch.save(ANFISmodel.get_premises(), os.path.join(iter_path, "post_MF.pth"))
         
         if verbose:
             early_stop_flag = False
@@ -121,14 +145,25 @@ class SONFIS(base_model_trainer):
         i = 0
         while(model_updated and i < self.max_iterations):
             
+            iter_path = None
+            if path is not None:
+                iter_path = os.path.join(path, f"iter {i+1}")
+                os.makedirs(iter_path, exist_ok=True)
+            
             print(f'\nITERATION: {i+1:{iter_width}}/{self.max_iterations}')
             
             self._freeze_subnets()
             
-            model_updated = self._update_structure(ANFISmodel, train_loader, verbose)
+            model_updated = self._update_structure(ANFISmodel, train_loader, verbose, iter_path)
             
             if model_updated:
+                if iter_path is not None:
+                    torch.save(ANFISmodel.get_premises(), os.path.join(iter_path, "pre_MF.pth"))
+                    
                 self.trainer._sonfis_update_parameters(ANFISmodel, train_loader, val_loader, self._freezed)
+                
+                if iter_path is not None:
+                    torch.save(ANFISmodel.get_premises(), os.path.join(iter_path, "post_MF.pth"))
                 
                 if verbose:
                     self._replace_trained_subnets_on_rules_dataframe(ANFISmodel)
@@ -294,7 +329,7 @@ class SONFIS(base_model_trainer):
     
     
     # ----- Update structure -----
-    def _update_structure(self, ANFISmodel, train_loader, verbose):
+    def _update_structure(self, ANFISmodel, train_loader, verbose, iter_path):
         """
         Ejecuta las operaciones GrowNet, SplitSubNet y VanishNet para actualizar la estructura del modelo ANFIS.
         
@@ -305,18 +340,24 @@ class SONFIS(base_model_trainer):
         Returns:
             bool: Indica si se realizó alguna actualización en la estructura del modelo.
         """
-        did_Grow = self._GrowNet(ANFISmodel, train_loader, verbose)
-        
+        did_Grow = self._GrowNet(ANFISmodel, train_loader, verbose, iter_path)
+        if iter_path is not None:
+            torch.save(torch.tensor(did_Grow), os.path.join(iter_path, "grow.pth"))
+
         did_Split = False
         if not did_Grow:
-            did_Split = self._SplitSubNet(ANFISmodel, train_loader, verbose)
-        
-        did_Vanish = self._VanishNet(ANFISmodel, train_loader, verbose)
+            did_Split = self._SplitSubNet(ANFISmodel, train_loader, verbose, iter_path)
+            if iter_path is not None:
+                torch.save(torch.tensor(did_Split), os.path.join(iter_path, "split.pth"))
+
+        did_Vanish = self._VanishNet(ANFISmodel, train_loader, verbose, iter_path)
+        if iter_path is not None:
+            torch.save(torch.tensor(did_Vanish), os.path.join(iter_path, "vanish.pth"))
 
         return did_Grow or did_Split or did_Vanish
     
     
-    def _GrowNet(self, ANFISmodel, train_loader, verbose):
+    def _GrowNet(self, ANFISmodel, train_loader, verbose, iter_path):
         """
         Ejecuta el operador GrowNet para generar nuevas subredes.
         
@@ -347,6 +388,15 @@ class SONFIS(base_model_trainer):
         bad_samples = bad_samples[indices_to_keep] # getting which samples will be considered
         bad_targets = bad_targets[indices_to_keep]
         clusters = clusters[indices_to_keep] # & the associated subnet
+                
+        if iter_path is not None:
+            grownet_iter_path = os.path.join(iter_path, f"grownet")
+            os.makedirs(grownet_iter_path, exist_ok=True)
+            torch.save(bad_samples, os.path.join(grownet_iter_path, "bad_samples.pth"))
+            torch.save(bad_targets, os.path.join(grownet_iter_path, "bad_targets.pth"))
+            torch.save(X[~dGrowMask], os.path.join(grownet_iter_path, "good_samples.pth"))
+            torch.save(y[~dGrowMask], os.path.join(grownet_iter_path, "good_targets.pth"))
+            torch.save(clusters, os.path.join(grownet_iter_path, "clusters.pth"))
         
         if bad_samples.size(0) == 0:
             return False
@@ -359,6 +409,10 @@ class SONFIS(base_model_trainer):
             
             new_premises = ANFISmodel._fuzzification_layer._membership_function._grow_new_premise_parameters(means, stds)
             ANFISmodel.set_premises(torch.cat((ANFISmodel.get_premises(), new_premises), dim=1))
+            
+            if iter_path is not None:
+                torch.save(new_premises, os.path.join(grownet_iter_path, "new_MF.pth"))
+                torch.save(ANFISmodel.get_premises(), os.path.join(grownet_iter_path, "all_MF.pth"))
             
             n_new_rules = new_premises.shape[1]
             new_consequents = ANFISmodel._consequent_layer._consequent_function.random_consequents(ANFISmodel._outputs, n_new_rules, ANFISmodel._input_size, ANFISmodel._dtype)
@@ -429,7 +483,7 @@ class SONFIS(base_model_trainer):
         
         return new_consequents
     
-    def _SplitSubNet(self, ANFISmodel, train_loader, verbose):
+    def _SplitSubNet(self, ANFISmodel, train_loader, verbose, iter_path):
         """
         Ejecuta el operador SplitSubNetwork para dividir subredes.
         
@@ -456,6 +510,10 @@ class SONFIS(base_model_trainer):
         
         indices_to_keep = torch.isin(best_rules, unique_rules[Nsplit_mask]).nonzero().squeeze()  # using Nsplit
         
+        if iter_path is not None:
+            splitsubnet_iter_path = os.path.join(iter_path, f"splitsubnet")
+            os.makedirs(splitsubnet_iter_path, exist_ok=True)
+        
         if indices_to_keep.size(0) == 0:
             return False
         
@@ -465,6 +523,10 @@ class SONFIS(base_model_trainer):
             samples = samples[indices_to_keep]
             targets = targets[indices_to_keep]
             best_rules = best_rules[indices_to_keep]
+            
+            if iter_path is not None:
+                torch.save(best_rules, os.path.join(splitsubnet_iter_path, "best_rules.pth"))
+                torch.save(samples, os.path.join(splitsubnet_iter_path, "samples.pth"))
             
             unique_rules = torch.unique(best_rules)
             
@@ -482,6 +544,9 @@ class SONFIS(base_model_trainer):
             eSplit_mask = loss_values > self.eSplit
             
             rules_to_split = unique_rules[eSplit_mask]
+            
+            if iter_path is not None:
+                torch.save(rules_to_split, os.path.join(splitsubnet_iter_path, "rules_to_split.pth"))
             
             if ((targets.shape[0] == 0) or (rules_to_split.shape[0] == 0)): # using eSplit
                 return False
@@ -501,6 +566,9 @@ class SONFIS(base_model_trainer):
                     new_premises = torch.cat((new_premises[:, :rule,:], new_premises[:, rule+1:, :]), dim=1)
                     to_split = ANFISmodel.get_premises()[:, rule:rule+1, :]
                     split = ANFISmodel._fuzzification_layer._membership_function._split_premise_parameters(to_split)
+                    
+                    if iter_path is not None:
+                        torch.save(split, os.path.join(splitsubnet_iter_path, f"split_{rule.item()}.pth"))
                     
                     new_premises = torch.cat((new_premises, split), dim=1)
                     
@@ -596,7 +664,7 @@ class SONFIS(base_model_trainer):
         
         return new_consequents
     
-    def _VanishNet(self, ANFISmodel, train_loader, verbose):
+    def _VanishNet(self, ANFISmodel, train_loader, verbose, iter_path):
         """
         Ejecuta el operador VanishNet para desvanecer subredes.
         
@@ -631,6 +699,13 @@ class SONFIS(base_model_trainer):
         else: # if there ARE rules to eliminate
             new_premises = ANFISmodel.get_premises()
             new_consequents = ANFISmodel.get_consequents()
+            
+            if iter_path is not None:
+                vanishnet_iter_path = os.path.join(iter_path, f"vanishnet")
+                os.makedirs(vanishnet_iter_path, exist_ok=True)
+                torch.save(new_premises, os.path.join(vanishnet_iter_path, "before_mfs.pth"))
+                torch.save(rules_to_eliminate, os.path.join(vanishnet_iter_path, "rules_to_eliminate.pth"))
+            
             for rule in torch.flip(rules_to_eliminate, dims=(0,)):
                 new_premises = torch.cat((new_premises[:, :rule, :], new_premises[:, rule+1:, :]), dim=1)
                 new_consequents = torch.cat((new_consequents[:, :rule, :], new_consequents[:, rule+1:, :]), dim=1)
@@ -639,6 +714,8 @@ class SONFIS(base_model_trainer):
                 self._freezed = torch.cat((self._freezed[:rule], self._freezed[rule+1:]))
             
             ANFISmodel.set_premises(new_premises)
+            if iter_path is not None:
+                torch.save(new_premises, os.path.join(vanishnet_iter_path, "after_mfs.pth"))
             ANFISmodel.set_consequents(new_consequents)
             
             if verbose:
