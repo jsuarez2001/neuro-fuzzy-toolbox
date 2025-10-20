@@ -75,7 +75,7 @@ class base_ANFIS(nn.Module):
             driver (string): Chooses the backend function that will be used, vaild values are: 'gels', 'gelsy', 'gelsd', 'gelss'. If None, then uses 'gels' (Default: None)
             ridge_lambda (float): Lambda usado para utilizar "Regularización Ridge" en la estimación de consecuentes con mínimos cuadrados. Si es 0, no se realiza regularización (Default: 0.).
         """
-        _, w_norm, _ = self.intermediate_values(x)
+        w_norm = self.get_firing_levels(x, normalized=True)
         xe = torch.cat([x, torch.ones(x.shape[0], 1, dtype=self._dtype)], dim=1)
         fs = w_norm.unsqueeze(2).repeat(1, 1, xe.shape[1]).view(w_norm.shape[0], -1)
         X = xe.repeat(1, self.rules)
@@ -146,27 +146,41 @@ class base_ANFIS(nn.Module):
     
     
     # ---- Intermediate values ----
-    def intermediate_values(self, x):
+    def get_firing_levels(self, x, normalized=False):
         """
-        Emula un paso hacia adelante del modelo y retorna los valores intermedios de las capas del modelo.
+        Retorna los niveles de disparo del modelo para los datos de entrada dados.
         
         Args:
             x (torch.Tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
-            
+
         Returns:
-            tuple: Tupla con los valores intermedios de las capas del modelo. Contiene:
-                - w (torch.Tensor): Niveles de disparo.
-                - w_norm (torch.Tensor): Niveles de disparo normalizados.
-                - outputs (torch.Tensor): Salidas individuales de las reglas del modelo.
+            torch.Tensor: Niveles de disparo del modelo. Es de tamaño (batch_size, num_rules).
+        """
+        with torch.no_grad():
+            w = self._fuzzification_layer(x)
+            w = self._firing_levels_layer(w)
+            if normalized:
+                w = self._normalization_layer(w)
+        return w
+    
+    def get_all_consequents_outputs(self, x):
+        """
+        Retorna las salidas individuales de las reglas del modelo para los datos de entrada dados.
+        
+        Args:
+            x (torch.Tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
+        
+        Returns:
+            torch.Tensor: Salidas individuales de las reglas del modelo. Es de tamaño (outputs, batch_size, num_rules).
         """
         with torch.no_grad():
             w = self._fuzzification_layer(x)
             w = self._firing_levels_layer(w)
             w_norm = self._normalization_layer(w)
             outputs = self._consequent_layer(x, w_norm)
-        return w, w_norm, outputs
-    
-    
+        return outputs
+
+
     # ---- ANFIS structure info ----
     @property
     def num_mfs(self):

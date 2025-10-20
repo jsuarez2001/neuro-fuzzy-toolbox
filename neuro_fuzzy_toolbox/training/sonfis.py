@@ -330,7 +330,7 @@ class SONFIS(base_model_trainer):
         X = train_loader.dataset.tensors[0]
         y = train_loader.dataset.tensors[1]
         
-        firing_levels, _, _ = ANFISmodel.intermediate_values(X)
+        firing_levels = ANFISmodel.get_firing_levels(X)
         max_fl = self._get_max_firing_level(firing_levels)
         
         dGrowMask = max_fl.values <= self.dGrow**ANFISmodel._input_size # using dGrow
@@ -397,7 +397,7 @@ class SONFIS(base_model_trainer):
             x = samples[rule]
             y = targets[rule]
             
-            _, w_norm, _ = ANFISmodel.intermediate_values(x)
+            w_norm = ANFISmodel.get_firing_levels(x, normalized=True)
             xe = torch.cat([x, torch.ones(x.shape[0], 1)], dim=1)
             fs = w_norm[:, i - n_new_rules].unsqueeze(0).t()
             
@@ -443,7 +443,7 @@ class SONFIS(base_model_trainer):
         samples = train_loader.dataset.tensors[0]
         targets = train_loader.dataset.tensors[1]
         
-        firing_levels, _, _ = ANFISmodel.intermediate_values(samples)
+        firing_levels = ANFISmodel.get_firing_levels(samples)
         max_fl = self._get_max_firing_level(firing_levels)
         
         best_rules = max_fl.indices
@@ -565,7 +565,7 @@ class SONFIS(base_model_trainer):
         x = samples
         y = targets
         
-        _, w_norm, _ = ANFISmodel.intermediate_values(x)
+        w_norm = ANFISmodel.get_firing_levels(x, normalized=True)
         x = torch.cat([x, torch.ones(x.shape[0], 1)], dim=1)
         w_norm = w_norm[:, -2:].unsqueeze(2).repeat(1, 1, x.shape[1]).view(w_norm[:, -2:].shape[0], -1)
         X = x.repeat(1, 2)
@@ -609,7 +609,7 @@ class SONFIS(base_model_trainer):
         """
         X = train_loader.dataset.tensors[0]
         
-        firing_levels, _, _ = ANFISmodel.intermediate_values(X)
+        firing_levels = ANFISmodel.get_firing_levels(X)
         max_fl = self._get_max_firing_level(firing_levels)
         
         best_rules = max_fl.indices

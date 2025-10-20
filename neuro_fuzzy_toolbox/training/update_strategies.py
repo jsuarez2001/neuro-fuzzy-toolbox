@@ -20,7 +20,7 @@ def classical_consequents_estimation_with_OLS(ANFISmodel, loader, driver, ridge_
     y = loader.dataset.tensors[1]
     
     # Least squares problem construction
-    _, w_norm, _ = ANFISmodel.intermediate_values(x)
+    w_norm = ANFISmodel.get_firing_levels(x, normalized=True)
     xe = torch.cat([x, torch.ones(x.shape[0], 1)], dim=1)
     fs = w_norm.unsqueeze(2).repeat(1, 1, xe.shape[1]).view(w_norm.shape[0], -1)
     X = xe.repeat(1, ANFISmodel.rules)
