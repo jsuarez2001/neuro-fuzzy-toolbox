@@ -1,23 +1,71 @@
+# ----------------------------
+# Python cache / bytecode
+# ----------------------------
 __pycache__/
-*.ipynb_checkpoints/
-.vscode/
+*.py[cod]
+
+# ----------------------------
+# Jupyter / notebooks
+# ----------------------------
+.ipynb_checkpoints/
+
+# ----------------------------
+# Virtual envs
+# ----------------------------
 env/
-test_notebooks_old/
-pendiente.txt
-tests/
-consideraciones.md
-old/
-img/
-dev_notebooks/
-test/
 test_env/
+other_env/
+.venv/
+venv/
+
+# ----------------------------
+# IDE / editor
+# ----------------------------
+.vscode/
+
+# ----------------------------
+# Build / packaging outputs
+# ----------------------------
+dist/
+build/
+*.egg-info/
+
+# ----------------------------
+# Test / tool caches
+# ----------------------------
+.pytest_cache/
+.tox/
+
+# ----------------------------
+# Sphinx docs build
+# ----------------------------
+docs/build/
+
+# ----------------------------
+# Local notes / temporary files
+# ----------------------------
+pendiente.txt
 util.txt
+consideraciones.md
+
+# ----------------------------
+# Scratch / experiments / old stuff (project-specific)
+# ----------------------------
+old/
+old_neuro_fuzzy_toolbox/
+test/
+test_notebooks_old/
+dev_notebooks/
+comparison_notebooks/
+radiomics_tests/
+pruebas_sonfis_data_leondry/
 EXP_neuro_fuzzy_toolbox/
 examples/0-EXP
-old_neuro_fuzzy_toolbox/
-docs/build/
-pruebas_sonfis_data_leondry/
-radiomics_tests/
-comparison_notebooks/
-other_env/
 z-markdown_utils/
+img/
+
+# ----------------------------
+# Usually keep tests tracked in git
+# (uncomment only if you really want to ignore them)
+# ----------------------------
+tests/
