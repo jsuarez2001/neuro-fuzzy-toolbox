@@ -1,0 +1,30 @@
+[project]
+name = "neuro-fuzzy-toolbox"
+version = "0.0.1"
+authors = [
+  { name="Juan Suárez", email="juan.suareza@usm.cl" },
+]
+description = "A toolbox for the development of Adaptive Neuro Fuzzy Inference Systems based on PyTorch. With this toolbox you would be able to build and train ANFIS models variations and design hybrid architectures.s"
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "Natural Language :: English",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/edge-mirage/neuro-fuzzy-toolbox"
+Issues = "https://github.com/edge-mirage/neuro-fuzzy-toolbox/issues"
+
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/neuro_fuzzy_toolbox"]
