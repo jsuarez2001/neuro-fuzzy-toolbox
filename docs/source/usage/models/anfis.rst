@@ -3,7 +3,10 @@
 ANFIS
 =====
 
-Modelo ANFIS clásico. Con esta clase se permiten distintos números de funciones de membresía para cada feature de los datos de entrada.
+.. image:: ../../_static/anfis/ANFISmodel.png
+    :align: center
+
+Modelo ANFIS clásico. La clase permite distintos números de funciones de membresía para cada característica de los datos de entrada.
 
 Importación
 -----------

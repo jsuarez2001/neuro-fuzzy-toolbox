@@ -17,6 +17,8 @@ copyright = '2025, Juan Suárez'
 author = 'Juan Suárez'
 release = '0.0.1'
 
+language = "es"
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
@@ -27,6 +29,41 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon']
+
+latex_engine = "xelatex"   # mejor soporte unicode
+
+latex_elements = {
+    # Tamaño de papel y cuerpo
+    "papersize": "a4paper",
+    "pointsize": "11pt",
+
+    # Envuelve líneas largas en bloques de código e inline-literals
+    "sphinxsetup": (
+        "verbatimwrapslines=true, "   # envuelve líneas en code-block
+        "verbatimforcewraps=true, "   # fuerza quiebre si aún no alcanza
+        "inlineliteralwraps=true"     # permite quiebres en ``inline code``
+    ),
+
+    # Ajustes LaTeX de bajo nivel
+    "preamble": r"""
+\setlength{\emergencystretch}{3em} % ayuda contra overfull \hbox
+\setlength{\headheight}{14pt}      % elimina el warning de fancyhdr
+\providecommand{\tightlist}{}      % evita avisos con listas "compactas"
+
+% Hace \newline más tolerante si aparece "fuera de línea"
+\let\orignewline\newline
+\renewcommand{\newline}{\leavevmode\orignewline}
+""",
+
+    # --- OPCIONAL ---
+    # Si NO quieres instalar FreeSerif en el sistema,
+    # descomenta las 3 líneas siguientes para usar DejaVu:
+    # "fontpkg": r"""
+    # \setmainfont{DejaVu Serif}
+    # \setsansfont{DejaVu Sans}
+    # \setmonofont{DejaVu Sans Mono}
+    # """,
+}
 
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False 

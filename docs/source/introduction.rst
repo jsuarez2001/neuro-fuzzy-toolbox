@@ -3,7 +3,7 @@ Introduction
 
 Neuro-Fuzzy Toolbox es una herramienta para el desarrollo de sistemas neurodifusos basada en PyTorch.
 
-Este proyecto permite construir y entrenar modelos ANFIS y otras variantes de redes neurodifusas.
+Este proyecto permite construir y entrenar modelos ANFIS (https://doi.org/10.1109/21.256541) y otras variantes de redes neurodifusas.
 
 Para los detalles de la instalación, consulta la sección :ref:`Installation`.
 
