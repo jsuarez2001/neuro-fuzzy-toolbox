@@ -304,7 +304,7 @@ class h_ANFIS(base_ANFIS):
     El procedimiento en este caso se realizaría solo multiplicando entre sí los valores de pertenencia *i* de cada feature, dando como resultado una cantidad de reglas igual al número de funciones de membresía de cada feature. (esto se detalla de mejor manera en :ref:`rule-reduced ANFIS <rule-reduced ANFIS>`).
     """
     
-    def __init__(self, input_size, num_mfs, outputs=1, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, output_type="default", rule_reduced=False, features=None, dtype=torch.float32):
+    def __init__(self, input_size, num_mfs, outputs=1, membership_function=GeneralizedBell_MF, output_type="default", rule_reduced=False, features=None, dtype=torch.float32):
         """
         Inicializa un modelo ANFIS homogéneo.
         
@@ -313,7 +313,6 @@ class h_ANFIS(base_ANFIS):
             num_mfs (int): Número de funciones de membresía por feature.
             outputs (int): Número de salidas del modelo (Default: 1).
             membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
-            consequent_function (ConsequentFunction): Función consecuente a utilizar (Default: Linear_CF).
             output_type (str): Tipo de salida del modelo (Default: 'default').
             rule_reduced (bool): True si se desea instanciar un ANFIS de reglas reducidas, False en caso contrario (Default: False).
             features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
@@ -361,7 +360,7 @@ class h_ANFIS(base_ANFIS):
             input_size=input_size,
             rules=rules,
             outputs=outputs,
-            consequent_function=consequent_function,
+            consequent_function=Linear_CF,
             features=features,
             dtype=dtype
             )
@@ -425,7 +424,7 @@ class ANFIS(base_ANFIS):
     Clase para un sistema de inferencia neuro-difuso adaptativo (ANFIS) con una cantidad de funciones de membresía arbitraria para cada feature de los datos de entrada.
     """
     
-    def __init__(self, mf_distribution, outputs=1, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, output_type="default", features=None, dtype=torch.float32):
+    def __init__(self, mf_distribution, outputs=1, membership_function=GeneralizedBell_MF, output_type="default", features=None, dtype=torch.float32):
         """
         Inicializa un modelo ANFIS.
         
@@ -433,7 +432,6 @@ class ANFIS(base_ANFIS):
             mf_distribution (list): Lista con la cantidad de funciones de membresía por feature de los datos de entrada.
             outputs (int): Número de salidas del modelo (Default: 1).
             membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
-            consequent_function (ConsequentFunction): Función consecuente a utilizar (Default: Linear_CF).
             output_type (str): Tipo de salida del modelo (Default: 'default').
             features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
             dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).
@@ -477,7 +475,7 @@ class ANFIS(base_ANFIS):
             input_size=self._input_size,
             rules=self._rules,
             outputs=outputs,
-            consequent_function=consequent_function,
+            consequent_function=Linear_CF,
             features=features,
             dtype=dtype)
         
@@ -592,7 +590,7 @@ class rule_reduced_ANFIS(base_ANFIS):
     en sí no captura (por el hecho de estar reducido).
     """
     
-    def __init__(self, input_size, num_mfs, outputs=1, default_rule=False, membership_function=GeneralizedBell_MF, consequent_function=Linear_CF, output_type="default", features=None, dtype=torch.float32):
+    def __init__(self, input_size, num_mfs, outputs=1, default_rule=False, membership_function=GeneralizedBell_MF, output_type="default", features=None, dtype=torch.float32):
         """
         Inicializa un modelo ANFIS homogéneo.
         
@@ -601,7 +599,6 @@ class rule_reduced_ANFIS(base_ANFIS):
             num_mfs (int): Número de funciones de membresía por feature.
             outputs (int): Número de salidas del modelo (Default: 1).
             membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
-            consequent_function (ConsequentFunction): Función consecuente a utilizar (Default: Linear_CF).
             output_type (str): Tipo de salida del modelo (Default: 'default').
             default_rule (bool): True si se desea agregar la regla por defecto, False en caso contrario (Default: False).
             features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
@@ -643,7 +640,7 @@ class rule_reduced_ANFIS(base_ANFIS):
             input_size=input_size,
             rules=num_mfs,
             outputs=outputs,
-            consequent_function=consequent_function,
+            consequent_function=Linear_CF,
             features=features,
             dtype=dtype
             )
