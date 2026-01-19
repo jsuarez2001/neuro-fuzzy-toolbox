@@ -1,4 +1,0 @@
-from .early_stopping import EarlyStopping
-from .update_strategies import optimizer_training_epoch, classical_consequents_estimation_with_OLS
-from .training_algorithms import Hybrid_learning_algorithm, Basic_optimizer_training_algorithm, base_model_trainer, Double_optimizer_training_algorithm
-from .sonfis import SONFIS
