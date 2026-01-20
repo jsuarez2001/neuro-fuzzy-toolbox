@@ -14,7 +14,7 @@ __pycache__/
 # ----------------------------
 env/
 test_env/
-other_env/
+test_pypi_env/
 .venv/
 venv/
 

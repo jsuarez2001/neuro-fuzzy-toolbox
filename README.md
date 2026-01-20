@@ -5,5 +5,4 @@ Repository for the development of Adaptive Neuro Fuzzy Inference Systems based o
  - torch >= 2.5 (tested in 2.5.1)
  - numpy >= 2.2 (tested in 2.2.1)
  - pandas >= 2.2 (tested in 2.2.3)
- - scikit-learn >= 1.6 (tested in 1.6.1)
-  - matplotlib >= 3.10 (tested in 3.10.0)
+ - matplotlib >= 3.10 (tested in 3.10.0)
