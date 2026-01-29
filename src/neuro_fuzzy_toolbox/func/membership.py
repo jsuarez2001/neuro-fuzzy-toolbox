@@ -17,34 +17,111 @@ class MembershipFunction(nn.Module):
         
     @abstractmethod
     def _simple_numpy_implementation(self, x, *args): # Simple numpy implementation needed for plotting
+        """
+        Implementación simple de la función de membresía en numpy. Este método se define para poder graficar las funciones de membresía.
+        
+        Args:
+            x (numpy.ndarray): Tensor de entrada.
+            *args: Parámetros de la función de membresía.
+        """
         pass
         
     @abstractmethod
     def forward(self, x, premises):
+        """
+        Paso hacia adelante de la función de membresía.
+        
+        Args:
+            x (torch.tensor): Tensor de entrada. Debe tener la forma (batch_size, input_size).
+            premises (torch.tensor): Parámetros de las premisas. Debe tener la forma (input_size, num_mfs, len(self._params)).
+            
+        Returns:
+            torch.tensor: Salida de la función de membresía (valores de membresía). La forma de salida es (batch_size, input_size, num_mfs).
+        """
         pass
     
     @abstractmethod
     def initialize_premises(self, x_train, num_mfs):
+        """
+        Inicializa los parámetros de la función de membresía basándose en los datos de entrada. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        
+        Args:
+            x_train (torch.tensor): Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).
+            num_mfs (int): Número de funciones de membresía por característica de entrada.
+            
+        Returns:
+            torch.tensor: Parámetros de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+        """
         pass
     
     @abstractmethod
     def general_initialize_premises(self, x_train, mf_distribution):
+        """
+        Inicializa los parámetros de la función de membresía basándose en los datos de entrada. Este método considera que cada característica de entrada puede tener un número distinto de funciones de membresía.
+        
+        Args:
+            x_train (torch.tensor): Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).
+            mf_distribution (list): Número de funciones de membresía por característica de entrada en forma de lista.
+            
+        Returns:
+            list: Lista de tensores con los parámetros de las funciones de membresía asociadas a cada feature de los datos de entrada. La forma del tensor i de la lista es (input_size, mf_distribution[i], len(self._params)).
+        """
         pass
     
     @abstractmethod
     def random_premises(self, input_size, num_mfs, dtype):
+        """
+        Genera parámetros aleatorios para las premisas en el rango [-1, 1], restringiendo ciertos parámetros a valores positivos (dependiendo de la función de membresía en cuestión).
+        
+        Args:
+            input_size (int): Número de características de entrada.
+            num_mfs (int): Número de funciones de membresía por característica de entrada.
+            dtype (torch.dtype): Tipo de dato de las premisas.
+            
+        Returns:
+            torch.tensor: Parámetros aleatorios de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+        """
         pass
     
     @abstractmethod
     def random_single_feature_mfs(self):
+        """
+        Genera parámetros aleatorios para una sola función de membresía en el rango [-1, 1], restringiendo ciertos parámetros a valores positivos (dependiendo de la función de membresía en cuestión).
+        
+        Args:
+            n_mfs (int): Número de funciones de membresía.
+            dtype (torch.dtype): Tipo de dato de las premisas.
+            
+        Returns:
+            torch.tensor: Parámetros aleatorios de las premisas. La forma de salida es (n_mfs, len(self._params)).
+        """
         pass
     
     @abstractmethod
     def _grow_new_premise_parameters(self, means, stds):
+        """
+        Método utilizado en el algoritmo para la modificación de la estructura del modelo SONFIS. Genera nuevas premisas dado un conjunto de medias y desviaciones estándar en la forma de un tensor. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        
+        Args:
+            means (torch.tensor): Medias por característica de entrada y función de membresía. La dimensión de la entrada es (num_new_mfs, input_size), donde num_new_mfs es el número de nuevas funciones de membresía que se agregarán a cada feature de los datos de entrada.
+            stds (torch.tensor): Desviaciones estándar por característica de entrada y función de membresía. La dimensión de la entrada es (num_new_mfs, input_size), de la misma forma que el tensor means.
+            
+        Returns:
+            torch.tensor: Nuevos parámetros de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+        """
         pass
     
     @abstractmethod
     def _split_premise_parameters(self, premises):
+        """
+        Método utilizado en el algoritmo para la modificación de la estructura del modelo SONFIS. Divide las premisas ingresadas en dos nuevas. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        
+        Args:
+            premises (torch.tensor): Parámetros de las premisas. La forma de entrada es (input_size, num_mfs, len(self._params)).
+            
+        Returns:
+            torch.tensor: Nuevos parámetros de las premisas. La forma de salida es (input_size, 2*num_mfs, len(self._params)).
+        """
         pass
 
 
@@ -193,7 +270,7 @@ class Gaussian_MF(MembershipFunction):
 
     def _grow_new_premise_parameters(self, means, stds):
         """
-        Método utilizado para la modificación de la estructura del modelo SONFIS. Genera nuevas premisas dado un conjunto de medias y desviaciones estándar en la forma de un tensor.
+        Método utilizado en el algoritmo para la modificación de la estructura del modelo SONFIS. Genera nuevas premisas dado un conjunto de medias y desviaciones estándar en la forma de un tensor. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
         
         Args:
             means (torch.tensor): Medias por característica de entrada y función de membresía. La dimensión de la entrada es (num_new_mfs, input_size), donde num_new_mfs es el número de nuevas funciones de membresía que se agregarán a cada feature de los datos de entrada.
@@ -206,7 +283,7 @@ class Gaussian_MF(MembershipFunction):
     
     def _split_premise_parameters(self, premises):
         """
-        Método utilizado para la modificación de la estructura del modelo SONFIS. Divide las premisas ingresadas en dos nuevas.
+        Método utilizado en el algoritmo para la modificación de la estructura del modelo SONFIS. Divide las premisas ingresadas en dos nuevas. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
         
         Args:
             premises (torch.tensor): Parámetros de las premisas. La forma de entrada es (input_size, num_mfs, len(self._params)).
@@ -437,7 +514,7 @@ class HighSlopeBell_MF(MembershipFunction):
     
     def _simple_numpy_implementation(self, x, a, c):
         """
-        Implementación simple de la función de membresía Generalized Bell en numpy. Este método se define para poder graficar las funciones de membresía.
+        Implementación simple de la función de membresía High Slope Bell en numpy. Este método se define para poder graficar las funciones de membresía.
         
         Args:
             x (numpy.ndarray): Tensor de entrada.
@@ -454,20 +531,20 @@ class HighSlopeBell_MF(MembershipFunction):
         
     def forward(self, x, premises):
         """
-        Paso hacia adelante de la función de membresía Generalized Bell.
+        Paso hacia adelante de la función de membresía High Slope Bell.
         
         Args:
             x (torch.tensor): Tensor de entrada. Debe tener la forma (batch_size, input_size).
             premises (torch.tensor): Parámetros de las premisas. Debe tener la forma (input_size, num_mfs, len(self._params)).
             
         Returns:
-            torch.tensor: Salida de la función de membresía Generalized Bell (valores de membresía). La forma de salida es (batch_size, input_size, num_mfs).
+            torch.tensor: Salida de la función de membresía High Slope Bell (valores de membresía). La forma de salida es (batch_size, input_size, num_mfs).
         """
         return 1/(1 + torch.pow(torch.abs((x.unsqueeze(x.dim()) - premises[:, :, 1])/torch.where(premises[:, :, 0] == 0, torch.tensor(1e-6), premises[:, :, 0])), 2*8.0))
 
     def initialize_premises(self, x_train, num_mfs):
         """
-        Inicializa los parámetros de la función de membresía Generalized Bell basándose en los datos de entrada. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Inicializa los parámetros de la función de membresía High Slope Bell basándose en los datos de entrada. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
         
         Args:
             x_train (torch.tensor): Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).
@@ -496,7 +573,7 @@ class HighSlopeBell_MF(MembershipFunction):
     
     def general_initialize_premises(self, x_train, mf_distribution):
         """
-        Inicializa los parámetros de la función de membresía Generalized Bell basándose en los datos de entrada. Este método considera que cada característica de entrada puede tener un número distinto de funciones de membresía.
+        Inicializa los parámetros de la función de membresía High Slope Bell basándose en los datos de entrada. Este método considera que cada característica de entrada puede tener un número distinto de funciones de membresía.
         
         Args:
             x_train (torch.tensor): Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).
@@ -546,7 +623,7 @@ class HighSlopeBell_MF(MembershipFunction):
     
     def random_single_feature_mfs(self, n_mfs, dtype):
         """
-        Genera parámetros aleatorios para una sola función de membresía Generalized Bell en el rango [-1, 1], restringiendo el parámetro del ancho (**width**) a valores positivos.
+        Genera parámetros aleatorios para una sola función de membresía High Slope Bell en el rango [-1, 1], restringiendo el parámetro del ancho (**width**) a valores positivos.
         
         Args:
             n_mfs (int): Número de funciones de membresía.
