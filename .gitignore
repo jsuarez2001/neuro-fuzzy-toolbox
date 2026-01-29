@@ -40,6 +40,7 @@ build/
 # Sphinx docs build
 # ----------------------------
 docs/build/
+docs_esp/
 
 # ----------------------------
 # Local notes / temporary files
