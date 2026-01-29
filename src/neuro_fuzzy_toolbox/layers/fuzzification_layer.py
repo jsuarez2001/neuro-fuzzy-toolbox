@@ -140,7 +140,7 @@ class FuzzificationLayer(nn.Module):
 
         df = pd.DataFrame(columns=columns)
 
-        mfs = [f'rule {i + 1}' for i in range(self._max_n_mfs)]
+        mfs = [f'MF {i + 1}' for i in range(self._max_n_mfs)]
 
         for i in range(self._input_size):
             num_mfs = self._mf_distribution[i]
@@ -152,9 +152,9 @@ class FuzzificationLayer(nn.Module):
                 df[(self.features[i], param_name)] = pd.Series(column_data, index=mfs)
 
         return df
-    
-    
-    def plot_premises(self, mf=None, input_dim=None, group_by_dim=False):
+
+
+    def plot_premises(self, mf=None, input_dim=None, group_by_dim=False, linestyles='-', linewidths=2.5):
         """
         Plotea las funciones de membresía de los antecedentes.
         
@@ -162,11 +162,13 @@ class FuzzificationLayer(nn.Module):
             mf (int): Función de membresía a plotear. Si es None, se plotean todas las funciones de membresía (Default: None).
             input_dim (int): Dimensión de entrada a plotear. Si es None, se plotean todas las dimensiones de entrada (Default: None).
             group_by_dim (bool): Si es True, agrupa las funciones de membresía en un solo gráfico por cada dimensión de entrada. (Default: False)
+            linestyles (string | list): String o lista de strings que representan los tipos de linea para representar las funciones de membresía. Si se usa una lista, los tipos de linea se irán alternando. Los caracteres permitidos son: ['-', '--', '-.', ':']. (Default: '-')
+            linewidths (float | list): Float o lista de floats que representan los grosores de linea para representar las funciones de membresía. Si se usa una lista, los grosores de linea se irán alternando. (Default: 2.5)
         """
         variables = self.features
         dataframe = self.get_premises_structure
         
-        x = np.linspace(self._membership_function._max_val_plot, self._membership_function._min_val_plot, 500)
+        x = np.linspace(self._membership_function._min_val_plot, self._membership_function._max_val_plot, 500)
         
         # Determine which mfs and dimensions to plot
         if mf is not None:
@@ -185,33 +187,44 @@ class FuzzificationLayer(nn.Module):
             dims_to_plot = [input_dim]
         else:
             dims_to_plot = range(len(variables))
+        
+        colors = plt.cm.tab10(np.linspace(0, 1, len(mfs_to_plot)))
             
         if group_by_dim:
-            fig, axes = plt.subplots(nrows=len(dims_to_plot), ncols=1, figsize=(6, 4*len(dims_to_plot)), squeeze=False)
+            fig, axes = plt.subplots(nrows=len(dims_to_plot), ncols=1, figsize=(10, 5*len(dims_to_plot)), squeeze=False)
             for j, dim in enumerate(dims_to_plot):
                 var = variables[dim]
                 ax = axes[j, 0]
-                for mf in mfs_to_plot:
+                for mf_idx, mf in enumerate(mfs_to_plot):
                     try:
                         params = []
                         for param in self._membership_function._params:
                             value = dataframe.loc[mf, (var, param)]
-                            #value = dataframe.loc[mf, f'{param} ({var})']
                             if pd.isna(value):
                                 break
                             params.append(value)
                         else:
                             y = self._membership_function._simple_numpy_implementation(x, *params)
-                            ax.plot(x, y, label=f'{mf}')
+                            color = colors[mf_idx % len(colors)]
+                            if linestyles != '-' and linestyles != '--' and linestyles != '-.'  and linestyles != ':':
+                                linestyle = linestyles[mf_idx % len(linestyles)]
+                            else:
+                                linestyle = linestyles
+                            if isinstance(linewidths, list):
+                                linewidth = linewidths[mf_idx % len(linewidths)]
+                            else:
+                                linewidth = linewidths
+                            ax.plot(x, y, label=f'{mf}', color=color, linestyle=linestyle, linewidth=linewidth)
                     except KeyError:
                         print(f"Warning: Could not find parameters for membership function '{mf}' and variable '{var}'")
                         continue
                     
-                ax.set_title(f'Membership Functions for {var}')
-                ax.grid(True)
-                ax.set_xlabel('x')
-                ax.set_ylabel('Membership Value')
-                ax.legend()
+                ax.set_title(f'Membership Functions for {var}', fontsize=12, fontweight='bold')
+                ax.grid(True, alpha=0.3)
+                ax.set_xlabel('x', fontsize=11)
+                ax.set_ylabel('Membership Value', fontsize=11)
+                ax.legend(fontsize=10, loc='best')
+                ax.set_ylim([0, 1.1])
 
         else:
             # Calculate subplot dimensions
@@ -220,10 +233,10 @@ class FuzzificationLayer(nn.Module):
 
             # Create subplots based on the number of mfs and dimensions
             if n_mfs == 1 and n_dims == 1:
-                fig, ax = plt.subplots(figsize=(8, 6))
+                fig, ax = plt.subplots(figsize=(10, 6))
                 axes = np.array([[ax]])
             else:
-                fig, axes = plt.subplots(nrows=n_mfs, ncols=n_dims, figsize=(5*n_dims, 4*n_mfs), squeeze=False)
+                fig, axes = plt.subplots(nrows=n_dims, ncols=n_mfs, figsize=(8*n_mfs, 6*n_dims), squeeze=False)
 
             for i, mf in enumerate(mfs_to_plot):
                 for j, dim in enumerate(dims_to_plot):
@@ -231,21 +244,30 @@ class FuzzificationLayer(nn.Module):
                     try:
                         params = []
                         for param in self._membership_function._params:
-                            #value = dataframe.loc[mf, f'{param} ({var})']
                             value = dataframe.loc[mf, (var, param)]
                             if pd.isna(value):
                                 break
                             params.append(value)
                         else:
                             y = self._membership_function._simple_numpy_implementation(x, *params)
-                            ax = axes[i, j]
-                            ax.plot(x, y, label=f'{mf}, {var}')
-                            ax.set_title(f'{mf}, {var}')
-                            ax.grid(True)
-                            if i == n_mfs - 1:
-                                ax.set_xlabel('x')
-                            if j == 0:
-                                ax.set_ylabel('Membership Value')
+                            ax = axes[j, i] if n_mfs > 1 else axes[i, j]
+                            color = colors[i % len(colors)]
+                            if linestyles != '-' and linestyles != '--' and linestyles != '-.'  and linestyles != ':':
+                                linestyle = linestyles[i % len(linestyles)]
+                            else:
+                                linestyle = linestyles
+                            if isinstance(linewidths, list):
+                                linewidth = linewidths[mf_idx % len(linewidths)]
+                            else:
+                                linewidth = linewidths
+                            ax.plot(x, y, color=color, linestyle=linestyle, linewidth=linewidth, label=f'{mf}, {var}')
+                            ax.set_title(f'{mf}, {var}', fontsize=11, fontweight='bold')
+                            ax.grid(True, alpha=0.3)
+                            ax.set_ylim([0, 1.1])
+                            if (i == n_mfs - 1) or (j == n_dims - 1):
+                                ax.set_xlabel('x', fontsize=10)
+                            if j == 0 or i == 0:
+                                ax.set_ylabel('Membership Value', fontsize=10)
                     except KeyError as e:
                         print(f"Warning: Could not find parameters for membership function '{mf}' and variable '{var}'")
                         continue
@@ -378,7 +400,7 @@ class h_FuzzificationLayer(nn.Module):
     
     
     
-    def plot_premises(self, mf=None, input_dim=None, group_by_dim=False):
+    def plot_premises(self, mf=None, input_dim=None, group_by_dim=False, linestyles='-', linewidths=2.5):
         """
         Plotea las funciones de membresía de los antecedentes.
         
@@ -386,11 +408,13 @@ class h_FuzzificationLayer(nn.Module):
             mf (int): Función de membresía a plotear. Si es None, se plotean todas las funciones de membresía (Default: None).
             input_dim (int): Dimensión de entrada a plotear. Si es None, se plotean todas las dimensiones de entrada (Default: None).
             group_by_dim (bool): Si es True, agrupa las funciones de membresía en un solo gráfico por cada dimensión de entrada. (Default: False)
+            linestyles (string | list): String o lista de strings que representan los tipos de linea para representar las funciones de membresía. Si se usa una lista, los tipos de linea se irán alternando. Los caracteres permitidos son: ['-', '--', '-.', ':']. (Default: '-')
+            linewidths (float | list): Float o lista de floats que representan los grosores de linea para representar las funciones de membresía. Si se usa una lista, los grosores de linea se irán alternando. (Default: 2.5)
         """
         variables = [f'{self.features[i]}' for i in range(self._input_size)]
         dataframe = self.get_premises_structure
 
-        x = np.linspace(self._membership_function._max_val_plot, self._membership_function._min_val_plot, 500)
+        x = np.linspace(self._membership_function._min_val_plot, self._membership_function._max_val_plot, 500)
 
         # Determine which mfs and dimensions to plot
         if mf is not None:
@@ -410,12 +434,14 @@ class h_FuzzificationLayer(nn.Module):
         else:
             dims_to_plot = range(len(variables))
             
+        colors = plt.cm.tab10(np.linspace(0, 1, len(mfs_to_plot)))
+            
         if group_by_dim:
-            fig, axes = plt.subplots(nrows=len(dims_to_plot), ncols=1, figsize=(6, 4*len(dims_to_plot)), squeeze=False)
+            fig, axes = plt.subplots(nrows=len(dims_to_plot), ncols=1, figsize=(10, 5*len(dims_to_plot)), squeeze=False)
             for j, dim in enumerate(dims_to_plot):
                 var = variables[dim]
                 ax = axes[j, 0]
-                for mf in mfs_to_plot:
+                for mf_idx, mf in enumerate(mfs_to_plot):
                     try:
                         params = []
                         for param in self._membership_function._params:
@@ -426,45 +452,69 @@ class h_FuzzificationLayer(nn.Module):
                             params.append(value)
                         else:
                             y = self._membership_function._simple_numpy_implementation(x, *params)
-                            ax.plot(x, y, label=f'{mf}')
+                            color = colors[mf_idx % len(colors)]
+                            if linestyles != '-' and linestyles != '--' and linestyles != '-.'  and linestyles != ':':
+                                linestyle = linestyles[mf_idx % len(linestyles)]
+                            else:
+                                linestyle = linestyles
+                            if isinstance(linewidths, list):
+                                linewidth = linewidths[mf_idx % len(linewidths)]
+                            else:
+                                linewidth = linewidths
+                            ax.plot(x, y, label=f'{mf}', color=color, linestyle=linestyle, linewidth=linewidth)
                     except KeyError:
                         print(f"Warning: Could not find parameters for membership function '{mf}' and variable '{var}'")
                         continue
                     
-                ax.set_title(f'Membership Functions for {var}')
-                ax.grid(True)
-                ax.set_xlabel('x')
-                ax.set_ylabel('Membership Value')
-                ax.legend()
+                ax.set_title(f'Membership Functions for {var}', fontsize=12, fontweight='bold')
+                ax.grid(True, alpha=0.3)
+                ax.set_xlabel('x', fontsize=11)
+                ax.set_ylabel('Membership Value', fontsize=11)
+                ax.legend(fontsize=10, loc='best')
+                ax.set_ylim([0, 1.1])
 
         else:
             # Calculate subplot dimensions
             n_mfs = len(mfs_to_plot)
             n_dims = len(dims_to_plot)
-    
+
             # Create subplots based on the number of mfs and dimensions
             if n_mfs == 1 and n_dims == 1:
-                fig, ax = plt.subplots(figsize=(8, 6))
+                fig, ax = plt.subplots(figsize=(10, 6))
                 axes = np.array([[ax]])
             else:
-                fig, axes = plt.subplots(nrows=n_mfs, ncols=n_dims, figsize=(5*n_dims, 4*n_mfs), squeeze=False)
-    
+                fig, axes = plt.subplots(nrows=n_dims, ncols=n_mfs, figsize=(8*n_mfs, 6*n_dims), squeeze=False)
+
             for i, mf in enumerate(mfs_to_plot):
                 for j, dim in enumerate(dims_to_plot):
                     var = variables[dim]
                     try:
-                        params = [dataframe.loc[mf, (var, param)] for param in self._membership_function._params]
-                        
-                        y = self._membership_function._simple_numpy_implementation(x, *params)
-    
-                        ax = axes[i, j]
-                        ax.plot(x, y, label=f'{mf}, {var}')
-                        ax.set_title(f'{mf}, {var}')
-                        ax.grid(True)
-                        if i == n_mfs - 1:
-                            ax.set_xlabel('x')
-                        if j == 0:
-                            ax.set_ylabel('Membership Value')
+                        params = []
+                        for param in self._membership_function._params:
+                            value = dataframe.loc[mf, (var, param)]
+                            if pd.isna(value):
+                                break
+                            params.append(value)
+                        else:
+                            y = self._membership_function._simple_numpy_implementation(x, *params)
+                            ax = axes[j, i] if n_mfs > 1 else axes[i, j]
+                            color = colors[i % len(colors)]
+                            if linestyles != '-' and linestyles != '--' and linestyles != '-.'  and linestyles != ':':
+                                linestyle = linestyles[i % len(linestyles)]
+                            else:
+                                linestyle = linestyles
+                            if isinstance(linewidths, list):
+                                linewidth = linewidths[mf_idx % len(linewidths)]
+                            else:
+                                linewidth = linewidths
+                            ax.plot(x, y, color=color, linestyle=linestyle, linewidth=linewidth, label=f'{mf}, {var}')
+                            ax.set_title(f'{mf}, {var}', fontsize=11, fontweight='bold')
+                            ax.grid(True, alpha=0.3)
+                            ax.set_ylim([0, 1.1])
+                            if (i == n_mfs - 1) or (j == n_dims - 1):
+                                ax.set_xlabel('x', fontsize=10)
+                            if j == 0 or i == 0:
+                                ax.set_ylabel('Membership Value', fontsize=10)
                     except KeyError as e:
                         print(f"Warning: Could not find parameters for membership function '{mf}' and variable '{var}'")
                         continue
@@ -608,7 +658,7 @@ class rule_reduced_FuzzificationLayer(nn.Module):
         return df
     
     
-    def plot_premises(self, mf=None, input_dim=None, group_by_dim=False):
+    def plot_premises(self, mf=None, input_dim=None, group_by_dim=False, linestyles='-', linewidths=2.5):
         """
         Plotea las funciones de membresía de los antecedentes.
         
@@ -616,21 +666,25 @@ class rule_reduced_FuzzificationLayer(nn.Module):
             mf (int): Función de membresía a plotear. Si es None, se plotean todas las funciones de membresía (Default: None).
             input_dim (int): Dimensión de entrada a plotear. Si es None, se plotean todas las dimensiones de entrada (Default: None).
             group_by_dim (bool): Si es True, agrupa las funciones de membresía en un solo gráfico por cada dimensión de entrada. (Default: False)
+            linestyles (string | list): String o lista de strings que representan los tipos de linea para representar las funciones de membresía. Si se usa una lista, los tipos de linea se irán alternando. Los caracteres permitidos son: ['-', '--', '-.', ':']. (Default: '-')
+            linewidths (float | list): Float o lista de floats que representan los grosores de linea para representar las funciones de membresía. Si se usa una lista, los grosores de linea se irán alternando. (Default: 2.5)
         """
         variables = [f'{self.features[i]}' for i in range(self._input_size)]
         dataframe = self.get_premises_structure
 
-        x = np.linspace(self._membership_function._max_val_plot, self._membership_function._min_val_plot, 500)
+        x = np.linspace(self._membership_function._min_val_plot, self._membership_function._max_val_plot, 500)
 
+        # Determine which mfs and dimensions to plot
         if mf is not None:
-            if isinstance(mf, (int, float)):
-                mf = f'{mf}'
+            mf = f'{mf}'
+            # Validate that the mf exists
             if mf not in dataframe.index:
                 raise ValueError(f"'{mf}' index not found in premises. Available mfs: {dataframe.index.tolist()}")
             mfs_to_plot = [mf]
         else:
             mfs_to_plot = dataframe.index
 
+        # Validate input dimension
         if input_dim is not None:
             if not isinstance(input_dim, int) or input_dim < 0 or input_dim >= len(variables):
                 raise ValueError(f"input_dim must be between 0 and {len(variables)-1}")
@@ -638,59 +692,87 @@ class rule_reduced_FuzzificationLayer(nn.Module):
         else:
             dims_to_plot = range(len(variables))
             
+        colors = plt.cm.tab10(np.linspace(0, 1, len(mfs_to_plot)))
+            
         if group_by_dim:
-            fig, axes = plt.subplots(nrows=len(dims_to_plot), ncols=1, figsize=(6, 4*len(dims_to_plot)), squeeze=False)
+            fig, axes = plt.subplots(nrows=len(dims_to_plot), ncols=1, figsize=(10, 5*len(dims_to_plot)), squeeze=False)
             for j, dim in enumerate(dims_to_plot):
                 var = variables[dim]
                 ax = axes[j, 0]
-                for mf in mfs_to_plot:
+                for mf_idx, mf in enumerate(mfs_to_plot):
                     try:
                         params = []
                         for param in self._membership_function._params:
                             value = dataframe.loc[mf, (var, param)]
-                            
+                            #value = dataframe.loc[mf, f'{param} ({var})']
                             if pd.isna(value):
                                 break
                             params.append(value)
                         else:
                             y = self._membership_function._simple_numpy_implementation(x, *params)
-                            ax.plot(x, y, label=f'{mf}')
+                            color = colors[mf_idx % len(colors)]
+                            if linestyles != '-' and linestyles != '--' and linestyles != '-.'  and linestyles != ':':
+                                linestyle = linestyles[mf_idx % len(linestyles)]
+                            else:
+                                linestyle = linestyles
+                            if isinstance(linewidths, list):
+                                linewidth = linewidths[mf_idx % len(linewidths)]
+                            else:
+                                linewidth = linewidths
+                            ax.plot(x, y, label=f'{mf}', color=color, linestyle=linestyle, linewidth=linewidth)
                     except KeyError:
                         print(f"Warning: Could not find parameters for membership function '{mf}' and variable '{var}'")
                         continue
                     
-                ax.set_title(f'Membership Functions for {var}')
-                ax.grid(True)
-                ax.set_xlabel('x')
-                ax.set_ylabel('Membership Value')
-                ax.legend()
+                ax.set_title(f'Membership Functions for {var}', fontsize=12, fontweight='bold')
+                ax.grid(True, alpha=0.3)
+                ax.set_xlabel('x', fontsize=11)
+                ax.set_ylabel('Membership Value', fontsize=11)
+                ax.legend(fontsize=10, loc='best')
+                ax.set_ylim([0, 1.1])
 
         else:
+            # Calculate subplot dimensions
             n_mfs = len(mfs_to_plot)
             n_dims = len(dims_to_plot)
-    
+
+            # Create subplots based on the number of mfs and dimensions
             if n_mfs == 1 and n_dims == 1:
-                fig, ax = plt.subplots(figsize=(8, 6))
+                fig, ax = plt.subplots(figsize=(10, 6))
                 axes = np.array([[ax]])
             else:
-                fig, axes = plt.subplots(nrows=n_mfs, ncols=n_dims, figsize=(5*n_dims, 4*n_mfs), squeeze=False)
-    
+                fig, axes = plt.subplots(nrows=n_dims, ncols=n_mfs, figsize=(8*n_mfs, 6*n_dims), squeeze=False)
+
             for i, mf in enumerate(mfs_to_plot):
                 for j, dim in enumerate(dims_to_plot):
                     var = variables[dim]
                     try:
-                        params = [dataframe.loc[mf, (var, param)] for param in self._membership_function._params]
-    
-                        y = self._membership_function._simple_numpy_implementation(x, *params)
-    
-                        ax = axes[i, j]
-                        ax.plot(x, y, label=f'{mf}, {var}')
-                        ax.set_title(f'{mf}, {var}')
-                        ax.grid(True)
-                        if i == n_mfs - 1:
-                            ax.set_xlabel('x')
-                        if j == 0:
-                            ax.set_ylabel('Membership Value')
+                        params = []
+                        for param in self._membership_function._params:
+                            value = dataframe.loc[mf, (var, param)]
+                            if pd.isna(value):
+                                break
+                            params.append(value)
+                        else:
+                            y = self._membership_function._simple_numpy_implementation(x, *params)
+                            ax = axes[j, i] if n_mfs > 1 else axes[i, j]
+                            color = colors[i % len(colors)]
+                            if linestyles != '-' and linestyles != '--' and linestyles != '-.'  and linestyles != ':':
+                                linestyle = linestyles[i % len(linestyles)]
+                            else:
+                                linestyle = linestyles
+                            if isinstance(linewidths, list):
+                                linewidth = linewidths[mf_idx % len(linewidths)]
+                            else:
+                                linewidth = linewidths
+                            ax.plot(x, y, color=color, linestyle=linestyle, linewidth=linewidth, label=f'{mf}, {var}')
+                            ax.set_title(f'{mf}, {var}', fontsize=11, fontweight='bold')
+                            ax.grid(True, alpha=0.3)
+                            ax.set_ylim([0, 1.1])
+                            if (i == n_mfs - 1) or (j == n_dims - 1):
+                                ax.set_xlabel('x', fontsize=10)
+                            if j == 0 or i == 0:
+                                ax.set_ylabel('Membership Value', fontsize=10)
                     except KeyError as e:
                         print(f"Warning: Could not find parameters for membership function '{mf}' and variable '{var}'")
                         continue

@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from neuro_fuzzy_toolbox.func import GeneralizedBell_MF, Linear_CF
+from neuro_fuzzy_toolbox.func import GeneralizedBell_MF
 from neuro_fuzzy_toolbox.layers import (
     FuzzificationLayer,
     h_FuzzificationLayer, 
@@ -119,7 +119,7 @@ class base_ANFIS(nn.Module):
             x (torch.Tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
             
         Returns:
-            np.ndarray: Predicciones del modelo.
+            torch.Tensor: Predicciones del modelo.
         """
         if self._output_type == 'default':
             with torch.no_grad():
@@ -282,7 +282,7 @@ class base_ANFIS(nn.Module):
     
     
     # ----- Plot premises -----
-    def plot_premises(self, mf=None, input_dim=None, group_by_dim=False):
+    def plot_premises(self, mf=None, input_dim=None, group_by_dim=False, linestyles='-', linewidths=2.5):
         """
         Plotea las funciones de membresía de los antecedentes del modelo.
         
@@ -290,8 +290,9 @@ class base_ANFIS(nn.Module):
             mf (int): Índice de la función de membresía a plotear. Si es None, se plotean todas las funciones de membresía.
             input_dim (int): Dimensión de la entrada a plotear. Si es None, se plotean todas las dimensiones.
             group_by_dim (bool): Si es True, agrupa las funciones de membresía en un solo gráfico por cada dimensión de entrada. (Default: False)
+            linestyles (string | list): String o lista de strings que representan los tipos de linea para representar las funciones de membresía. Si se usa una lista, los tipos de linea se irán alternando. Los caracteres permitidos son: ['-', '--', '-.', ':']. (Default: '-')
         """
-        self._fuzzification_layer.plot_premises(mf, input_dim, group_by_dim)
+        self._fuzzification_layer.plot_premises(mf, input_dim, group_by_dim, linestyles, linewidths)
     
 
 
@@ -360,7 +361,6 @@ class h_ANFIS(base_ANFIS):
             input_size=input_size,
             rules=rules,
             outputs=outputs,
-            consequent_function=Linear_CF,
             features=features,
             dtype=dtype
             )
@@ -475,7 +475,6 @@ class ANFIS(base_ANFIS):
             input_size=self._input_size,
             rules=self._rules,
             outputs=outputs,
-            consequent_function=Linear_CF,
             features=features,
             dtype=dtype)
         
@@ -585,8 +584,16 @@ class rule_reduced_ANFIS(base_ANFIS):
     En vez de hacer la combinatoria completa para las multiplicaciones de los valores de pertenencia, el procedimiento se realizaría solo multiplicando entre sí los valores de pertenencia *i* 
     entre los features, dando como resultado una cantidad de reglas igual al número de funciones de membresía (en cada feature). Esto se detalla de mejor manera en :ref:`rule-reduced ANFIS <rule-reduced ANFIS>`.
     
-    Cuenta con un parámetro especial 'default_rule' que permite agregar un nivel de disparo extra para capturar todas las combinaciones que el conjunto de reglas del modelo 
+    Cuenta con un parámetro experimental 'default_rule' que permite agregar un nivel de disparo extra para capturar todas las combinaciones que el conjunto de reglas del modelo 
     en sí no captura (por el hecho de estar reducido).
+    
+    .. note::
+        Cuenta con un parámetro ``default_rule`` que está actualmente marcado como **experimental**. Este permite agregar un nivel de disparo extra para capturar todas las combinaciones que el conjunto de reglas del modelo no captura (por el hecho de estar reducido).
+        Su funcionalidad no está completamente implementada en el toolbox y está sujeto a cambios en futuras versiones.
+    
+    .. warning::
+        El uso de ``default_rule=True`` no está soportado en todas las operaciones
+        del toolbox y puede generar comportamientos inesperados.
     """
     
     def __init__(self, input_size, num_mfs, outputs=1, default_rule=False, membership_function=GeneralizedBell_MF, output_type="default", features=None, dtype=torch.float32):
@@ -599,9 +606,13 @@ class rule_reduced_ANFIS(base_ANFIS):
             outputs (int): Número de salidas del modelo (Default: 1).
             membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
             output_type (str): Tipo de salida del modelo (Default: 'default').
-            default_rule (bool): True si se desea agregar la regla por defecto, False en caso contrario (Default: False).
+            default_rule (bool): **EXPERIMENTAL** - True si se desea agregar la regla por defecto, False en caso contrario (Default: False).
             features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
             dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).
+        
+        .. caution::
+            El parámetro ``default_rule`` está en desarrollo activo. Su comportamiento puede cambiar y algunas funcionalidades pueden no estar disponibles.
+            
         """
         super(rule_reduced_ANFIS, self).__init__()
         self._rule_reduced = True
@@ -639,7 +650,6 @@ class rule_reduced_ANFIS(base_ANFIS):
             input_size=input_size,
             rules=num_mfs,
             outputs=outputs,
-            consequent_function=Linear_CF,
             features=features,
             dtype=dtype
             )

@@ -10,7 +10,7 @@ class ConsequentLayer(nn.Module):
     """
     Clase para representar la capa consecuente de un modelo de Sistema de Inferencia Neuro-Difuso Adaptativo (ANFIS).
     """
-    def __init__(self, input_size, rules, outputs=1, consequent_function=Linear_CF, features=None, dtype=torch.float32):
+    def __init__(self, input_size, rules, outputs=1, features=None, dtype=torch.float32):
         """
         Inicializa una nueva instancia de la clase ConsequentLayer.
         
@@ -18,7 +18,6 @@ class ConsequentLayer(nn.Module):
             input_size (int): Número de features de los datos de entrada (del modelo ANFIS, no de la capa).
             rules (int): Número de reglas del modelo ANFIS, depende del modelo en sí.
             outputs (int): Número de salidas del modelo ANFIS (Default: 1).
-            consequent_function (ConsequentFunction): Función consecuente a utilizar en la capa (Default: Linear_CF).
             features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
             dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).
         """
@@ -29,7 +28,7 @@ class ConsequentLayer(nn.Module):
             self.features = features
             
         # Initialize consequent function
-        self._consequent_function = consequent_function()
+        self._consequent_function = Linear_CF()
             
         self._consequents = Parameter(self._consequent_function.random_consequents(outputs=outputs,
                                                                                        rules=rules, 
@@ -136,7 +135,7 @@ class alt_ConsequentLayer(nn.Module):
     """
     Clase para representar la capa consecuente de un modelo de Sistema de Inferencia Neuro-Difuso Adaptativo (ANFIS). Tiene la particularidad de las reglas se almacenan en una lista de tensores y no en un tensor único.
     """
-    def __init__(self, input_size, rules, outputs=1, consequent_function=Linear_CF, features=None, dtype=torch.float32):
+    def __init__(self, input_size, rules, outputs=1, features=None, dtype=torch.float32):
         """
         Inicializa una nueva instancia de la clase alt_ConsequentLayer.
         
@@ -144,7 +143,6 @@ class alt_ConsequentLayer(nn.Module):
             input_size (int): Número de features de los datos de entrada (del modelo ANFIS, no de la capa).
             rules (int): Número de reglas del modelo ANFIS, depende del modelo en sí.
             outputs (int): Número de salidas del modelo ANFIS (Default: 1).
-            consequent_function (ConsequentFunction): Función consecuente a utilizar en la capa (Default: Linear_CF).
             dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).
         """
         super(alt_ConsequentLayer, self).__init__()
@@ -154,7 +152,7 @@ class alt_ConsequentLayer(nn.Module):
             self.features = features
         
         # Initialize consequent function
-        self._consequent_function = consequent_function()
+        self._consequent_function = Linear_CF()
             
         self._consequents = nn.ParameterList([
             nn.Parameter(consequent, requires_grad=True) for consequent in self._consequent_function.random_consequents(
