@@ -14,7 +14,7 @@ class FuzzificationLayer(nn.Module):
 
     Esta diseñada para un modelo ANFIS general, es decir, para manejar diferentes cantidades de funciones de membresía para cada feature de los datos de entrada.
     """
-    def __init__(self, mf_distribution, membership_function=GeneralizedBell_MF, features=None, dtype=torch.float32):
+    def __init__(self, mf_distribution, membership_function=GeneralizedBell_MF(), features=None, dtype=torch.float32):
         """
         Inicializa una nueva instancia de FuzzificationLayer.
         
@@ -35,7 +35,7 @@ class FuzzificationLayer(nn.Module):
             self.features = features
         
         # Membership function
-        self._membership_function = membership_function()
+        self._membership_function = membership_function
         
         # Premise parameters
         self._max_n_mfs = max(mf_distribution)
@@ -283,7 +283,7 @@ class h_FuzzificationLayer(nn.Module):
     con la misma cantidad de funciones de membresía para cada feature de los datos de entrada, limitando a que cada uno tenga el mismo 
     número de variables lingüisticas.
     """
-    def __init__(self, input_size, num_mfs=1, membership_function=GeneralizedBell_MF, features=None, dtype=torch.float32):
+    def __init__(self, input_size, num_mfs=1, membership_function=GeneralizedBell_MF(), features=None, dtype=torch.float32):
         """
         Inicializa una nueva instancia de h_FuzzificationLayer.
         
@@ -304,7 +304,7 @@ class h_FuzzificationLayer(nn.Module):
             self.features = features
         
         # Membership function
-        self._membership_function = membership_function()
+        self._membership_function = membership_function
 
         # Initialize premise parameters
         self._premises = Parameter(self._membership_function.random_premises(input_size, num_mfs, dtype), requires_grad=True)
@@ -530,7 +530,7 @@ class rule_reduced_FuzzificationLayer(nn.Module):
     con la misma cantidad de funciones de membresía para cada feature de los datos de entrada, limitando a que cada uno tenga el mismo 
     número de variables lingüisticas.
     """
-    def __init__(self, input_size, num_mfs=1, membership_function=GeneralizedBell_MF, features=None, dtype=torch.float32):
+    def __init__(self, input_size, num_mfs=1, membership_function=GeneralizedBell_MF(), features=None, dtype=torch.float32):
         """
         Inicializa una nueva instancia de rule_reduced_FuzzificationLayer.
         
@@ -551,7 +551,7 @@ class rule_reduced_FuzzificationLayer(nn.Module):
             self.features = features
         
         # Membership function
-        self._membership_function = membership_function()
+        self._membership_function = membership_function
 
         # Initialize premise parameters
         self._premises = nn.ParameterList([

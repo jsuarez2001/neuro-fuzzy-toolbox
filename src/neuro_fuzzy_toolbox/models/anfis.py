@@ -305,7 +305,7 @@ class h_ANFIS(base_ANFIS):
     El procedimiento en este caso se realizaría solo multiplicando entre sí los valores de pertenencia *i* de cada feature, dando como resultado una cantidad de reglas igual al número de funciones de membresía de cada feature. (esto se detalla de mejor manera en :ref:`rule-reduced ANFIS <rule-reduced ANFIS>`).
     """
     
-    def __init__(self, input_size, num_mfs, outputs=1, membership_function=GeneralizedBell_MF, output_type="default", rule_reduced=False, features=None, dtype=torch.float32):
+    def __init__(self, input_size, num_mfs, outputs=1, membership_function=GeneralizedBell_MF(), output_type="default", rule_reduced=False, features=None, dtype=torch.float32):
         """
         Inicializa un modelo ANFIS homogéneo.
         
@@ -424,7 +424,7 @@ class ANFIS(base_ANFIS):
     Clase para un sistema de inferencia neuro-difuso adaptativo (ANFIS) con una cantidad de funciones de membresía arbitraria para cada feature de los datos de entrada.
     """
     
-    def __init__(self, mf_distribution, outputs=1, membership_function=GeneralizedBell_MF, output_type="default", features=None, dtype=torch.float32):
+    def __init__(self, mf_distribution, outputs=1, membership_function=GeneralizedBell_MF(), output_type="default", features=None, dtype=torch.float32):
         """
         Inicializa un modelo ANFIS.
         
@@ -596,7 +596,7 @@ class rule_reduced_ANFIS(base_ANFIS):
         del toolbox y puede generar comportamientos inesperados.
     """
     
-    def __init__(self, input_size, num_mfs, outputs=1, default_rule=False, membership_function=GeneralizedBell_MF, output_type="default", features=None, dtype=torch.float32):
+    def __init__(self, input_size, num_mfs, outputs=1, default_rule=False, membership_function=GeneralizedBell_MF(), output_type="default", features=None, dtype=torch.float32):
         """
         Inicializa un modelo ANFIS homogéneo.
         
