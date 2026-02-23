@@ -48,6 +48,21 @@ class ConsequentLayer(nn.Module):
             torch.Tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas del modelo ANFIS.
         """
         return self._consequent_function(x, self._consequents, weights)
+    
+    
+    def get_consequents_outputs(self, x):
+        """
+        Retorna las salidas de las reglas sin ponderación (sin multiplicar por los normalized firing levels)
+        
+        Args:
+            x (torch.Tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.
+            consequents (torch.Tensor): Tensor de tamaño (outputs, rules, input_size + 1) que contiene los parámetros consecuentes de la red ANFIS, donde *rules* es el número de reglas y *outputs* es el número de salidas del modelo.
+        
+        Returns:
+            torch.Tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas individuales de cada regla sin ponderar con los normalized firing levels.
+        
+        """
+        return self._consequent_function.get_consequents_outputs(x, self._consequents)
 
     
     @property
@@ -176,6 +191,21 @@ class alt_ConsequentLayer(nn.Module):
             torch.Tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas del modelo ANFIS.
         """
         return self._consequent_function(x, torch.stack([consequent for consequent in self._consequents], 1), weights)
+    
+    
+    def get_consequents_outputs(self, x):
+        """
+        Retorna las salidas de las reglas sin ponderación (sin multiplicar por los normalized firing levels)
+        
+        Args:
+            x (torch.Tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.
+            consequents (torch.Tensor): Tensor de tamaño (outputs, rules, input_size + 1) que contiene los parámetros consecuentes de la red ANFIS, donde *rules* es el número de reglas y *outputs* es el número de salidas del modelo.
+        
+        Returns:
+            torch.Tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas individuales de cada regla sin ponderar con los normalized firing levels.
+        
+        """
+        return self._consequent_function.get_consequents_outputs(x, torch.stack([consequent for consequent in self._consequents], 1))
     
     
     @property

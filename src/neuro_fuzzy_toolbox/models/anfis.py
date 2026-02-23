@@ -163,21 +163,25 @@ class base_ANFIS(nn.Module):
                 w = self._normalization_layer(w)
         return w
     
-    def get_all_consequents_outputs(self, x):
+    def get_all_consequents_outputs(self, x, weighted=True):
         """
         Retorna las salidas individuales de las reglas del modelo para los datos de entrada dados.
         
         Args:
             x (torch.Tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
+            weighted (bool): True si las salidas de las reglas se retornarán ponderadas por los firing levels, False en caso contrario (Default: True)
         
         Returns:
             torch.Tensor: Salidas individuales de las reglas del modelo. Es de tamaño (outputs, batch_size, num_rules).
         """
-        with torch.no_grad():
-            w = self._fuzzification_layer(x)
-            w = self._firing_levels_layer(w)
-            w_norm = self._normalization_layer(w)
-            outputs = self._consequent_layer(x, w_norm)
+        if weighted:
+            with torch.no_grad():
+                w = self._fuzzification_layer(x)
+                w = self._firing_levels_layer(w)
+                w_norm = self._normalization_layer(w)
+                outputs = self._consequent_layer(x, w_norm)
+        else:
+            outputs = self._consequent_layer.get_consequents_outputs(x)
         return outputs
 
 
@@ -201,6 +205,16 @@ class base_ANFIS(nn.Module):
             int: Cantidad de reglas.
         """
         return self.get_consequents().shape[1]
+    
+    @property
+    def outputs(self):
+        """
+        Retorna el número de outputs del modelo
+
+        Returns:
+            int: Cantidad de outputs
+        """
+        return self.get_consequents().shape[0]
     
     
     # ----- Premises seters and getters -----

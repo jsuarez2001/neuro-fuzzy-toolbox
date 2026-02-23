@@ -55,7 +55,8 @@ class base_model_trainer():
         
         Args:
             model (torch.nn.Module): Modelo a entrenar.
-            loader (DataLoader): DataLoader con los datos de entrenamiento.
+            train_loader (DataLoader): DataLoader con los datos de entrenamiento.
+            val_loader (DataLoader): Dataloader con los datos de validación (Default: None).
             verbose (bool): Indica si se deben imprimir mensajes de aviso (Default: True).
         
         """

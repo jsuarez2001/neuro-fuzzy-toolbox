@@ -12,6 +12,10 @@ class ConsequentFunction(nn.Module):
         pass
     
     @abstractmethod
+    def get_consequents_outputs(self, x, consequents):
+        pass
+    
+    @abstractmethod
     def random_consequents(self, outputs, rules, input_size, dtype):
         pass
 
@@ -46,6 +50,22 @@ class Linear_CF(ConsequentFunction):
         
         """
         return (torch.bmm(x.unsqueeze(0).expand(consequents[:, :, :-1].size(0), -1, -1), torch.transpose(consequents[:, :, :-1], 1, 2)) + consequents[:, :, -1].unsqueeze(1)).mul(weights.unsqueeze(0))
+    
+    def get_consequents_outputs(self, x, consequents):
+        """
+        Retorna las salidas de las reglas sin ponderación (sin multiplicar oor los normalized firing levels)
+        
+        Args:
+            x (torch.Tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.
+            consequents (torch.Tensor): Tensor de tamaño (outputs, rules, input_size + 1) que contiene los parámetros consecuentes de la red ANFIS, donde *rules* es el número de reglas y *outputs* es el número de salidas del modelo.
+        
+        Returns:
+            torch.Tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas individuales de cada regla sin ponderar con los normalized firing levels.
+        
+        """
+        with torch.no_grad():
+            outputs = torch.bmm(x.unsqueeze(0).expand(consequents[:, :, :-1].size(0), -1, -1), torch.transpose(consequents[:, :, :-1], 1, 2)) + consequents[:, :, -1].unsqueeze(1)
+        return outputs
 
     def random_consequents(self, outputs, rules, input_size, dtype):
         """
