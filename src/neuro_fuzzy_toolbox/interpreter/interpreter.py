@@ -53,14 +53,14 @@ class RulesAnalyzer:
     
     def layers_outputs(self, x):
         """
-        Obtiene las salidas relevantes de cada capa del modelo para una muestra dada en un diccionario.
+        Obtiene, para una única muestra, las salidas intermedias relevantes del modelo.  
         
         Note:
             Si el modelo tiene tipo de salida 'default', el diccionario de salida incluye: 'membership values', 'firing levels', 'norm firing levels', 'consequent outputs', 'rules contributions' y 'final output'.  
             Si el modelo tiene tipo de salida 'softmax', se incluye además 'logits' (salida antes de softmax).
         
         Args:
-            x (torch.tensor): Muestra de entrada (1D o 2D).
+            x (torch.tensor): Muestra de entrada. Debe ser un tensor de forma ``(n_features,)`` o ``(1, n_features)``.
         
         Returns:
             dict: Diccionario con salidas relevantes de cada capa.
@@ -93,32 +93,98 @@ class RulesAnalyzer:
         return dict_output
     
     
-    def _logits_margin(self, pred_class_idx, logits):
+    def _classification_rule_scores(self, logits, probs, rules_contributions, class_idx):
         """
-        Calcula el margen de logits para la clase predicha, definido como la diferencia entre el logit de la clase predicha y el logit de la clase con la segunda mayor probabilidad.
-        
+        Calcula medidas post-hoc de relevancia de reglas para una clase específica.
+
         Args:
-            pred_class_idx (int): Índice de la clase predicha.
-            logits (torch.tensor): Tensor con los logits de todas las clases (C,).
-            
+            logits (torch.tensor): Logits del modelo para la muestra analizada. Forma ``(n_classes,)``.
+            probs (torch.tensor): Probabilidades finales del modelo para la muestra analizada. Forma ``(n_classes,)``.
+            rules_contributions (torch.tensor): Contribución de cada regla a cada clase en el espacio de logits. Forma ``(n_classes, n_rules)``.
+            class_idx (int): Índice de la clase objetivo :math:`c`.
+
         Returns:
-            float: Margen de logits para la clase predicha.
-            
+            tuple[torch.Tensor, torch.Tensor, torch.Tensor]: Tupla con tres tensores de forma ``(n_rules,)`` con: ``I_logit_margin_max``, ``I_logit_margin_mean``, ``I_prob``
+
         Note:
-            Un margen de logits más alto indica una mayor confianza en la predicción, ya que la clase predicha tiene un logit significativamente mayor que las demás clases. Este margen puede ser útil para
-            evaluar la confianza de la predicción y para analizar cómo las reglas contribuyen a aumentar o disminuir este margen.
-            
+            Sea :math:`\\Delta z_{r,c}` la contribución de la regla :math:`r` al logit de
+            la clase :math:`c`, y sea :math:`\\Delta \\mathbf{z}_r` el vector completo de
+            contribuciones de esa regla a todas las clases.
+
+            Las medidas calculadas son:
+
+            **1) Margen máximo en logits por clase**
+
+            .. math::
+
+                I^{(c)}_{\\text{logit\\_margin\\_max}}(r)
+                =
+                \\Delta z_{r,c}
+                -
+                \\max_{j \\neq c} \\Delta z_{r,j}
+
+            Esta medida favorece reglas que aumentan el logit de la clase objetivo más
+            que el de cualquier otra clase.
+
+            **2) Margen medio en logits por clase**
+
+            .. math::
+
+                I^{(c)}_{\\text{logit\\_margin\\_mean}}(r)
+                =
+                \\Delta z_{r,c}
+                -
+                \\frac{1}{C-1} \\sum_{j \\neq c} \\Delta z_{r,j}
+
+            Esta variante compara la contribución de la regla a la clase objetivo con el
+            promedio de sus contribuciones al resto de clases.
+
+            **3) Leave-one-rule-out en probabilidad**
+
+            .. math::
+
+                I^{(c)}_{\\text{prob}}(r)
+                =
+                p_c(\\mathbf{z})
+                -
+                p_c(\\mathbf{z} - \\Delta \\mathbf{z}_r)
+
+            donde :math:`p_c(\\mathbf{z})` es la probabilidad softmax de la clase objetivo
+            usando todas las reglas, y :math:`p_c(\\mathbf{z} - \\Delta \\mathbf{z}_r)` es
+            la probabilidad obtenida al remover la contribución de la regla :math:`r`.
+
+            Un valor positivo indica que la regla ayuda a sostener la probabilidad de la
+            clase objetivo; un valor negativo indica que la perjudica.
         """
+        no_pred_classes_contributions = torch.cat([rules_contributions[:class_idx], rules_contributions[class_idx+1:]], dim=0)
+        pred_class_contribution = rules_contributions[class_idx, :]
+        
+        I_logit_margin_max = pred_class_contribution - torch.max(no_pred_classes_contributions, dim=0).values
+        
+        I_logit_margin_mean = pred_class_contribution - torch.mean(no_pred_classes_contributions, dim=0)
+        
+        I_prob = (probs - nn.functional.softmax(logits - rules_contributions.t(), dim=1))[:, class_idx] # leave one rule out -> probs
+        """ this is the same as:
+            I_prob = []
+            for i in range(model4.rules):
+                z_without_r = logits - contribution[:,i]
+                p_without_r = nn.functional.softmax(z_without_r, dim=0)
+                I_prob_r = real_prob[pred_idx] - p_without_r[pred_idx]
+                I_prob.append(I_prob_r)
+            I_prob = torch.tensor(I_prob)
+        """
+
+        return I_logit_margin_max, I_logit_margin_mean, I_prob
     
     
     def top_activated_rules(self, x, top_k=None, output_idx=None, sort_by='firing_levels'):
         """
-        Identifica las k reglas más activas para una muestra de entrada.
+        Identifica y ordena las k reglas más activas para una muestra de entrada.
 
         Args:
-            x (torch.tensor): Tensor con el dato de entrada a analizar.
+            x (torch.tensor): Tensor con el dato de entrada a analizar. Debe tener forma ``(n_features,)`` o ``(1, n_features)``.
             top_k (int, optional): Número de reglas top a retornar. Si no se indica, se incluyen todas las reglas. (Default: None)
-            output_idx (int, optional): Índice de la salida a analizar. Si no se indica, se analiza todas las salidas. (Default: None)
+            output_idx (int, optional): Índice de la salida a analizar. Este argumento solo se usa en problemas de regresión con múltiples salidas, en otros casos se ignora. (Default: None)
             sort_by (str, optional): Criterio de ordenamiento de reglas activas. Puede ser 'firing_levels', 'abs_rules_outputs', 'rules_outputs', 'abs_contribution' o 'contribution'. Si el modelo tiene tipo salida 'softmax', se puede usar adicionalmente 'leave_one_rule_out', 'logit_margin' o 'logit_margin_mean'. (Default: 'firing_levels')
             
         Returns:
@@ -126,8 +192,19 @@ class RulesAnalyzer:
                 - Si el modelo tiene una sola salida o se especifica output_idx: dataframe con las reglas ordenadas por el criterio indicado, con columnas 'rule', 'firing_level', 'rule_output' y 'contribution'.
                 - Si el modelo tiene múltiples salidas y no se especifica output_idx: dict con claves 'output_0', 'output_1', ... para cada salida, y valores que son dataframes con las reglas ordenadas.
             - Si el modelo tiene tipo de salida 'softmax':
-                - Si se especifica output_idx: dataframe con las reglas ordenadas por el criterio indicado, con columnas 'rule', 'firing_level', 'rule_output', 'contribution'.
+                - Si se especifica output_idx: dataframe con las reglas ordenadas por el criterio indicado, con columnas 'rule', 'firing_level', 'rule_output', 'contribution', 'logit_margin', 'logit_margin_mean' y 'I_prob'.
                 - Si output_idx es None: dict con claves 'class_0', 'class_1', ... para cada salida, y valores que son dataframes con las reglas ordenadas. Si el modelo tiene ids de clase personalizados se usan esos ids en lugar de 'class_0', 'class_1', ...
+        
+        Note:
+            Los criterios de ordenamiento disponibles son:
+                - 'firing_levels': Ordena por niveles de disparo normalizados (w).
+                - 'abs_rules_outputs': Ordena por valor absoluto de las salidas individuales de cada regla antes de ponderar por los niveles de disparo (f(x) sin multiplicar por w).
+                - 'rules_outputs': Ordena por valor de las salidas individuales de cada regla antes de ponderar por los niveles de disparo (f(x) sin multiplicar por w).
+                - 'abs_contribution': Ordena por valor absoluto de la contribución de cada regla a la salida final (f(x)*w).
+                - 'contribution': Ordena por valor de la contribución de cada regla a la salida final (f(x)*w).
+                - 'leave_one_rule_out' (solo para tipo salida 'softmax'): Ordena por el impacto en la probabilidad de la clase analizada al dejar una regla fuera, calculado la diferencia entre las probabilidades de la clase con todas la reglas y al dejar la regla afuera.
+                - 'logit_margin' (solo para tipo salida 'softmax'): Ordena por el impacto en el margen de logits. Se calcula la diferencia entre la contribución de la regla al logit de la clase analizada y la contribucion de la regla a la clase con mayor probabilidad sin considerar la clase analizada.
+                - 'logit_margin_mean' (solo para tipo salida 'softmax'): Ordena por el impacto en el margen de logits usando la media. Se calcula la diferencia entre la contribución de la regla al logit de la clase analizada y el promedio de contribuciones de la regla a las demás clases.
         """
         x = self._standardize_input(x)
         
@@ -142,29 +219,6 @@ class RulesAnalyzer:
         # each rule output per model output/class: (O, R)
         rules_contributions = all_layers_outputs['rules contribution'].squeeze(1)
         
-        if self.is_classification:
-            logits = all_layers_outputs['logits'].squeeze(0)  # (C,)
-            pred_probs = all_layers_outputs['final output'].squeeze(0)  # (C,)
-            pred_idx = torch.argmax(all_layers_outputs['final output']).item()
-            
-            no_pred_classes_contributions = torch.cat([rules_contributions[:pred_idx], rules_contributions[pred_idx+1:]], dim=0)
-            pred_class_contribution = rules_contributions[pred_idx, :]
-            
-            I_logit_margin_max = pred_class_contribution - torch.max(no_pred_classes_contributions, dim=0).values
-            
-            I_logit_margin_mean = pred_class_contribution - torch.mean(no_pred_classes_contributions, dim=0)
-            
-            I_prob = (pred_probs - nn.functional.softmax(logits - rules_contributions.t(), dim=1))[:, pred_idx] # leave one rule out -> probs
-            """ this is the same as:
-            I_prob = []
-            for i in range(model4.rules):
-                z_without_r = logits - contribution[:,i]
-                p_without_r = nn.functional.softmax(z_without_r, dim=0)
-                I_prob_r = real_prob[pred_idx] - p_without_r[pred_idx]
-                I_prob.append(I_prob_r)
-            I_prob = torch.tensor(I_prob)
-            """
-        
         # decide outputs/classes to analyze
         if output_idx is not None:
             outputs_to_analyze = [output_idx]
@@ -175,40 +229,51 @@ class RulesAnalyzer:
         
         results_dict = {}
         
-        for out_idx in outputs_to_analyze:
-            # sorting
-            if sort_by == "firing_levels":
-                sorted_indices = torch.argsort(w, descending=True)
-            elif sort_by == "abs_rules_outputs":
-                sorted_indices = torch.argsort(torch.abs(consequent_outputs[out_idx, :]), descending=True)
-            elif sort_by == "rules_outputs":
-                sorted_indices = torch.argsort(consequent_outputs[out_idx, :], descending=True)
-            elif sort_by == "abs_contribution":
-                sorted_indices = torch.argsort(torch.abs(rules_contributions[out_idx, :]), descending=True)
-            elif sort_by == "contribution":
-                sorted_indices = torch.argsort(rules_contributions[out_idx, :], descending=True)
-            else:
-                if self.is_classification:
-                    if sort_by == "leave_one_rule_out":
-                        sorted_indices = torch.argsort(I_prob, descending=True)
-                    elif sort_by == "logit_margin":
-                        sorted_indices = torch.argsort(I_logit_margin_max, descending=True)
-                    elif sort_by == "logit_margin_mean":
-                        sorted_indices = torch.argsort(I_logit_margin_mean, descending=True)
-                    else:
-                        raise ValueError(f"Modo sort_by='{sort_by}' no disponible. Use 'firing_levels', 'abs_rules_outputs', 'rules_outputs', 'abs_contribution', 'contribution', 'leave_one_rule_out', 'logit_margin' o 'logit_margin_mean'.")
-                else:
-                    raise ValueError(f"Modo sort_by='{sort_by}' no disponible. Use 'firing_levels', 'abs_rules_outputs', 'rules_outputs', 'abs_contribution' o 'contribution'.")
-
-            if top_k == None:
-                top_k_indices = sorted_indices[:self.model.rules]
-            else:
-                top_k_indices = sorted_indices[:top_k]
+        ##################################################################
+        ######################### CLASSIFICATION #########################
+        ##################################################################
+        
+        if self.is_classification:
+            logits = all_layers_outputs['logits'].squeeze(0)  # (C,)
+            pred_probs = all_layers_outputs['final output'].squeeze(0)  # (C,)
             
-            rows = []
-            for idx in top_k_indices:
-                rid = idx.item()
-                if self.is_classification:
+            for out_idx in outputs_to_analyze:
+                I_logit_margin_max, I_logit_margin_mean, I_prob = self._classification_rule_scores(
+                    logits=logits,
+                    probs=pred_probs,
+                    rules_contributions=rules_contributions,
+                    class_idx=out_idx
+                )
+            
+                if sort_by == "firing_levels":
+                    sorted_indices = torch.argsort(w, descending=True)
+                elif sort_by == "abs_rules_outputs":
+                    sorted_indices = torch.argsort(torch.abs(consequent_outputs[out_idx, :]), descending=True)
+                elif sort_by == "rules_outputs":
+                    sorted_indices = torch.argsort(consequent_outputs[out_idx, :], descending=True)
+                elif sort_by == "abs_contribution":
+                    sorted_indices = torch.argsort(torch.abs(rules_contributions[out_idx, :]), descending=True)
+                elif sort_by == "contribution":
+                    sorted_indices = torch.argsort(rules_contributions[out_idx, :], descending=True)
+                elif sort_by == "leave_one_rule_out":
+                    sorted_indices = torch.argsort(I_prob, descending=True)
+                elif sort_by == "logit_margin":
+                    sorted_indices = torch.argsort(I_logit_margin_max, descending=True)
+                elif sort_by == "logit_margin_mean":
+                    sorted_indices = torch.argsort(I_logit_margin_mean, descending=True)
+                else:
+                    raise ValueError(
+                        f"Modo sort_by='{sort_by}' no disponible. Use 'firing_levels', 'abs_rules_outputs', 'rules_outputs', 'abs_contribution', 'contribution', 'leave_one_rule_out', 'logit_margin' o 'logit_margin_mean'."
+                    )
+                
+                if top_k == None:
+                    top_k_indices = sorted_indices[:self.model.rules]
+                else:
+                    top_k_indices = sorted_indices[:top_k]
+                
+                rows = []
+                for idx in top_k_indices:
+                    rid = idx.item()
                     rows.append({
                         "rule_id": rid + 1,
                         "firing_level": w[idx].item(),
@@ -218,29 +283,54 @@ class RulesAnalyzer:
                         "I_logit_margin_mean": I_logit_margin_mean[idx].item(),
                         "I_prob": I_prob[idx].item(),
                     })
+            
+                if self.model._custom_classes:
+                    results_dict[f"class_{self.model._classes[out_idx].item()}"] = pd.DataFrame(rows)
                 else:
+                    results_dict[f"class_{out_idx}"] = pd.DataFrame(rows)
+                
+            return results_dict[f"class_{self.model._classes[outputs_to_analyze[0]].item()}"] if len(outputs_to_analyze) == 1 else results_dict 
+        
+        ##################################################################
+        ########################### REGRESSION ###########################
+        ##################################################################
+        
+        else:
+        
+            for out_idx in outputs_to_analyze:
+                # sorting
+                if sort_by == "firing_levels":
+                    sorted_indices = torch.argsort(w, descending=True)
+                elif sort_by == "abs_rules_outputs":
+                    sorted_indices = torch.argsort(torch.abs(consequent_outputs[out_idx, :]), descending=True)
+                elif sort_by == "rules_outputs":
+                    sorted_indices = torch.argsort(consequent_outputs[out_idx, :], descending=True)
+                elif sort_by == "abs_contribution":
+                    sorted_indices = torch.argsort(torch.abs(rules_contributions[out_idx, :]), descending=True)
+                elif sort_by == "contribution":
+                    sorted_indices = torch.argsort(rules_contributions[out_idx, :], descending=True)
+                else:
+                    raise ValueError(
+                        f"Modo sort_by='{sort_by}' no disponible. Use 'firing_levels', 'abs_rules_outputs', 'rules_outputs', 'abs_contribution' o 'contribution'."
+                    )
+
+                if top_k == None:
+                    top_k_indices = sorted_indices[:self.model.rules]
+                else:
+                    top_k_indices = sorted_indices[:top_k]
+
+                rows = []
+                for idx in top_k_indices:
+                    rid = idx.item()
                     rows.append({
                         "rule_id": rid + 1,
                         "firing_level": w[idx].item(),
                         "rule_output": consequent_outputs[out_idx, idx].item(),
                         "contribution": rules_contributions[out_idx, idx].item(),
                     })
-                
-            # SOFTMAX OUTPUT TYPE
-            if self.is_classification:
-                
-                if self.model._custom_classes:
-                    results_dict[f"class_{self.model._classes[out_idx].item()}"] = pd.DataFrame(rows)
-                else:
-                    results_dict[f"class_{out_idx}"] = pd.DataFrame(rows)
-                    
-            # DEFAULT OUTPUT TYPE
-            else:
+
                 results_dict[f"output_{out_idx}"] = pd.DataFrame(rows)
-                
-        if self.is_classification:
-            return results_dict[f"class_{self.model._classes[outputs_to_analyze[0]].item()}"] if len(outputs_to_analyze) == 1 else results_dict
-        else:
+
             return results_dict[f"output_{outputs_to_analyze[0]}"] if len(outputs_to_analyze) == 1 else results_dict
     
     
@@ -259,7 +349,20 @@ class RulesAnalyzer:
             str: Explicación textual de la predicción basada en las reglas más activas y sus contribuciones.
             
         Note:
-            output_idx solo se utiliza para modelos de regresión con múltiples salidas, y se incluye en la descripción para indicar a qué salida corresponde la explicación. En modelos de clasificación o regresión con una sola salida, output_idx se ignora.
+            Con respecto al argumento output_idx:
+                - En modelos de regresión (salida default) solo se utiliza cuando es de múltiples salidas, y se incluye en la descripción para indicar a qué salida corresponde la explicación. En modelos de regresión con una sola salida, output_idx se ignora.
+                - En modelos de clasificación (salida softmax) se ignora, ya que la explicación se enfoca en la clase predicha.  
+            
+            Con respecto al argumento sort_by, los criterios de ordenamiento disponibles son:
+                - 'firing_levels': Ordena por niveles de disparo normalizados (w).
+                - 'abs_rules_outputs': Ordena por valor absoluto de las salidas individuales de cada regla antes de ponderar por los niveles de disparo (f(x) sin multiplicar por w).
+                - 'rules_outputs': Ordena por valor de las salidas individuales de cada regla antes de ponderar por los niveles de disparo (f(x) sin multiplicar por w).
+                - 'abs_contribution': Ordena por valor absoluto de la contribución de cada regla a la salida final (f(x)*w).
+                - 'contribution': Ordena por valor de la contribución de cada regla a la salida final (f(x)*w).
+                - 'leave_one_rule_out' (solo para tipo salida 'softmax'): Ordena por el impacto en la probabilidad de la clase analizada al dejar una regla fuera, calculado la diferencia entre las probabilidades de la clase con todas la reglas y al dejar la regla afuera.
+                - 'logit_margin' (solo para tipo salida 'softmax'): Ordena por el impacto en el margen de logits. Se calcula la diferencia entre la contribución de la regla al logit de la clase analizada y la contribucion de la regla a la clase con mayor probabilidad sin considerar la clase analizada.
+                - 'logit_margin_mean' (solo para tipo salida 'softmax'): Ordena por el impacto en el margen de logits usando la media. Se calcula la diferencia entre la contribución de la regla al logit de la clase analizada y el promedio de contribuciones de la regla a las demás clases.
+        
         """
         x = self._standardize_input(x)
         
@@ -285,7 +388,7 @@ class RulesAnalyzer:
                 explanation += "\n"
                 
                 output_idx = pred_idx
-                explanation += f"Explicando clase predicha: {pred}\n\n"
+                explanation += f"Explicando clase predicha: {pred.item()}\n\n"
                 
                 top_rules = self.top_activated_rules(x, top_k, None, sort_by=sort_by)
                 
