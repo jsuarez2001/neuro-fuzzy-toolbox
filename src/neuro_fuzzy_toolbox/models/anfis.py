@@ -179,7 +179,7 @@ class base_ANFIS(nn.Module):
         """
         outputs = self._outputs
         if len(new_classes_ids) != outputs:
-            raise ValueError(f"Lista entregada de largo {len(new_classes_ids)} no concuerda con la cantidad de clases: {model._outputs}")
+            raise ValueError(f"Lista entregada de largo {len(new_classes_ids)} no concuerda con la cantidad de clases: {self._outputs}")
         
         self._classes = torch.tensor(new_classes_ids, dtype=torch.long).sort().values
         
