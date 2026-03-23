@@ -39,7 +39,7 @@ class base_ANFIS(nn.Module):
         Realiza un paso hacia adelante a través del modelo.
         
         Args:
-            x (torch.Tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
+            x (torch.tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
             return_probs (bool): Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es 'softmax', en caso contrario, se ignora (Default: False).
         
         """
@@ -55,7 +55,7 @@ class base_ANFIS(nn.Module):
         Inicializa los parámetros de las funciones de membresía de la capa de fuzzificación del modelo a partir de los datos ingresados.
         
         Args:
-            x (torch.Tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
+            x (torch.tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
         """
         self._dtype = x.dtype
         self._consequent_layer._to_dtype(x.dtype) # Set dtype to consequents
@@ -70,10 +70,14 @@ class base_ANFIS(nn.Module):
             Específicamente, el método utilizado se indica con el parámetro "driver". Para más información, ver: https://pytorch.org/docs/stable/generated/torch.linalg.lstsq.html.
         
         Args:
-            x (torch.Tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
-            y (torch.Tensor): Tensor con los datos de salida. Es de tamaño (batch_size, outputs).
+            x (torch.tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
+            y (torch.tensor): Tensor con los datos de salida. Es de tamaño (batch_size, outputs).
             driver (string): Chooses the backend function that will be used, vaild values are: 'gels', 'gelsy', 'gelsd', 'gelss'. If None, then uses 'gels' (Default: None)
             ridge_lambda (float): Lambda usado para utilizar "Regularización Ridge" en la estimación de consecuentes con mínimos cuadrados. Si es 0, no se realiza regularización (Default: 0.).
+        
+        Important:
+            Si el modelo tiene *output_type='softmax'*, se espera que las etiquetas de las clases en *y* sean enteros que representen las clases a predecir, y se realizará una codificación one-hot de estas etiquetas interna para la estimación de mínimos cuadrados.
+            Si estas etiquetas no son [0, 1, 2...], el modelo se ajustará automáticamente a las etiquetas presentes en *y* y se establecerán como las clases que el modelo intentará predecir. Esto es útil para casos en los que las clases a predecir no son representables como enteros consecutivos, pero se debe tener cuidado de que estas etiquetas sean consistentes a lo largo del entrenamiento y uso del modelo.
         """
         w_norm = self.get_firing_levels(x, normalized=True)
         xe = torch.cat([x, torch.ones(x.shape[0], 1, dtype=self._dtype)], dim=1)
@@ -83,8 +87,10 @@ class base_ANFIS(nn.Module):
         '''preliminary fix for the dtype issue'''
         if self._output_type == 'softmax':
             if not torch.equal(torch.unique(y), torch.arange(self._outputs)):
-                self.classes = torch.unique(y)
                 y = torch.searchsorted(torch.unique(y), y)
+                if not self._custom_classes:
+                    self.set_custom_classes_ids(torch.unique(y))
+                    print(f"Custom classes set to: {self._classes}")
             y = torch.nn.functional.one_hot(y, self._outputs)
         if y.dtype != X.dtype:
             y = y.to(X.dtype)
@@ -116,10 +122,10 @@ class base_ANFIS(nn.Module):
         Realiza una predicción con el modelo. Ajusta la salida a la forma esperada según el tipo de salida del modelo.
         
         Args:
-            x (torch.Tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
+            x (torch.tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
             
         Returns:
-            torch.Tensor: Predicciones del modelo.
+            torch.tensor: Predicciones del modelo.
         """
         if self._output_type == 'default':
             with torch.no_grad():
@@ -135,6 +141,9 @@ class base_ANFIS(nn.Module):
                 output = self.forward(x, return_probs=True)
             output = torch.argmax(output, dim=1).detach()
             
+            if self._custom_classes:
+                output = self._classes[output]
+            
             """
             if not torch.equal(self.classes, torch.arange(self._outputs)):
                 output = self.classes[output].numpy()
@@ -144,6 +153,42 @@ class base_ANFIS(nn.Module):
             
         return output
     
+    @property
+    def classes(self):
+        """
+        Retorna las clases que el modelo intenta predecir.
+        
+        Returns:
+            torch.tensor: Tensor con las ids de las clases que el modelo intenta predecir.
+        """
+        return self._classes
+    
+    def set_custom_classes_ids(self, new_classes_ids):
+        """
+        Cambia las ids de las clases que el modelo intenta predecir.
+        
+        Important:
+            Solo es utilizable si el modelo tiene *output_type='softmax'*
+        
+        Note:
+            Considerando que el problema es de *C* clases, las que intenta predecir el modelo son, por defecto, de la forma [0, 1, ..., C].
+            Esta función permite establecer ids de clases personalizados, pero las dejará siempre en orden ascendente.
+            
+        Args:
+            new_classes_ids (list): Lista con las ids de las nuevas clases
+        """
+        outputs = self._outputs
+        if len(new_classes_ids) != outputs:
+            raise ValueError(f"Lista entregada de largo {len(new_classes_ids)} no concuerda con la cantidad de clases: {model._outputs}")
+        
+        self._classes = torch.tensor(new_classes_ids, dtype=torch.long).sort().values
+        
+        if torch.equal(self._classes, torch.arange(outputs)):
+            self._custom_classes = False
+        else:
+            self._custom_classes = True
+        print(f"New classes: {self._classes}")
+        
     
     # ---- Intermediate values ----
     def get_firing_levels(self, x, normalized=False):
@@ -151,10 +196,10 @@ class base_ANFIS(nn.Module):
         Retorna los niveles de disparo del modelo para los datos de entrada dados.
         
         Args:
-            x (torch.Tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
+            x (torch.tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
 
         Returns:
-            torch.Tensor: Niveles de disparo del modelo. Es de tamaño (batch_size, num_rules).
+            torch.tensor: Niveles de disparo del modelo. Es de tamaño (batch_size, num_rules).
         """
         with torch.no_grad():
             w = self._fuzzification_layer(x)
@@ -168,11 +213,11 @@ class base_ANFIS(nn.Module):
         Retorna las salidas individuales de las reglas del modelo para los datos de entrada dados.
         
         Args:
-            x (torch.Tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
+            x (torch.tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
             weighted (bool): True si las salidas de las reglas se retornarán ponderadas por los firing levels, False en caso contrario (Default: True)
         
         Returns:
-            torch.Tensor: Salidas individuales de las reglas del modelo. Es de tamaño (outputs, batch_size, num_rules).
+            torch.tensor: Salidas individuales de las reglas del modelo. Es de tamaño (outputs, batch_size, num_rules).
         """
         if weighted:
             with torch.no_grad():
@@ -355,7 +400,8 @@ class h_ANFIS(base_ANFIS):
         # Output info
         self._output_type = output_type
         self._outputs = outputs
-        self.classes = torch.arange(outputs)
+        self._classes = torch.arange(outputs)
+        self._custom_classes = False
         
         
         # Layers
@@ -469,7 +515,8 @@ class ANFIS(base_ANFIS):
         # Output info
         self._output_type = output_type
         self._outputs = outputs
-        self.classes = torch.arange(outputs)
+        self._classes = torch.arange(outputs)
+        self._custom_classes = False
         
         
         # Layers
@@ -620,6 +667,7 @@ class rule_reduced_ANFIS(base_ANFIS):
             outputs (int): Número de salidas del modelo (Default: 1).
             membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
             output_type (str): Tipo de salida del modelo (Default: 'default').
+            classes (list): Lista que define las clases a predecir por el modelo. Si es None, se usan [0, 1, 2, ...]. Utilizable solo si *output_type* es 'softmax'. (Default: None).
             default_rule (bool): **EXPERIMENTAL** - True si se desea agregar la regla por defecto, False en caso contrario (Default: False).
             features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
             dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).
@@ -644,7 +692,8 @@ class rule_reduced_ANFIS(base_ANFIS):
         # Output info
         self._output_type = output_type
         self._outputs = outputs
-        self.classes = torch.arange(outputs)
+        self._classes = torch.arange(outputs)
+        self._custom_classes = False
         
         
         # Layers

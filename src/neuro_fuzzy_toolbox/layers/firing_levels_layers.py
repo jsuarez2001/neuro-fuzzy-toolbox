@@ -24,10 +24,10 @@ class FiringLevelsLayer(nn.Module):
         Realiza un paso hacia adelante a través de la capa para calcular los niveles de disparo.
         
         Args:
-            membership_values (torch.Tensor): Tensor de entrada que contiene los valores de pertenencia para cada regla. Debe tener tamaño (batch_size, input_size, max_num_mfs), donde max_n_mfs es el número máximo de funciones de membresía entre todos los features.
+            membership_values (torch.tensor): Tensor de entrada que contiene los valores de pertenencia para cada regla. Debe tener tamaño (batch_size, input_size, max_num_mfs), donde max_n_mfs es el número máximo de funciones de membresía entre todos los features.
             
         Returns:
-            torch.Tensor: Tensor de tamaño (batch_size, num_mfs1 * num_mfs2 * ... * num_mfsn) que contiene los niveles de disparo.
+            torch.tensor: Tensor de tamaño (batch_size, num_mfs1 * num_mfs2 * ... * num_mfsn) que contiene los niveles de disparo.
         """
         return torch.cat([torch.cartesian_prod(*[dim_mvs[dim_mask] for dim_mvs, dim_mask in zip(mvs, self._firing_level_mask)]).prod(dim=-1) for mvs in membership_values]).reshape(-1, self._rules)
 
@@ -59,10 +59,10 @@ class h_FiringLevelsLayer(nn.Module):
         Realiza un paso hacia adelante a través de la capa para calcular los niveles de disparo.
         
         Args:
-            membership_values (torch.Tensor): Tensor de entrada que contiene los valores de pertenencia para cada regla. Debe tener tamaño (batch_size, input_size, num_mfs), donde num_mfs es el número de funciones de membresía para cada feature.
+            membership_values (torch.tensor): Tensor de entrada que contiene los valores de pertenencia para cada regla. Debe tener tamaño (batch_size, input_size, num_mfs), donde num_mfs es el número de funciones de membresía para cada feature.
             
         Returns:
-            torch.Tensor: Tensor de tamaño (batch_size, num_mfs^input_size) que contiene los niveles de disparo. Si es 'rule_reduced' es True, el tamaño será (batch_size, num_mfs).
+            torch.tensor: Tensor de tamaño (batch_size, num_mfs^input_size) que contiene los niveles de disparo. Si es 'rule_reduced' es True, el tamaño será (batch_size, num_mfs).
             
         """
         return self._get_firing_levels(membership_values)
@@ -98,10 +98,10 @@ class rule_reduced_FiringLevelsLayer(nn.Module):
         Realiza un paso hacia adelante a través de la capa para calcular los niveles de disparo.
         
         Args:
-            membership_values (torch.Tensor): Tensor de entrada que contiene los valores de pertenencia para cada regla. Debe tener tamaño (batch_size, input_size, num_mfs), donde num_mfs es el número de funciones de membresía para cada feature.
+            membership_values (torch.tensor): Tensor de entrada que contiene los valores de pertenencia para cada regla. Debe tener tamaño (batch_size, input_size, num_mfs), donde num_mfs es el número de funciones de membresía para cada feature.
             
         Returns:
-            torch.Tensor: Tensor de tamaño (batch_size, num_mfs^input_size) que contiene los niveles de disparo. Si es 'rule_reduced' es True, el tamaño será (batch_size, num_mfs).
+            torch.tensor: Tensor de tamaño (batch_size, num_mfs^input_size) que contiene los niveles de disparo. Si es 'rule_reduced' es True, el tamaño será (batch_size, num_mfs).
             
         """
         firing_levels = membership_values.prod(dim=membership_values.dim()-2)
@@ -134,10 +134,10 @@ class NormalizationLayer(nn.Module):
         Realiza un paso hacia adelante a través de la capa para normalizar los niveles de disparo.
         
         Args:
-            w (torch.Tensor): Tensor de entrada que contiene los niveles de disparo. Debe tener tamaño (batch_size, num_rules). donde num_rules es el número de reglas generadas en el modelo ANFIS, el cual dependerá del modelo específico.
+            w (torch.tensor): Tensor de entrada que contiene los niveles de disparo. Debe tener tamaño (batch_size, num_rules). donde num_rules es el número de reglas generadas en el modelo ANFIS, el cual dependerá del modelo específico.
             
         Returns:
-            torch.Tensor: Tensor de tamaño (batch_size, num_rules) que contiene los niveles de disparo normalizados.
+            torch.tensor: Tensor de tamaño (batch_size, num_rules) que contiene los niveles de disparo normalizados.
         """
         total = torch.sum(w, dim=-1, keepdim=True)
         total[total == 0] += 1
@@ -149,11 +149,11 @@ class NormalizationLayer(nn.Module):
         Realiza un paso hacia adelante a través de la capa para normalizar los niveles de disparo.
         
         Args:
-            firing_levels (torch.Tensor): Tensor de entrada que contiene los niveles de disparo. Debe tener tamaño (batch_size, num_rules). donde num_rules es el número de reglas generadas en el modelo ANFIS, el cual dependerá del modelo específico.
+            firing_levels (torch.tensor): Tensor de entrada que contiene los niveles de disparo. Debe tener tamaño (batch_size, num_rules). donde num_rules es el número de reglas generadas en el modelo ANFIS, el cual dependerá del modelo específico.
             
         Returns:
             tuple: Tupla con los niveles de disparo de la regla por defecto en tensores de un elemento. Contiene:
-                - default_w (torch.Tensor): Nivel de disparo de la regla por defecto.
-                - default_w_norm (torch.Tensor): Nivel de disparo de la regla por defecto normalizado.
+                - default_w (torch.tensor): Nivel de disparo de la regla por defecto.
+                - default_w_norm (torch.tensor): Nivel de disparo de la regla por defecto normalizado.
         """
         firing_levels = self._get_firing_levels(firing_levels)

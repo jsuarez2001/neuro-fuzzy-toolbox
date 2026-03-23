@@ -382,13 +382,13 @@ class SONFIS(base_model_trainer):
 
         Args:
             ANFISmodel (rule_reduced_ANFIS): Instancia del modelo ANFIS reducido en reglas.
-            samples (torch.Tensor): Datos de entrada que se consideran para la creación de las nuevas reglas (o subredes)
-            targets (torch.Tensor): Targets asociados a los samples considerados para la creación de las nuevas reglas (o suredes).
+            samples (torch.tensor): Datos de entrada que se consideran para la creación de las nuevas reglas (o subredes)
+            targets (torch.tensor): Targets asociados a los samples considerados para la creación de las nuevas reglas (o suredes).
             rules_mask (list): Lista de largo "n_new_rules" que contiene máscaras, las cuales indican a qué reglas se asocian cada uno de los elementos de los tensores "samples" y "targets".
             n_new_rules (int): Cantidad de nuevas reglas (o subredes) que se generaron en el método GrowNet.
 
         Returns:
-            torch.Tensor: Parámetros consecuentes estimados con mínimos cuadrados de las reglas agregadas en la operación GrowNet
+            torch.tensor: Parámetros consecuentes estimados con mínimos cuadrados de las reglas agregadas en la operación GrowNet
         """
         new_consequents = torch.tensor([])
         
@@ -477,7 +477,10 @@ class SONFIS(base_model_trainer):
             targets_list = [targets[rule] for rule in rules]
                 
             # compute loss 
-            loss_values = torch.stack([self.loss_function(model_outputs_list[i], targets_list[i]) for i in range(len(rules))]) # for each of the considered subnets with ONLY its associated samples
+            if ANFISmodel._output_type == "softmax" and ANFISmodel._custom_classes: # if classes are not [0, 1, 2, ...] 
+                loss_values = torch.stack([self.loss_function(model_outputs_list[i], torch.searchsorted(ANFISmodel.classes, targets_list[i]).long()) for i in range(len(rules))]) # for each of the considered subnets with ONLY its associated samples
+            else:
+                loss_values = torch.stack([self.loss_function(model_outputs_list[i], targets_list[i]) for i in range(len(rules))]) # for each of the considered subnets with ONLY its associated samples
             
             eSplit_mask = loss_values > self.eSplit
             

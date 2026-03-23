@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 
 def classical_consequents_estimation_with_OLS(ANFISmodel, loader, driver, ridge_lambda):
     """
@@ -58,22 +59,25 @@ def optimizer_training_epoch(model, loader, optimizer, loss_function):
     Actualiza los parámetros de un modelo utilizando un optimizador (ya instanciado) y una función de pérdida dados como parámetros. Los parámetros a actualizar son indicados por el optimizador (ya instanciado).
     
     Args:
-        model (nn.Module): Modelo a entrenar.
+        model (ANFIS | h_ANFIS | rule_reduced_ANFIS): Modelo ANFIS a entrenar.
         loader (DataLoader): DataLoader con los datos de entrenamiento.
         optimizer (torch.optim.Optimizer): Optimizador instanciado a utilizar.
-        loss_function (callable): Función de pérdida a utilizar.
+        loss_function (torch.nn.Module): Función de pérdida a utilizar.
     
     """
     for batch_x, batch_y in loader:
         batch_y_copy = batch_y.clone().detach()
         
         '''preliminary fix for the dtype issue'''
-        if loss_function != torch.nn.functional.cross_entropy: #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
+        if not isinstance(loss_function, nn.CrossEntropyLoss): #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
             if loader.dataset.tensors[0].dtype != loader.dataset.tensors[1].dtype:
                 batch_y_copy = batch_y_copy.to(batch_x.dtype)
-        else: 
-            batch_y_copy = batch_y_copy.to(torch.int64)
+        else:
+            batch_y_copy = batch_y_copy.long()
         '''preliminary fix for the dtype issue'''
+        
+        if isinstance(loss_function, nn.CrossEntropyLoss) and model._custom_classes:
+            batch_y_copy = torch.searchsorted(model.classes, batch_y_copy).long()
         
         optimizer.zero_grad()
         pred = model(batch_x)

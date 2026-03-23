@@ -41,11 +41,11 @@ class ConsequentLayer(nn.Module):
         Realiza un paso hacia adelante para calcular la salida de la capa consecuente.
         
         Args:
-            x (torch.Tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.
-            weights (torch.Tensor): Tensor de tamaño (batch_size, rules) que contiene los pesos de las reglas.
+            x (torch.tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.
+            weights (torch.tensor): Tensor de tamaño (batch_size, rules) que contiene los pesos de las reglas.
             
         Returns:
-            torch.Tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas del modelo ANFIS.
+            torch.tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas del modelo ANFIS.
         """
         return self._consequent_function(x, self._consequents, weights)
     
@@ -55,11 +55,11 @@ class ConsequentLayer(nn.Module):
         Retorna las salidas de las reglas sin ponderación (sin multiplicar por los normalized firing levels)
         
         Args:
-            x (torch.Tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.
-            consequents (torch.Tensor): Tensor de tamaño (outputs, rules, input_size + 1) que contiene los parámetros consecuentes de la red ANFIS, donde *rules* es el número de reglas y *outputs* es el número de salidas del modelo.
+            x (torch.tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.
+            consequents (torch.tensor): Tensor de tamaño (outputs, rules, input_size + 1) que contiene los parámetros consecuentes de la red ANFIS, donde *rules* es el número de reglas y *outputs* es el número de salidas del modelo.
         
         Returns:
-            torch.Tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas individuales de cada regla sin ponderar con los normalized firing levels.
+            torch.tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas individuales de cada regla sin ponderar con los normalized firing levels.
         
         """
         return self._consequent_function.get_consequents_outputs(x, self._consequents)
@@ -184,11 +184,11 @@ class alt_ConsequentLayer(nn.Module):
         Realiza un paso hacia adelante para calcular la salida de la capa consecuente.
         
         Args:
-            x (torch.Tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.
-            weights (torch.Tensor): Tensor de tamaño (batch_size, rules) que contiene los pesos de las reglas.
+            x (torch.tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.
+            weights (torch.tensor): Tensor de tamaño (batch_size, rules) que contiene los pesos de las reglas.
             
         Returns:
-            torch.Tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas del modelo ANFIS.
+            torch.tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas del modelo ANFIS.
         """
         return self._consequent_function(x, torch.stack([consequent for consequent in self._consequents], 1), weights)
     
@@ -198,11 +198,11 @@ class alt_ConsequentLayer(nn.Module):
         Retorna las salidas de las reglas sin ponderación (sin multiplicar por los normalized firing levels)
         
         Args:
-            x (torch.Tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.
-            consequents (torch.Tensor): Tensor de tamaño (outputs, rules, input_size + 1) que contiene los parámetros consecuentes de la red ANFIS, donde *rules* es el número de reglas y *outputs* es el número de salidas del modelo.
+            x (torch.tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.
+            consequents (torch.tensor): Tensor de tamaño (outputs, rules, input_size + 1) que contiene los parámetros consecuentes de la red ANFIS, donde *rules* es el número de reglas y *outputs* es el número de salidas del modelo.
         
         Returns:
-            torch.Tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas individuales de cada regla sin ponderar con los normalized firing levels.
+            torch.tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas individuales de cada regla sin ponderar con los normalized firing levels.
         
         """
         return self._consequent_function.get_consequents_outputs(x, torch.stack([consequent for consequent in self._consequents], 1))

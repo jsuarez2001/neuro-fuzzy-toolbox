@@ -38,7 +38,7 @@ class OutputLayer(nn.Module):
         Realiza un paso hacia adelante para calcular la salida de la capa de salida.
         
         Args:
-            rules_outputs (torch.Tensor): Tensor de tamaño (batch_size, rules) que contiene las salidas de cada regla.
+            rules_outputs (torch.tensor): Tensor de tamaño (batch_size, rules) que contiene las salidas de cada regla.
             return_probs (bool): Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es 'softmax', en caso contrario, se ignora (Default: False).
         """
         return self._last_layer(self._get_output(rules_outputs, return_probs))

@@ -25,6 +25,33 @@ class MembershipFunction(nn.Module):
             *args: Parámetros de la función de membresía.
         """
         pass
+    
+    @abstractmethod
+    def _simple_alpha_cut(self, alpha, *args):
+        """
+        Implementación simple de un alpha-cut.
+
+        Args:
+            alpha (float): Valor entre 0 y 1 que indica el grado de pertenencia mínimo que se desea usar para el corte
+            *args: Parámetros de la función de membresía.
+
+        Returns:
+            np.array: Array de 2 elementos que representa el intervalo en el que el grado de pertenencia de la función es mayor a alpha.
+        """
+        pass
+    
+    @abstractmethod
+    def _get_center(self, *args):
+        """
+        Método simple para retornar el centro de la función de membresía. Este método se define para poder graficar las funciones de membresía más facilmente.
+        
+        Args:
+            *args: Parámetros de la función de membresía.
+            
+        Returns:
+            float: Centro de la función de membresía.
+        """
+        pass
         
     @abstractmethod
     def forward(self, x, premises):
@@ -159,6 +186,37 @@ class Gaussian_MF(MembershipFunction):
             numpy.ndarray: Salida de la función de membresía Gaussiana.
         """
         return np.exp(-0.5 * np.power((x - mu)/sigma, 2))
+    
+    def _simple_alpha_cut(self, alpha, mu, sigma):
+        """
+        Implementación simple de un alpha-cut.
+
+        Args:
+            alpha (float): Valor entre 0 y 1 que indica el grado de pertenencia mínimo que se desea usar para el corte
+            mu (float): Parámetro mu.
+            sigma (float): Parámetro sigma.
+
+        Returns:
+            np.array: Array de 2 elementos que representa el intervalo en el que el grado de pertenencia de la función es mayor a alpha.
+        """
+        sigma = abs(sigma)
+        r = np.sqrt(-2*np.log(alpha))
+        L = mu - sigma*r
+        U = mu + sigma*r
+        return np.array([L, U])
+    
+    def _get_center(self, mu, sigma):
+        """
+        Método simple para retornar el centro de la función de membresía. Este método se define para poder graficar las funciones de membresía más facilmente.
+        
+        Args:
+            mu (float): Parámetro mu.
+            sigma (float): Parámetro sigma.
+            
+        Returns:
+            float: Centro de la función de membresía.
+        """
+        return mu
 
     def forward(self, x, premises):
         """
@@ -341,6 +399,39 @@ class GeneralizedBell_MF(MembershipFunction):
         
         """
         return 1/(1 + np.power(np.abs((x - c)/a), 2*b))
+    
+    def _simple_alpha_cut(self, alpha, a, b, c):
+        """
+        Implementación simple de un alpha-cut.
+
+        Args:
+            alpha (float): Valor entre 0 y 1 que indica el grado de pertenencia mínimo que se desea usar para el corte
+            a (float): Parámetro a (ancho).
+            b (float): Parámetro b (pendiente).
+            c (float): Parámetro c (centro).
+            
+        Returns:
+            np.array: Array de 2 elementos que representa el intervalo en el que el grado de pertenencia de la función es mayor a alpha.
+        """
+        a = abs(a)
+        r = np.power(1.0/alpha - 1.0, 1.0/(2.0*b))
+        L = c - a*r
+        U = c + a*r
+        return np.array([L, U])
+    
+    def _get_center(self, a, b, c):
+        """
+        Método simple para retornar el centro de la función de membresía. Este método se define para poder graficar las funciones de membresía más facilmente.
+        
+        Args:
+            a (float): Parámetro a (ancho).
+            b (float): Parámetro b (pendiente).
+            c (float): Parámetro c (centro).
+            
+        Returns:
+            float: Centro de la función de membresía.
+        """
+        return c
         
     def forward(self, x, premises):
         """
@@ -528,6 +619,37 @@ class HighSlopeBell_MF(MembershipFunction):
         if a == 0:
             a = 1e-6
         return 1/(1 + np.power(np.abs((x - c)/a), 2*8.0))
+    
+    def _simple_alpha_cut(self, alpha, a, c):
+        """
+        Implementación simple de un alpha-cut.
+
+        Args:
+            alpha (float): Valor entre 0 y 1 que indica el grado de pertenencia mínimo que se desea usar para el corte
+            a (float): Parámetro a (ancho).
+            c (float): Parámetro c (centro).
+            
+        Returns:
+            np.array: Array de 2 elementos que representa el intervalo en el que el grado de pertenencia de la función es mayor a alpha.
+        """
+        a = abs(a)
+        r = (1.0/alpha - 1.0)**(0.0625)
+        L = c - a*r
+        U = c + a*r
+        return np.array([L, U])
+    
+    def _get_center(self, a, c):
+        """
+        Método simple para retornar el centro de la función de membresía. Este método se define para poder graficar las funciones de membresía más facilmente.
+        
+        Args:
+            a (float): Parámetro a (ancho).
+            c (float): Parámetro c (centro).
+            
+        Returns:
+            float: Centro de la función de membresía.
+        """
+        return c
         
     def forward(self, x, premises):
         """
@@ -540,7 +662,7 @@ class HighSlopeBell_MF(MembershipFunction):
         Returns:
             torch.tensor: Salida de la función de membresía High Slope Bell (valores de membresía). La forma de salida es (batch_size, input_size, num_mfs).
         """
-        return 1/(1 + torch.pow(torch.abs((x.unsqueeze(x.dim()) - premises[:, :, 1])/torch.where(premises[:, :, 0] == 0, torch.tensor(1e-6), premises[:, :, 0])), 2*8.0))
+        return 1/(1 + torch.pow(torch.abs((x.unsqueeze(x.dim()) - premises[:, :, 1])/torch.where(premises[:, :, 0] == 0, torch.tensor(1e-6), premises[:, :, 0])), 16.0))
 
     def initialize_premises(self, x_train, num_mfs):
         """

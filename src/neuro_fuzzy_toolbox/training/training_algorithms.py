@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 
 from neuro_fuzzy_toolbox.training import (
     classical_consequents_estimation_with_OLS,
@@ -25,7 +26,7 @@ class base_model_trainer():
         
         Args:
             epochs (int): Número de épocas de entrenamiento.
-            loss_function (torch.nn.functional): Función de pérdida a utilizar en el entrenamiento.
+            loss_function (torch.nn.Module): Instancia de función de pérdida a utilizar en el entrenamiento.
             early_stopping (EarlyStopping): Mecanismo de Early Stopping a utilizar en el entrenamiento (Default: None).
             optimizer (torch.optim): Optimizador a utilizar en el entrenamiento (Default: torch.optim.Adam).
             optimizer_params (dict): Parámetros a utilizar en el optimizador (Default: {}).
@@ -90,25 +91,28 @@ class base_model_trainer():
         print('Training finished')
             
             
-    def _loss_function(self, pred, y):
+    def _loss_function(self, model, pred, y):
         """
         Ejecuta la función de pérdida.
         
         Args:
-            pred (torch.Tensor): Tensor con las predicciones del modelo.
-            y (torch.Tensor): Tensor con las etiquetas reales.
+            pred (torch.tensor): Tensor con las predicciones del modelo.
+            y (torch.tensor): Tensor con las etiquetas reales.
             
         Returns:
-            torch.Tensor: Tensor con el valor de la pérdida.
+            torch.tensor: Tensor con el valor de la pérdida.
         """
         
         '''preliminary fix for the dtype issue'''
-        if self.loss_function != torch.nn.functional.cross_entropy: #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
+        if not isinstance(self.loss_function, nn.CrossEntropyLoss): #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
             if y.dtype != pred.dtype:
                 y = y.to(pred.dtype)
         else: 
             y = y.type(torch.int64)
         '''preliminary fix for the dtype issue'''
+        
+        if isinstance(self.loss_function, nn.CrossEntropyLoss) and model._custom_classes:
+            y = torch.searchsorted(model.classes, y).long()
         
         return self.loss_function(pred, y)
     
@@ -143,21 +147,21 @@ class base_model_trainer():
             val_loader (DataLoader): DataLoader con los datos de validación.
         
         Returns:
-            torch.Tensor: Tensor con el valor de la pérdida.
-            torch.Tensor: Tensor con el valor de la pérdida de validación.
+            torch.tensor: Tensor con el valor de la pérdida.
+            torch.tensor: Tensor con el valor de la pérdida de validación.
         """
         val_loss = None
         x = train_loader.dataset.tensors[0]
         y = train_loader.dataset.tensors[1]
         with torch.no_grad():
             pred = model(x)
-            loss = self._loss_function(pred, y)
+            loss = self._loss_function(model, pred, y)
         if val_loader is not None:
             x = val_loader.dataset.tensors[0]
             y = val_loader.dataset.tensors[1]
             with torch.no_grad():
                 pred = model(x)
-                val_loss = self._loss_function(pred, y)
+                val_loss = self._loss_function(model, pred, y)
         return loss, val_loss
     
     
@@ -198,7 +202,7 @@ class Hybrid_learning_algorithm(base_model_trainer):
         
         Args:
             epochs (int): Número de épocas de entrenamiento.
-            loss_function (torch.nn.functional): Función de pérdida a utilizar en el entrenamiento.
+            loss_function (torch.nn.Module): Instancia de función de pérdida a utilizar en el entrenamiento.
             driver (string): Chooses the backend function that will be used, vaild values are: 'gels', 'gelsy', 'gelsd', 'gelss'. If None, then uses 'gels' (Default: None)
             ridge_lambda (float): Lambda usado para utilizar "Regularización Ridge" en la estimación de consecuentes con mínimos cuadrados. Si es 0, no se realiza regularización (Default: 0.).
             early_stopping (EarlyStopping): Mecanismo de Early Stopping a utilizar en el entrenamiento (Default: None).
@@ -331,7 +335,7 @@ class Basic_optimizer_training_algorithm(base_model_trainer):
         
         Args:
             epochs (int): Número de épocas de entrenamiento.
-            loss_function (torch.nn.functional): Función de pérdida a utilizar en el entrenamiento.
+            loss_function (torch.nn.Module): Instancia de función de pérdida a utilizar en el entrenamiento.
             early_stopping (EarlyStopping): Mecanismo de Early Stopping a utilizar en el entrenamiento (Default: None).
             optimizer (torch.optim): Optimizador a utilizar en el entrenamiento (Default: torch.optim.Adam).
             optimizer_params (dict): Parámetros a utilizar en el optimizador (Default: {}).
@@ -444,7 +448,7 @@ class Double_optimizer_training_algorithm(base_model_trainer):
         
         Args:
             epochs (int): Número de épocas de entrenamiento.
-            loss_function (torch.nn.functional): Función de pérdida a utilizar en el entrenamiento.
+            loss_function (torch.nn.Module): Instancia de función de pérdida a utilizar en el entrenamiento.
             validation (float): Proporción de los datos de entrenamiento a utilizar como datos de validación (Default: 0).
             early_stopping (EarlyStopping): Mecanismo de Early Stopping a utilizar en el entrenamiento (Default: None).
             mode (int):
@@ -491,12 +495,15 @@ class Double_optimizer_training_algorithm(base_model_trainer):
             batch_y_copy = batch_y.clone().detach()
 
             '''preliminary fix for the dtype issue'''
-            if self.loss_function != torch.nn.functional.cross_entropy:
+            if not isinstance(self.loss_function, nn.CrossEntropyLoss):
                 if loader.dataset.tensors[0].dtype != loader.dataset.tensors[1].dtype:
                     batch_y_copy = batch_y_copy.to(batch_x.dtype)
             else: 
                 batch_y_copy = batch_y_copy.to(torch.int64) #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
             '''preliminary fix for the dtype issue'''
+            
+            if isinstance(self.loss_function, nn.CrossEntropyLoss) and model._custom_classes:
+                batch_y_copy = torch.searchsorted(model.classes, batch_y_copy).long()
 
             self._prems_optimizer_instance.zero_grad()
             self._cons_optimizer_instance.zero_grad()
@@ -511,7 +518,7 @@ class Double_optimizer_training_algorithm(base_model_trainer):
             
     def _update_parameters_1(self, model, loader):
         """
-        Actualiza los parámetros del modelo (época única).
+        Actualiza los parámetros del modelo en 2 épocas: en la primera solo actualiza los parámetros consecuentes, en la segunda solo las premisas.
         
         Args:
             model (torch.nn.Module): Modelo a entrenar.
@@ -521,12 +528,15 @@ class Double_optimizer_training_algorithm(base_model_trainer):
             batch_y_copy = batch_y.clone().detach()
 
             '''preliminary fix for the dtype issue'''
-            if self.loss_function != torch.nn.functional.cross_entropy:
+            if not isinstance(self.loss_function, nn.CrossEntropyLoss):
                 if loader.dataset.tensors[0].dtype != loader.dataset.tensors[1].dtype:
                     batch_y_copy = batch_y_copy.to(batch_x.dtype)
             else: 
                 batch_y_copy = batch_y_copy.to(torch.int64) #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
             '''preliminary fix for the dtype issue'''
+            
+            if isinstance(self.loss_function, nn.CrossEntropyLoss) and model._custom_classes:
+                batch_y_copy = torch.searchsorted(model.classes, batch_y_copy).long()
 
             self._cons_optimizer_instance.zero_grad()
             pred = model(batch_x)
@@ -541,12 +551,15 @@ class Double_optimizer_training_algorithm(base_model_trainer):
             batch_y_copy = batch_y.clone().detach()
 
             '''preliminary fix for the dtype issue'''
-            if self.loss_function != torch.nn.functional.cross_entropy:
+            if not isinstance(self.loss_function, nn.CrossEntropyLoss):
                 if loader.dataset.tensors[0].dtype != loader.dataset.tensors[1].dtype:
                     batch_y_copy = batch_y_copy.to(batch_x.dtype)
             else: 
                 batch_y_copy = batch_y_copy.to(torch.int64) #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
             '''preliminary fix for the dtype issue'''
+            
+            if isinstance(self.loss_function, nn.CrossEntropyLoss) and model._custom_classes:
+                batch_y_copy = torch.searchsorted(model.classes, batch_y_copy).long()
 
             self._prems_optimizer_instance.zero_grad()
             pred = model(batch_x)

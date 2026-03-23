@@ -52,10 +52,10 @@ class FuzzificationLayer(nn.Module):
         Realiza un paso hacia adelante para calcular los valores de membresía para cada feature de entrada.
         
         Args:
-            x (torch.Tensor): Conjunto de datos de entrada, tiene tamaño (batch_size, input_size).
+            x (torch.tensor): Conjunto de datos de entrada, tiene tamaño (batch_size, input_size).
             
         Returns:
-            torch.Tensor: Tensor de tamaño (batch_size, input_size, max_n_mfs) que contiene los valores de membresía para cada feature, donde max_n_mfs es el número máximo de funciones de membresía entre todos los features.
+            torch.tensor: Tensor de tamaño (batch_size, input_size, max_n_mfs) que contiene los valores de membresía para cada feature, donde max_n_mfs es el número máximo de funciones de membresía entre todos los features.
             
         Note:
             Para manejar las distintas cantidades de funciones de membresía para cada feature, se rellenan con ceros las funciones de membresía faltantes. Esto podría ser mejorable en futuras versiones (agregando 0s directamente a un tensor que contenga los parámetros durante la instanciación de la capa, y no en el método forward).
@@ -76,7 +76,7 @@ class FuzzificationLayer(nn.Module):
         Inicializa los parámetros de las funciones de membresía de los antecedentes utilizando los datos de entrenamiento.
         
         Args:
-            x_train (torch.Tensor): Datos de entrenamiento de entrada.
+            x_train (torch.tensor): Datos de entrenamiento de entrada.
         """
         self._dtype = x_train.dtype
         self._premises = nn.ParameterList(self._membership_function.general_initialize_premises(x_train, self._mf_distribution))
@@ -315,10 +315,10 @@ class h_FuzzificationLayer(nn.Module):
         Realiza un paso hacia adelante para calcular los valores de membresía para cada feature de entrada.
         
         Args:
-            x (torch.Tensor): Conjunto de datos de entrada, tiene tamaño (batch_size, input_size).
+            x (torch.tensor): Conjunto de datos de entrada, tiene tamaño (batch_size, input_size).
             
         Returns:
-            torch.Tensor: Tensor de tamaño (batch_size, input_size, num_mfs) que contiene los valores de membresía para cada feature, donde num_mfs es el número de funciones de membresía para cada feature.
+            torch.tensor: Tensor de tamaño (batch_size, input_size, num_mfs) que contiene los valores de membresía para cada feature, donde num_mfs es el número de funciones de membresía para cada feature.
         """
         return self._membership_function(x, self._premises)
     
@@ -328,7 +328,7 @@ class h_FuzzificationLayer(nn.Module):
         Inicializa los parámetros de las funciones de membresía de los antecedentes utilizando los datos de entrenamiento.
         
         Args:
-            x_train (torch.Tensor): Datos de entrenamiento de entrada.
+            x_train (torch.tensor): Datos de entrenamiento de entrada.
         """
         self._dtype = x_train.dtype
         self._premises = Parameter(self._membership_function.initialize_premises(x_train=x_train, num_mfs=self._premises.data.shape[1]), requires_grad=True)
@@ -340,7 +340,7 @@ class h_FuzzificationLayer(nn.Module):
         Retorna los parámetros de las funciones de membresía de los antecedentes.
         
         Returns:
-            torch.Tensor: Tensor con los parámetros de las funciones de membresía de los antecedentes.
+            torch.tensor: Tensor con los parámetros de las funciones de membresía de los antecedentes.
         """
         return self._premises.data.clone().detach()
     
@@ -350,7 +350,7 @@ class h_FuzzificationLayer(nn.Module):
         Asigna los parámetros de las funciones de membresía de los antecedentes.
         
         Args:
-            premises (torch.Tensor): Tensor con los parámetros de las funciones de membresía de los antecedentes.
+            premises (torch.tensor): Tensor con los parámetros de las funciones de membresía de los antecedentes.
         """
         self._premises = Parameter(premises, requires_grad=True)
         
@@ -568,10 +568,10 @@ class rule_reduced_FuzzificationLayer(nn.Module):
         Realiza un paso hacia adelante para calcular los valores de membresía para cada feature de entrada.
         
         Args:
-            x (torch.Tensor): Conjunto de datos de entrada, tiene tamaño (batch_size, input_size).
+            x (torch.tensor): Conjunto de datos de entrada, tiene tamaño (batch_size, input_size).
             
         Returns:
-            torch.Tensor: Tensor de tamaño (batch_size, input_size, num_mfs) que contiene los valores de membresía para cada feature, donde num_mfs es el número de funciones de membresía para cada feature.
+            torch.tensor: Tensor de tamaño (batch_size, input_size, num_mfs) que contiene los valores de membresía para cada feature, donde num_mfs es el número de funciones de membresía para cada feature.
         """
         return self._membership_function(x, torch.stack([premise for premise in self._premises], 1))
 
@@ -581,7 +581,7 @@ class rule_reduced_FuzzificationLayer(nn.Module):
         Inicializa los parámetros de las funciones de membresía de los antecedentes utilizando los datos de entrenamiento.
         
         Args:
-            x_train (torch.Tensor): Datos de entrenamiento de entrada.
+            x_train (torch.tensor): Datos de entrenamiento de entrada.
         """
         self._dtype = x_train.dtype
         self._premises = nn.ParameterList([
