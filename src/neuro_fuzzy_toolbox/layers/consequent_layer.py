@@ -8,18 +8,23 @@ from neuro_fuzzy_toolbox.func import Linear_CF
 
 class ConsequentLayer(nn.Module):
     """
-    Clase para representar la capa consecuente de un modelo de Sistema de Inferencia Neuro-Difuso Adaptativo (ANFIS).
+    Consequent layer for an Adaptive Neuro-Fuzzy Inference System (ANFIS).
+
+    Computes the weighted output of each fuzzy rule using a linear consequent
+    function. Consequent parameters are stored as a single trainable tensor.
     """
     def __init__(self, input_size, rules, outputs=1, features=None, dtype=torch.float32):
         """
-        Inicializa una nueva instancia de la clase ConsequentLayer.
-        
+        Initializes a new ConsequentLayer instance.
+
         Args:
-            input_size (int): Número de features de los datos de entrada (del modelo ANFIS, no de la capa).
-            rules (int): Número de reglas del modelo ANFIS, depende del modelo en sí.
-            outputs (int): Número de salidas del modelo ANFIS (Default: 1).
-            features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
-            dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).
+            input_size (int): Number of input features of the ANFIS model.
+            rules (int): Number of fuzzy rules in the ANFIS model.
+            outputs (int): Number of model outputs. Defaults to ``1``.
+            features (iterable, optional): Names of the input features as
+                strings, of length ``input_size``. Defaults to ``None``.
+            dtype (torch.dtype): Data type for the layer parameters.
+                Defaults to ``torch.float32``.
         """
         super(ConsequentLayer, self).__init__()
         # Input data info
@@ -38,29 +43,36 @@ class ConsequentLayer(nn.Module):
     
     def forward(self, x, weights):
         """
-        Realiza un paso hacia adelante para calcular la salida de la capa consecuente.
-        
+        Forward pass of the consequent layer.
+
+        Computes the weighted output of each rule using the normalized firing
+        levels as weights.
+
         Args:
-            x (torch.tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.
-            weights (torch.tensor): Tensor de tamaño (batch_size, rules) que contiene los pesos de las reglas.
-            
+            x (torch.Tensor): Input features of shape
+                ``(batch_size, input_size)``.
+            weights (torch.Tensor): Normalized firing levels of shape
+                ``(batch_size, rules)``.
+
         Returns:
-            torch.tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas del modelo ANFIS.
+            torch.Tensor: Weighted rule outputs of shape
+            ``(outputs, batch_size, rules)``.
         """
         return self._consequent_function(x, self._consequents, weights)
     
     
     def get_consequents_outputs(self, x):
         """
-        Retorna las salidas de las reglas sin ponderación (sin multiplicar por los normalized firing levels)
-        
+        Returns the individual rule outputs without weighting by normalized
+        firing levels.
+
         Args:
-            x (torch.tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.
-            consequents (torch.tensor): Tensor de tamaño (outputs, rules, input_size + 1) que contiene los parámetros consecuentes de la red ANFIS, donde *rules* es el número de reglas y *outputs* es el número de salidas del modelo.
-        
+            x (torch.Tensor): Input features of shape
+                ``(batch_size, input_size)``.
+
         Returns:
-            torch.tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas individuales de cada regla sin ponderar con los normalized firing levels.
-        
+            torch.Tensor: Unweighted rule outputs of shape
+            ``(outputs, batch_size, rules)``.
         """
         return self._consequent_function.get_consequents_outputs(x, self._consequents)
 
@@ -68,10 +80,12 @@ class ConsequentLayer(nn.Module):
     @property
     def get_consequents_structure(self):
         """
-        Retorna la estructura de los parámetros consecuentes.
-        
+        Structure of the consequent parameters.
+
         Returns:
-            list: Lista de DataFrames de pandas que contienen la estructura de los parámetros consecuentes
+            list[pd.DataFrame]: List of DataFrames, one per model output,
+            each describing the consequent parameters for every rule and
+            input feature.
         """
         consequents_tensor = self.get_consequents()
         dfs = []
@@ -107,40 +121,42 @@ class ConsequentLayer(nn.Module):
     
     def _to_dtype(self, dtype):
         """
-        Cambia el tipo de dato de los parámetros consecuentes.
-        
+        Casts the consequent parameters to a different data type.
+
         Args:
-            dtype (torch.dtype): Tipo de dato al que se desea cambiar.
+            dtype (torch.dtype): Target data type.
         """
         self._consequents.data = self._consequents.data.type(dtype)
         
         
     def get_consequents(self):
         """
-        Retorna los parámetros consecuentes del modelo.
-        
+        Returns the current consequent parameters.
+
         Returns:
-            torch.tensor: Tensor con los parámetros consecuentes. Su forma es (outputs, rules, input_size + 1).
+            torch.Tensor: Consequent parameter tensor of shape
+            ``(outputs, rules, input_size + 1)``.
         """
         return self._consequents.data.clone().detach()
     
     
     def set_consequents(self, consequents):
         """
-        Setea los parámetros consecuentes del modelo.
-        
+        Sets the consequent parameters.
+
         Args:
-            consequents (torch.tensor): Tensor con los parámetros consecuentes. Su forma debe ser (outputs, rules, input_size + 1).
+            consequents (torch.Tensor): Consequent parameter tensor of shape
+                ``(outputs, rules, input_size + 1)``.
         """
         self._consequents = Parameter(consequents, requires_grad=True)
     
     
     def get_consequents_as_parameters_list(self):
         """
-        Retorna los parámetros consecuentes del modelo como una lista de parámetros. Esto es útil para algoritmos de optimización.
-        
+        Returns the consequent parameters as a single-element list of trainable parameters, useful for passing to optimizers.
+
         Returns:
-            list: Lista de 1 solo elemento (nn.Parameter) que contiene los parámetros consecuentes.
+            list[nn.Parameter]: List containing a single ``nn.Parameter`` with all consequent parameters.
         """
         return [self._consequents]
         
@@ -148,17 +164,22 @@ class ConsequentLayer(nn.Module):
 
 class alt_ConsequentLayer(nn.Module):
     """
-    Clase para representar la capa consecuente de un modelo de Sistema de Inferencia Neuro-Difuso Adaptativo (ANFIS). Tiene la particularidad de las reglas se almacenan en una lista de tensores y no en un tensor único.
+    Alternative consequent layer for an Adaptive Neuro-Fuzzy Inference System (ANFIS).
+    
+    Functionally equivalent to :class:`ConsequentLayer`, but stores the consequent parameters as a :class:`nn.ParameterList` 
+    of per-rule tensors rather than a single tensor. This representation is required by optimizers and training algorithms 
+    that add or remove rules dynamically during structural adaptation.
     """
     def __init__(self, input_size, rules, outputs=1, features=None, dtype=torch.float32):
         """
-        Inicializa una nueva instancia de la clase alt_ConsequentLayer.
-        
+        Initializes a new alt_ConsequentLayer instance.
+
         Args:
-            input_size (int): Número de features de los datos de entrada (del modelo ANFIS, no de la capa).
-            rules (int): Número de reglas del modelo ANFIS, depende del modelo en sí.
-            outputs (int): Número de salidas del modelo ANFIS (Default: 1).
-            dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).
+            input_size (int): Number of input features of the ANFIS model.
+            rules (int): Number of fuzzy rules in the ANFIS model.
+            outputs (int): Number of model outputs. Defaults to ``1``.
+            features (iterable, optional): Names of the input features as strings, of length ``input_size``. Defaults to ``None``.
+            dtype (torch.dtype): Data type for the layer parameters. Defaults to ``torch.float32``.
         """
         super(alt_ConsequentLayer, self).__init__()
         # Input data info
@@ -181,29 +202,30 @@ class alt_ConsequentLayer(nn.Module):
         
     def forward(self, x, weights):
         """
-        Realiza un paso hacia adelante para calcular la salida de la capa consecuente.
-        
+        Forward pass of the alternative consequent layer.
+
+        Computes the weighted output of each rule using the normalized firing
+        levels as weights.
+
         Args:
-            x (torch.tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.
-            weights (torch.tensor): Tensor de tamaño (batch_size, rules) que contiene los pesos de las reglas.
-            
+            x (torch.Tensor): Input features of shape ``(batch_size, input_size)``.
+            weights (torch.Tensor): Normalized firing levels of shape ``(batch_size, rules)``.
+
         Returns:
-            torch.tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas del modelo ANFIS.
+            torch.Tensor: Weighted rule outputs of shape ``(outputs, batch_size, rules)``.
         """
         return self._consequent_function(x, torch.stack([consequent for consequent in self._consequents], 1), weights)
     
     
     def get_consequents_outputs(self, x):
         """
-        Retorna las salidas de las reglas sin ponderación (sin multiplicar por los normalized firing levels)
-        
+        Returns the individual rule outputs without weighting by normalized firing levels.
+
         Args:
-            x (torch.tensor): Tensor de tamaño (batch_size, input_size) que contiene los features de entrada.
-            consequents (torch.tensor): Tensor de tamaño (outputs, rules, input_size + 1) que contiene los parámetros consecuentes de la red ANFIS, donde *rules* es el número de reglas y *outputs* es el número de salidas del modelo.
-        
+            x (torch.Tensor): Input features of shape ``(batch_size, input_size)``.
+
         Returns:
-            torch.tensor: Tensor de tamaño (outputs, batch_size, rules) que contiene las salidas individuales de cada regla sin ponderar con los normalized firing levels.
-        
+            torch.Tensor: Unweighted rule outputs of shape ``(outputs, batch_size, rules)``.
         """
         return self._consequent_function.get_consequents_outputs(x, torch.stack([consequent for consequent in self._consequents], 1))
     
@@ -211,10 +233,11 @@ class alt_ConsequentLayer(nn.Module):
     @property
     def get_consequents_structure(self):
         """
-        Retorna la estructura de los parámetros consecuentes.
-        
+        Structure of the consequent parameters.
+
         Returns:
-            list: Lista de DataFrames de pandas que contienen la estructura de los parámetros consecuentes
+            list[pd.DataFrame]: List of DataFrames, one per model output, each describing the consequent parameters for every rule
+            and input feature.
         """
         consequents_tensor = torch.stack(
             [consequent.data.clone().detach() for consequent in self._consequents], 1
@@ -252,10 +275,10 @@ class alt_ConsequentLayer(nn.Module):
     
     def _to_dtype(self, dtype):
         """
-        Cambia el tipo de dato de los parámetros consecuentes.
-        
+        Casts the consequent parameters to a different data type.
+
         Args:
-            dtype (torch.dtype): Tipo de dato al que se desea cambiar.
+            dtype (torch.dtype): Target data type.
         """
         for consequent in self._consequents:
             consequent.data = consequent.data.type(dtype)
@@ -263,20 +286,21 @@ class alt_ConsequentLayer(nn.Module):
         
     def get_consequents(self):
         """
-        Retorna los parámetros consecuentes del modelo.
-        
+        Returns the current consequent parameters as a single tensor.
+
         Returns:
-            torch.tensor: Tensor con los parámetros consecuentes. Su forma es (outputs, rules, input_size + 1).
+            torch.Tensor: Consequent parameter tensor of shape ``(outputs, rules, input_size + 1)``.
         """
         return torch.stack([consequent.data.clone().detach() for consequent in self._consequents], 1)
     
     
     def set_consequents(self, consequents):
         """
-        Setea los parámetros consecuentes del modelo.
-        
+        Sets the consequent parameters from a single tensor, converting each rule's parameters into a separate trainable
+        entry in the internal :class:`nn.ParameterList`.
+
         Args:
-            consequents (torch.tensor): Tensor con los parámetros consecuentes. Su forma debe ser (outputs, rules, input_size + 1).
+            consequents (torch.Tensor): Consequent parameter tensor of shape ``(outputs, rules, input_size + 1)``.
         """
         self._consequents = nn.ParameterList([
             nn.Parameter(consequent) for consequent in consequents.unbind(1)
@@ -285,9 +309,9 @@ class alt_ConsequentLayer(nn.Module):
     
     def get_consequents_as_parameters_list(self):
         """
-        Retorna los parámetros consecuentes del modelo como una lista de parámetros. Esto es útil para algoritmos de optimización.
-        
+        Returns the consequent parameters as a PyTorch ParameterList, useful for passing to optimizers.
+
         Returns:
-            nn.ParameterList: Lista de parámetros consecuentes.
+            nn.ParameterList: List of per-rule consequent parameters.
         """
         return self._consequents

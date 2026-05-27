@@ -10,20 +10,21 @@ from neuro_fuzzy_toolbox.func import GeneralizedBell_MF
 
 class FuzzificationLayer(nn.Module):
     """
-    Clase para representar la capa de fuzzificación de un sistema de inferencia neuro-difuso adaptativo (ANFIS). Esta capa se encarga de transformar los datos de entrada en valores de membresía para cada función de membresía de cada feature.
+    Fuzzification layer for an Adaptive Neuro-Fuzzy Inference System (ANFIS).
 
-    Esta diseñada para un modelo ANFIS general, es decir, para manejar diferentes cantidades de funciones de membresía para cada feature de los datos de entrada.
+    Transforms input data into membership degrees for each MF of each input
+    feature. Designed to handle a general ANFIS model where different input
+    features may have different numbers of MFs.
     """
     def __init__(self, mf_distribution, membership_function=GeneralizedBell_MF(), features=None, dtype=torch.float32):
         """
-        Inicializa una nueva instancia de FuzzificationLayer.
+        Initializes a new FuzzificationLayer instance.
         
         Args:
-            mf_distribution (list): Lista de enteros que representan la cantidad de funciones de membresía para cada feature de entrada.
-            membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
-            features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
-            dtype (torch.dtype): Tipo de dato de los datos de entrada (Default: torch.float32).
-        
+            mf_distribution (list[int]): Number of MFs for each input feature.
+            membership_function (MembershipFunction): MF type to use. Defaults to ``GeneralizedBell_MF()``.
+            features (iterable, optional): Names of the input features as strings, of length ``input_size``. Defaults to ``None``.
+            dtype (torch.dtype): Data type for the layer parameters. Defaults to ``torch.float32``.
         """
         super(FuzzificationLayer, self).__init__()
         
@@ -49,16 +50,21 @@ class FuzzificationLayer(nn.Module):
     
     def forward(self, x):
         """
-        Realiza un paso hacia adelante para calcular los valores de membresía para cada feature de entrada.
-        
+        Forward pass of the fuzzification layer.
+
+        Computes the membership degrees for each input feature.
+
         Args:
-            x (torch.tensor): Conjunto de datos de entrada, tiene tamaño (batch_size, input_size).
-            
+            x (torch.Tensor): Input data of shape ``(batch_size, input_size)``.
+
         Returns:
-            torch.tensor: Tensor de tamaño (batch_size, input_size, max_n_mfs) que contiene los valores de membresía para cada feature, donde max_n_mfs es el número máximo de funciones de membresía entre todos los features.
-            
+            torch.Tensor: Membership degrees of shape ``(batch_size, input_size, max_n_mfs)``, where ``max_n_mfs`` is the maximum number of MFs across all input features.
+
         Note:
-            Para manejar las distintas cantidades de funciones de membresía para cada feature, se rellenan con ceros las funciones de membresía faltantes. Esto podría ser mejorable en futuras versiones (agregando 0s directamente a un tensor que contenga los parámetros durante la instanciación de la capa, y no en el método forward).
+            Features with fewer MFs than ``max_n_mfs`` are zero-padded to
+            match the output shape. This padding is applied during the forward
+            pass and may be improved in future versions by embedding it
+            directly into the premise parameter tensors at instantiation time.
         """
         reshaped_premises = torch.tensor([], dtype=self._dtype)
                 
@@ -73,10 +79,10 @@ class FuzzificationLayer(nn.Module):
     
     def init_premises(self, x_train):
         """
-        Inicializa los parámetros de las funciones de membresía de los antecedentes utilizando los datos de entrenamiento.
-        
+        Initializes the MF premise parameters from training data.
+
         Args:
-            x_train (torch.tensor): Datos de entrenamiento de entrada.
+            x_train (torch.Tensor): Training input data of shape ``(n_samples, input_size)``.
         """
         self._dtype = x_train.dtype
         self._premises = nn.ParameterList(self._membership_function.general_initialize_premises(x_train, self._mf_distribution))
@@ -85,20 +91,20 @@ class FuzzificationLayer(nn.Module):
     
     def get_premises(self):
         """
-        Retorna los parámetros de las funciones de membresía de los antecedentes.
-        
+        Returns the current premise parameters.
+
         Returns:
-            list: Lista de parámetros de las funciones de membresía de los antecedentes.
+            list[torch.Tensor]: List of premise parameter tensors, one per input feature.
         """
         return [mf.data.clone().detach() for mf in self._premises]
     
     
     def set_premises(self, premises):
         """
-        Asigna los parámetros de las funciones de membresía de los antecedentes.
-        
+        Sets the premise parameters for all input features.
+
         Args:
-            premises (list): Lista de tensores con los parámetros de las funciones de membresía. Cada tensor debe tener forma (num_mfs, mf_params), donde mf_params es el número de parámetros de la función de membresía.
+            premises (list[torch.Tensor]): List of premise parameter tensors. Each tensor must have shape ``(num_mfs, mf_params)``, where ``mf_params`` is the number of parameters of the MF type in use.
         """
         for i, premise in enumerate(premises):
             self._premises[i] = Parameter(premise, requires_grad=True)
@@ -106,10 +112,10 @@ class FuzzificationLayer(nn.Module):
     
     def get_premises_as_parameters_list(self):
         """
-        Retorna los parámetros de las funciones de membresía de los antecedentes como una lista de parámetros.
-        
+        Returns the premise parameters as a PyTorch ParameterList.
+
         Returns:
-            nn.ParameterList: Lista de parámetros de las funciones de membresía de los antecedentes.
+            nn.ParameterList: Premise parameters wrapped as a list of trainable parameters.
         """
         return self._premises
     
@@ -117,10 +123,10 @@ class FuzzificationLayer(nn.Module):
     @property
     def num_mfs(self):
         """
-        Retorna la cantidad de funciones de membresía por feature.
-        
+        Number of MFs per input feature.
+
         Returns:
-            torch.tensor: Tensor con la cantidad de funciones de membresía por feature.
+            torch.Tensor: Tensor containing the number of MFs for each input feature.
         """
         return self._mf_distribution
     
@@ -128,10 +134,10 @@ class FuzzificationLayer(nn.Module):
     @property
     def get_premises_structure(self):
         """
-        Retorna la estructura de los antecedentes.
-        
+        Structure of the premise parameters.
+
         Returns:
-            pd.DataFrame: DataFrame de pandas que contiene la estructura de los antecedentes.
+            pd.DataFrame: DataFrame describing the premise parameters for each input feature and MF.
         """
         
         columns = pd.MultiIndex.from_product(
@@ -156,14 +162,14 @@ class FuzzificationLayer(nn.Module):
 
     def plot_premises(self, mf=None, input_dim=None, group_by_dim=False, linestyles='-', linewidths=2.5):
         """
-        Plotea las funciones de membresía de los antecedentes.
-        
+        Plots the premise membership functions.
+
         Args:
-            mf (int): Función de membresía a plotear. Si es None, se plotean todas las funciones de membresía (Default: None).
-            input_dim (int): Dimensión de entrada a plotear. Si es None, se plotean todas las dimensiones de entrada (Default: None).
-            group_by_dim (bool): Si es True, agrupa las funciones de membresía en un solo gráfico por cada dimensión de entrada. (Default: False)
-            linestyles (string | list): String o lista de strings que representan los tipos de linea para representar las funciones de membresía. Si se usa una lista, los tipos de linea se irán alternando. Los caracteres permitidos son: ['-', '--', '-.', ':']. (Default: '-')
-            linewidths (float | list): Float o lista de floats que representan los grosores de linea para representar las funciones de membresía. Si se usa una lista, los grosores de linea se irán alternando. (Default: 2.5)
+            mf (int, optional): Index of the MF to plot. If ``None``, all MFs are plotted. Defaults to ``None``.
+            input_dim (int, optional): Index of the input feature to plot. If ``None``, all input features are plotted. Defaults to ``None``.
+            group_by_dim (bool): If ``True``, all MFs for each input feature are grouped into a single plot. Defaults to ``False``.
+            linestyles (str or list[str]): Line style or list of line styles to cycle through when plotting MFs. Accepted values are ``'-'``, ``'--'``, ``'-.'``, and ``':'``. Defaults to ``'-'``.
+            linewidths (float or list[float]): Line width or list of line widths to cycle through when plotting MFs. Defaults to ``2.5``.
         """
         variables = self.features
         dataframe = self.get_premises_structure
@@ -279,20 +285,23 @@ class FuzzificationLayer(nn.Module):
 
 class h_FuzzificationLayer(nn.Module):
     """
-    Clase para representar la capa de fuzzificación de un sistema de inferencia neuro-difuso adaptativo (ANFIS) homogéneo, es decir, 
-    con la misma cantidad de funciones de membresía para cada feature de los datos de entrada, limitando a que cada uno tenga el mismo 
-    número de variables lingüisticas.
+    Homogeneous fuzzification layer for an Adaptive Neuro-Fuzzy Inference System (ANFIS).
+
+    Transforms input data into membership degrees for each MF of each input
+    feature. Unlike :class:`FuzzificationLayer`, this layer enforces the same
+    number of MFs for every input feature, constraining each to the same
+    number of linguistic variables.
     """
     def __init__(self, input_size, num_mfs=1, membership_function=GeneralizedBell_MF(), features=None, dtype=torch.float32):
         """
-        Inicializa una nueva instancia de h_FuzzificationLayer.
-        
+        Initializes a new h_FuzzificationLayer instance.
+
         Args:
-            input_size (int): Número de features de entrada.
-            num_mfs (int): Número de funciones de membresía para cada feature (Default: 1).
-            membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
-            features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
-            dtype (torch.dtype): Tipo de dato de los datos de entrada (Default: torch.float32).
+            input_size (int): Number of input features.
+            num_mfs (int): Number of MFs per input feature. Defaults to ``1``.
+            membership_function (MembershipFunction): MF type to use. Defaults to ``GeneralizedBell_MF()``.
+            features (iterable, optional): Names of the input features as strings, of length ``input_size``. Defaults to ``None``.
+            dtype (torch.dtype): Data type for the layer parameters. Defaults to ``torch.float32``.
         """
         super(h_FuzzificationLayer, self).__init__()
 
@@ -312,23 +321,26 @@ class h_FuzzificationLayer(nn.Module):
 
     def forward(self, x):
         """
-        Realiza un paso hacia adelante para calcular los valores de membresía para cada feature de entrada.
-        
+        Forward pass of the homogeneous fuzzification layer.
+
+        Computes the membership degrees for each input feature.
+
         Args:
-            x (torch.tensor): Conjunto de datos de entrada, tiene tamaño (batch_size, input_size).
-            
+            x (torch.Tensor): Input data of shape ``(batch_size, input_size)``.
+
         Returns:
-            torch.tensor: Tensor de tamaño (batch_size, input_size, num_mfs) que contiene los valores de membresía para cada feature, donde num_mfs es el número de funciones de membresía para cada feature.
+            torch.Tensor: Membership degrees of shape ``(batch_size, input_size, num_mfs)``.
         """
         return self._membership_function(x, self._premises)
     
     
     def init_premises(self, x_train):
         """
-        Inicializa los parámetros de las funciones de membresía de los antecedentes utilizando los datos de entrenamiento.
+        Initializes the MF premise parameters from training data.
         
         Args:
-            x_train (torch.tensor): Datos de entrenamiento de entrada.
+            x_train (torch.Tensor): Training input data of shape
+                ``(n_samples, input_size)``.
         """
         self._dtype = x_train.dtype
         self._premises = Parameter(self._membership_function.initialize_premises(x_train=x_train, num_mfs=self._premises.data.shape[1]), requires_grad=True)
@@ -337,30 +349,30 @@ class h_FuzzificationLayer(nn.Module):
 
     def get_premises(self):
         """
-        Retorna los parámetros de las funciones de membresía de los antecedentes.
-        
+        Returns the current premise parameters.
+
         Returns:
-            torch.tensor: Tensor con los parámetros de las funciones de membresía de los antecedentes.
+            torch.Tensor: Premise parameter tensor of shape ``(input_size, num_mfs, mf_params)``, where ``mf_params`` is the number of parameters of the MF type in use.
         """
         return self._premises.data.clone().detach()
     
     
     def set_premises(self, premises):
         """
-        Asigna los parámetros de las funciones de membresía de los antecedentes.
-        
+        Sets the premise parameters for all input features.
+
         Args:
-            premises (torch.tensor): Tensor con los parámetros de las funciones de membresía de los antecedentes.
+            premises (torch.Tensor): Premise parameter tensor of shape ``(input_size, num_mfs, mf_params)``, where ``mf_params`` is the number of parameters of the MF type in use.
         """
         self._premises = Parameter(premises, requires_grad=True)
         
         
     def get_premises_as_parameters_list(self):
         """
-        Retorna los antecedentes del modelo como una lista de parámetros. Esto es útil para algoritmos de optimización.
-        
+        Returns the premise parameters as a single-element list of trainable parameters, useful for passing to optimizers.
+
         Returns:
-            list: Lista de 1 solo elemento (nn.Parameter) que contiene los parámetros de los antecedentes.
+            list[nn.Parameter]: List containing a single ``nn.Parameter`` with all premise parameters.
         """
         return [self._premises]
     
@@ -368,10 +380,10 @@ class h_FuzzificationLayer(nn.Module):
     @property
     def num_mfs(self):
         """
-        Retorna la cantidad de funciones de membresía por feature.
-        
+        Number of MFs per input feature.
+
         Returns:
-            int: Cantidad de funciones de membresía que tiene cada feature.
+            int: Number of MFs assigned to each input feature.
         """
         return self.get_premises().shape[1]
     
@@ -379,7 +391,10 @@ class h_FuzzificationLayer(nn.Module):
     @property
     def get_premises_structure(self):
         """
-        Retorna la estructura de los antecedentes en un DataFrame de pandas.
+        Structure of the premise parameters.
+
+        Returns:
+            pd.DataFrame: DataFrame describing the premise parameters for each input feature and MF.
         """
         premises = self.get_premises()
         
@@ -402,14 +417,14 @@ class h_FuzzificationLayer(nn.Module):
     
     def plot_premises(self, mf=None, input_dim=None, group_by_dim=False, linestyles='-', linewidths=2.5):
         """
-        Plotea las funciones de membresía de los antecedentes.
-        
+        Plots the premise membership functions.
+
         Args:
-            mf (int): Función de membresía a plotear. Si es None, se plotean todas las funciones de membresía (Default: None).
-            input_dim (int): Dimensión de entrada a plotear. Si es None, se plotean todas las dimensiones de entrada (Default: None).
-            group_by_dim (bool): Si es True, agrupa las funciones de membresía en un solo gráfico por cada dimensión de entrada. (Default: False)
-            linestyles (string | list): String o lista de strings que representan los tipos de linea para representar las funciones de membresía. Si se usa una lista, los tipos de linea se irán alternando. Los caracteres permitidos son: ['-', '--', '-.', ':']. (Default: '-')
-            linewidths (float | list): Float o lista de floats que representan los grosores de linea para representar las funciones de membresía. Si se usa una lista, los grosores de linea se irán alternando. (Default: 2.5)
+            mf (int, optional): Index of the MF to plot. If ``None``, all MFs are plotted. Defaults to ``None``.
+            input_dim (int, optional): Index of the input feature to plot. If ``None``, all input features are plotted. Defaults to ``None``.
+            group_by_dim (bool): If ``True``, all MFs for each input feature are grouped into a single plot. Defaults to ``False``.
+            linestyles (str or list[str]): Line style or list of line styles to cycle through when plotting MFs. Accepted values are ``'-'``, ``'--'``, ``'-.'``, and ``':'``. Defaults to ``'-'``.
+            linewidths (float or list[float]): Line width or list of line widths to cycle through when plotting MFs. Defaults to ``2.5``.
         """
         variables = [f'{self.features[i]}' for i in range(self._input_size)]
         dataframe = self.get_premises_structure
@@ -526,20 +541,24 @@ class h_FuzzificationLayer(nn.Module):
     
 class rule_reduced_FuzzificationLayer(nn.Module):
     """
-    Clase para representar la capa de fuzzificación de un sistema de inferencia neuro-difuso adaptativo (ANFIS) con reducción de reglas, es decir, 
-    con la misma cantidad de funciones de membresía para cada feature de los datos de entrada, limitando a que cada uno tenga el mismo 
-    número de variables lingüisticas.
+    Fuzzification layer for a rule-reduced Adaptive Neuro-Fuzzy Inference System (ANFIS).
+
+    Transforms input data into membership degrees for each MF of each input
+    feature. Like :class:`h_FuzzificationLayer`, this layer enforces the same
+    number of MFs for every input feature. It is specifically designed for the
+    rule-reduced ANFIS model, which supports structural adaptation via the
+    SONFIS algorithm.
     """
     def __init__(self, input_size, num_mfs=1, membership_function=GeneralizedBell_MF(), features=None, dtype=torch.float32):
         """
-        Inicializa una nueva instancia de rule_reduced_FuzzificationLayer.
-        
+        Initializes a new rule_reduced_FuzzificationLayer instance.
+
         Args:
-            input_size (int): Número de features de entrada.
-            num_mfs (int): Número de funciones de membresía para cada feature (Default: 1).
-            membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
-            features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
-            dtype (torch.dtype): Tipo de dato de los datos de entrada (Default: torch.float32).
+            input_size (int): Number of input features.
+            num_mfs (int): Number of MFs per input feature. Defaults to ``1``.
+            membership_function (MembershipFunction): MF type to use. Defaults to ``GeneralizedBell_MF()``.
+            features (iterable, optional): Names of the input features as strings, of length ``input_size``. Defaults to ``None``.
+            dtype (torch.dtype): Data type for the layer parameters. Defaults to ``torch.float32``.
         """
         super(rule_reduced_FuzzificationLayer, self).__init__()
 
@@ -565,23 +584,25 @@ class rule_reduced_FuzzificationLayer(nn.Module):
 
     def forward(self, x):
         """
-        Realiza un paso hacia adelante para calcular los valores de membresía para cada feature de entrada.
-        
+        Forward pass of the rule-reduced fuzzification layer.
+
+        Computes the membership degrees for each input feature.
+
         Args:
-            x (torch.tensor): Conjunto de datos de entrada, tiene tamaño (batch_size, input_size).
-            
+            x (torch.Tensor): Input data of shape ``(batch_size, input_size)``.
+
         Returns:
-            torch.tensor: Tensor de tamaño (batch_size, input_size, num_mfs) que contiene los valores de membresía para cada feature, donde num_mfs es el número de funciones de membresía para cada feature.
+            torch.Tensor: Membership degrees of shape ``(batch_size, input_size, num_mfs)``.
         """
         return self._membership_function(x, torch.stack([premise for premise in self._premises], 1))
 
 
     def init_premises(self, x_train):
         """
-        Inicializa los parámetros de las funciones de membresía de los antecedentes utilizando los datos de entrenamiento.
-        
+        Initializes the MF premise parameters from training data.
+
         Args:
-            x_train (torch.tensor): Datos de entrenamiento de entrada.
+            x_train (torch.Tensor): Training input data of shape ``(n_samples, input_size)``.
         """
         self._dtype = x_train.dtype
         self._premises = nn.ParameterList([
@@ -593,20 +614,20 @@ class rule_reduced_FuzzificationLayer(nn.Module):
         
     def get_premises(self):
         """
-        Retorna los antecedentes del modelo.
-        
+        Returns the current premise parameters.
+
         Returns:
-            torch.tensor: Tensor con los antecedentes del modelo. Su forma es (input_size, num_mfs, mf_params).
+            torch.Tensor: Premise parameter tensor of shape ``(input_size, num_mfs, mf_params)``, where ``mf_params`` is the number of parameters of the MF type in use.
         """
         return torch.stack([premise.data.clone().detach() for premise in self._premises], 1)
         
         
     def set_premises(self, premises):
         """
-        Setea los parámetros de las funciones de membresía de la capa de fuzzificación del modelo.
-        
+        Sets the premise parameters for all input features.
+
         Args:
-            premises (torch.tensor): Tensor con los parámetros de las funciones de membresía. Su forma debe ser (input_size, num_mfs, mf_params), donde mf_params es el número de parámetros de la función de membresía.
+            premises (torch.Tensor): Premise parameter tensor of shape ``(input_size, num_mfs, mf_params)``, where ``mf_params`` is the number of parameters of the MF type in use.
         """
         self._premises = nn.ParameterList([
             nn.Parameter(premise, requires_grad=True) for premise in premises.unbind(1)
@@ -615,10 +636,11 @@ class rule_reduced_FuzzificationLayer(nn.Module):
         
     def get_premises_as_parameters_list(self):
         """
-        Retorna los antecedentes del modelo como una lista de parámetros. Esto es útil para algoritmos de optimización.
-        
+        Returns the premise parameters as a PyTorch ParameterList, useful
+        for passing to optimizers.
+
         Returns:
-            nn.ParameterList: Lista de parámetros de las funciones de membresía de los antecedentes.
+            nn.ParameterList: Premise parameters wrapped as a list of trainable parameters.
         """
         return self._premises
     
@@ -626,10 +648,10 @@ class rule_reduced_FuzzificationLayer(nn.Module):
     @property
     def num_mfs(self):
         """
-        Retorna la cantidad de funciones de membresía por feature.
-        
+        Number of MFs per input feature.
+
         Returns:
-            int: Cantidad de funciones de membresía que tiene cada feature.
+            int: Number of MFs assigned to each input feature.
         """
         return self.get_premises().shape[1]
         
@@ -637,7 +659,11 @@ class rule_reduced_FuzzificationLayer(nn.Module):
     @property
     def get_premises_structure(self):
         """
-        Retorna la estructura de los antecedentes en un DataFrame de pandas.
+        Structure of the premise parameters.
+
+        Returns:
+            pd.DataFrame: DataFrame describing the premise parameters for
+            each input feature and MF.
         """
         premises_tensor = torch.stack([premise.data.clone().detach() for premise in self._premises], 1)
         n_mfs = premises_tensor.shape[1]
@@ -660,14 +686,14 @@ class rule_reduced_FuzzificationLayer(nn.Module):
     
     def plot_premises(self, mf=None, input_dim=None, group_by_dim=False, linestyles='-', linewidths=2.5):
         """
-        Plotea las funciones de membresía de los antecedentes.
-        
+        Plots the premise membership functions.
+
         Args:
-            mf (int): Función de membresía a plotear. Si es None, se plotean todas las funciones de membresía (Default: None).
-            input_dim (int): Dimensión de entrada a plotear. Si es None, se plotean todas las dimensiones de entrada (Default: None).
-            group_by_dim (bool): Si es True, agrupa las funciones de membresía en un solo gráfico por cada dimensión de entrada. (Default: False)
-            linestyles (string | list): String o lista de strings que representan los tipos de linea para representar las funciones de membresía. Si se usa una lista, los tipos de linea se irán alternando. Los caracteres permitidos son: ['-', '--', '-.', ':']. (Default: '-')
-            linewidths (float | list): Float o lista de floats que representan los grosores de linea para representar las funciones de membresía. Si se usa una lista, los grosores de linea se irán alternando. (Default: 2.5)
+            mf (int, optional): Index of the MF to plot. If ``None``, all MFs are plotted. Defaults to ``None``.
+            input_dim (int, optional): Index of the input feature to plot. If ``None``, all input features are plotted. Defaults to ``None``.
+            group_by_dim (bool): If ``True``, all MFs for each input feature are grouped into a single plot. Defaults to ``False``.
+            linestyles (str or list[str]): Line style or list of line styles to cycle through when plotting MFs. Accepted values are ``'-'``, ``'--'``, ``'-.'``, and ``':'``. Defaults to ``'-'``.
+            linewidths (float or list[float]): Line width or list of line widths to cycle through when plotting MFs. Defaults to ``2.5``.
         """
         variables = [f'{self.features[i]}' for i in range(self._input_size)]
         dataframe = self.get_premises_structure

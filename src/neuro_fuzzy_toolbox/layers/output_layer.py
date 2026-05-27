@@ -3,21 +3,21 @@ import torch.nn as nn
 
 class OutputLayer(nn.Module):
     """
-    Clase para representar la capa de salida de un modelo de Sistema de Inferencia Neuro-Difuso Adaptativo (ANFIS).
-    Esta capa se encarga de calcular la salida final del modelo ANFIS a partir las salidas de cada regla.
-    
-    Tiene naturaleza dependiente del tipo de salida del modelo ANFIS, por lo que se debe especificar el tipo de salida al inicializar la capa. Los tipos de salida soportados son:
-        - 'default': Para problemas de regresión.
-        - 'sigmoid': Para problemas de clasificación binaria.
-        - 'softmax': Para problemas de clasificación multiclase.
-        
+    Output layer for an Adaptive Neuro-Fuzzy Inference System (ANFIS).
+
+    Aggregates the weighted rule outputs by summing across all rules and applies an output activation function to produce 
+    the final model prediction. The activation is determined by the specified output type:
+
+    - ``'default'``: No activation (identity). Suitable for regression.
+    - ``'sigmoid'``: Sigmoid activation..
+    - ``'softmax'``: Softmax activation (applied only when ``return_probs=True`` in :meth:`forward`). Suitable for classification.
     """
     def __init__(self, output_type):
         """
-        Inicializa una nueva instancia de la clase OutputLayer.
-        
+        Initializes a new OutputLayer instance.
+
         Args:
-            output_type (str): Tipo de salida del modelo ANFIS. Puede ser 'default', 'sigmoid' o 'softmax'.
+            output_type (str): Output activation type. Must be one of ``'default'``, ``'sigmoid'``, or ``'softmax'``.
         """
         super(OutputLayer, self).__init__()
         self._output_type = output_type.lower()
@@ -35,10 +35,16 @@ class OutputLayer(nn.Module):
 
     def forward(self, rules_outputs, return_probs=False):
         """
-        Realiza un paso hacia adelante para calcular la salida de la capa de salida.
-        
+        Forward pass of the output layer.
+
+        Sums the weighted rule outputs across all rules and applies the configured output activation.
+
         Args:
-            rules_outputs (torch.tensor): Tensor de tamaño (batch_size, rules) que contiene las salidas de cada regla.
-            return_probs (bool): Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es 'softmax', en caso contrario, se ignora (Default: False).
+            rules_outputs (torch.Tensor): Weighted rule outputs of shape ``(outputs, batch_size, rules)``.
+            return_probs (bool): If ``True`` and the output type is ``'softmax'``, applies a softmax activation 
+                to return class probabilities. Ignored for all other output types. Defaults to ``False``.
+
+        Returns:
+            torch.Tensor: Model output of shape ``(batch_size, outputs)``, or ``(batch_size,)`` for single-output models.
         """
         return self._last_layer(self._get_output(rules_outputs, return_probs))
