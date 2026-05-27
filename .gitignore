@@ -64,9 +64,11 @@ EXP_neuro_fuzzy_toolbox/
 examples/0-EXP
 z-markdown_utils/
 img/
+src_esp/
+docs_esp/
+examples/Old Examples/
 
 # ----------------------------
-# Usually keep tests tracked in git
-# (uncomment only if you really want to ignore them)
+# Probably I should keep tests tracked in git (I'll do it when they are more organized, but for now, let's ignore them)
 # ----------------------------
 tests/
