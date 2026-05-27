@@ -6,7 +6,10 @@ from abc import abstractmethod
 
 class MembershipFunction(nn.Module):
     """
-    Clase abstracta para funciones de membresía, solo define la estructura necesaria para diseñarlas en el toolbox. Sirve de guía para futuras implementaciones.
+    Abstract base class for membership functions.
+    
+    Defines the interface required for implementing membership functions within the toolbox. 
+    Intended as a guide for future implementations.
     """
     def __init__(self):
         super(MembershipFunction, self).__init__()
@@ -18,153 +21,160 @@ class MembershipFunction(nn.Module):
     @abstractmethod
     def _simple_numpy_implementation(self, x, *args): # Simple numpy implementation needed for plotting
         """
-        Implementación simple de la función de membresía en numpy. Este método se define para poder graficar las funciones de membresía.
+        NumPy implementation of the membership function, used for plotting.
         
         Args:
-            x (numpy.ndarray): Tensor de entrada.
-            *args: Parámetros de la función de membresía.
+            x (numpy.ndarray): Input array.
+            *args: MF parameters.
         """
         pass
     
     @abstractmethod
     def _simple_alpha_cut(self, alpha, *args):
         """
-        Implementación simple de un alpha-cut.
+        Computes the alpha-cut interval of the membership function.
 
         Args:
-            alpha (float): Valor entre 0 y 1 que indica el grado de pertenencia mínimo que se desea usar para el corte
-            *args: Parámetros de la función de membresía.
+            alpha (float): Membership degree threshold in the range ``[0, 1]``.
+            *args: MF parameters.
 
         Returns:
-            np.array: Array de 2 elementos que representa el intervalo en el que el grado de pertenencia de la función es mayor a alpha.
+            numpy.ndarray: Array of 2 elements representing the interval over which the membership degree is greater than ``alpha``.
         """
         pass
     
     @abstractmethod
     def _get_center(self, *args):
         """
-        Método simple para retornar el centro de la función de membresía. Este método se define para poder graficar las funciones de membresía más facilmente.
-        
+        Returns the center of the membership function, used for plotting.
+                
         Args:
-            *args: Parámetros de la función de membresía.
-            
+            *args: MF parameters.
+
         Returns:
-            float: Centro de la función de membresía.
+            float: Center of the membership function.
         """
         pass
         
     @abstractmethod
     def forward(self, x, premises):
         """
-        Paso hacia adelante de la función de membresía.
+        Forward pass of the membership function.
         
         Args:
-            x (torch.tensor): Tensor de entrada. Debe tener la forma (batch_size, input_size).
-            premises (torch.tensor): Parámetros de las premisas. Debe tener la forma (input_size, num_mfs, len(self._params)).
+            x (torch.Tensor): Input tensor of shape ``(batch_size, input_size)``.
+            premises (torch.tensor): Premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
             
         Returns:
-            torch.tensor: Salida de la función de membresía (valores de membresía). La forma de salida es (batch_size, input_size, num_mfs).
+            torch.tensor: Membership degrees of shape ``(batch_size, input_size, num_mfs)``.
         """
         pass
     
     @abstractmethod
     def initialize_premises(self, x_train, num_mfs):
         """
-        Inicializa los parámetros de la función de membresía basándose en los datos de entrada. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Initializes the premise parameters from training data, assuming the same number of MFs for every input feature.
         
         Args:
-            x_train (torch.tensor): Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).
-            num_mfs (int): Número de funciones de membresía por característica de entrada.
+            x_train (torch.tensor): Training input data of shape ``(n_samples, input_size)``.
+            num_mfs (int): Number of MFs per input feature.
             
         Returns:
-            torch.tensor: Parámetros de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+            torch.tensor: Initialized premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
         """
         pass
     
     @abstractmethod
     def general_initialize_premises(self, x_train, mf_distribution):
         """
-        Inicializa los parámetros de la función de membresía basándose en los datos de entrada. Este método considera que cada característica de entrada puede tener un número distinto de funciones de membresía.
+        Initializes the premise parameters from training data, allowing a different number of MFs per input feature.
         
         Args:
-            x_train (torch.tensor): Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).
-            mf_distribution (list): Número de funciones de membresía por característica de entrada en forma de lista.
+            x_train (torch.tensor): Training input data of shape ``(n_samples, input_size)``.
+            mf_distribution (list[int]): Number of MFs for each input feature.
             
         Returns:
-            list: Lista de tensores con los parámetros de las funciones de membresía asociadas a cada feature de los datos de entrada. La forma del tensor i de la lista es (input_size, mf_distribution[i], len(self._params)).
+            list[torch.Tensor]: List of premise parameter tensors, one per input feature. The tensor at index ``i`` has shape 
+            ``(input_size, mf_distribution[i], len(self._params))``.
         """
         pass
     
     @abstractmethod
     def random_premises(self, input_size, num_mfs, dtype):
         """
-        Genera parámetros aleatorios para las premisas en el rango [-1, 1], restringiendo ciertos parámetros a valores positivos (dependiendo de la función de membresía en cuestión).
+        Generates randomly initialized premise parameters in the range ``[-1, 1]``, with certain parameters constrained to 
+        positive values depending on the MF type.
         
         Args:
-            input_size (int): Número de características de entrada.
-            num_mfs (int): Número de funciones de membresía por característica de entrada.
-            dtype (torch.dtype): Tipo de dato de las premisas.
+            input_size (int): Number of input features.
+            num_mfs (int): Number of MFs per input feature.
+            dtype (torch.dtype): Data type of the premise parameters.
             
         Returns:
-            torch.tensor: Parámetros aleatorios de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+            torch.tensor: Randomly initialized premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
         """
         pass
     
     @abstractmethod
     def random_single_feature_mfs(self):
         """
-        Genera parámetros aleatorios para una sola función de membresía en el rango [-1, 1], restringiendo ciertos parámetros a valores positivos (dependiendo de la función de membresía en cuestión).
+        Generates randomly initialized premise parameters for a single input feature in the range ``[-1, 1]``, 
+        with certain parameters constrained to positive values depending on the MF type.
         
         Args:
-            n_mfs (int): Número de funciones de membresía.
-            dtype (torch.dtype): Tipo de dato de las premisas.
+            n_mfs (int): Number of MFs.
+            dtype (torch.dtype): Data type of the premise parameters.
             
         Returns:
-            torch.tensor: Parámetros aleatorios de las premisas. La forma de salida es (n_mfs, len(self._params)).
+            torch.tensor: Randomly initialized premise parameters of shape ``(n_mfs, len(self._params))``.
         """
         pass
     
     @abstractmethod
     def _grow_new_premise_parameters(self, means, stds):
         """
-        Método utilizado en el algoritmo para la modificación de la estructura del modelo SONFIS. Genera nuevas premisas dado un conjunto de medias y desviaciones estándar en la forma de un tensor. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Generates new premise parameters from provided means and standard
+        deviations, used during structural adaptation in the SONFIS algorithm
+        (grow operation). Assumes the same number of MFs for every input feature.
         
         Args:
-            means (torch.tensor): Medias por característica de entrada y función de membresía. La dimensión de la entrada es (num_new_mfs, input_size), donde num_new_mfs es el número de nuevas funciones de membresía que se agregarán a cada feature de los datos de entrada.
-            stds (torch.tensor): Desviaciones estándar por característica de entrada y función de membresía. La dimensión de la entrada es (num_new_mfs, input_size), de la misma forma que el tensor means.
+            means (torch.tensor): Per-feature MF centers of shape ``(num_new_mfs, input_size)``, where ``num_new_mfs`` is the
+                number of new MFs to add to each input feature.
+            stds (torch.tensor): Per-feature MF spreads of shape ``(num_new_mfs, input_size)``, matching the shape of ``means``.
             
         Returns:
-            torch.tensor: Nuevos parámetros de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+            torch.tensor: New premise parameters of shape ``(input_size, num_new_mfs, len(self._params))``.
         """
         pass
     
     @abstractmethod
     def _split_premise_parameters(self, premises):
         """
-        Método utilizado en el algoritmo para la modificación de la estructura del modelo SONFIS. Divide las premisas ingresadas en dos nuevas. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Splits each MF in the given premises into two, used during structural
+        adaptation in the SONFIS algorithm (split operation). Assumes the same
+        number of MFs for every input feature.
         
         Args:
-            premises (torch.tensor): Parámetros de las premisas. La forma de entrada es (input_size, num_mfs, len(self._params)).
+            premises (torch.tensor): Premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
             
         Returns:
-            torch.tensor: Nuevos parámetros de las premisas. La forma de salida es (input_size, 2*num_mfs, len(self._params)).
+            torch.tensor: Resultant premise parameters of shape ``(input_size, 2 * num_mfs, len(self._params))``, where each original MF has been replaced by two new MFs.
         """
         pass
 
 
 class Gaussian_MF(MembershipFunction):
     """  
-    Función de membresía Gaussiana. Está definida como:  
+    Gaussian membership function, defined as: 
 
     .. math::
 
         gaussian(x) = e^{-\\frac{(x - \\mu)^2}{2\\sigma^2}}
 
     donde:
-        - :math:`x` es la variable de entrada.
-        - :math:`\\mu` es el centro de la función.
-        - :math:`\\sigma` es la desviación estándar, que controla la anchura de la curva.
-    
+        - :math:`x` is the input variable.
+        - :math:`\\mu` is the center of the function.
+        - :math:`\\sigma` is the standard deviation, controlling the width of the curve.
     """
     def __init__(self):
         super(Gaussian_MF, self).__init__()
@@ -175,29 +185,29 @@ class Gaussian_MF(MembershipFunction):
         
     def _simple_numpy_implementation(self, x, mu, sigma):
         """
-        Implementación simple de la función de membresía Gaussiana en numpy. Este método se define para poder graficar las funciones de membresía.
+        NumPy implementation of the Gaussian MF, used for plotting.
         
         Args:
-            x (numpy.ndarray): Tensor de entrada.
-            mu (float): Parámetro mu.
-            sigma (float): Parámetro sigma.
+            x (numpy.ndarray): Input array.
+            mu (float): Center of the Gaussian MF.
+            sigma (float): Standard deviation of the Gaussian MF.
             
         Returns:
-            numpy.ndarray: Salida de la función de membresía Gaussiana.
+            numpy.ndarray: Membership degrees for each value in ``x``.
         """
         return np.exp(-0.5 * np.power((x - mu)/sigma, 2))
     
     def _simple_alpha_cut(self, alpha, mu, sigma):
         """
-        Implementación simple de un alpha-cut.
+        Computes the alpha-cut interval of the Gaussian MF.
 
         Args:
-            alpha (float): Valor entre 0 y 1 que indica el grado de pertenencia mínimo que se desea usar para el corte
-            mu (float): Parámetro mu.
-            sigma (float): Parámetro sigma.
+            alpha (float): Membership degree threshold in the range ``[0, 1]``.
+            mu (float): Center of the Gaussian MF.
+            sigma (float): Standard deviation of the Gaussian MF.
 
         Returns:
-            np.array: Array de 2 elementos que representa el intervalo en el que el grado de pertenencia de la función es mayor a alpha.
+            np.array: Array of 2 elements representing the interval over which the membership degree is greater than ``alpha``.
         """
         sigma = abs(sigma)
         r = np.sqrt(-2*np.log(alpha))
@@ -207,40 +217,40 @@ class Gaussian_MF(MembershipFunction):
     
     def _get_center(self, mu, sigma):
         """
-        Método simple para retornar el centro de la función de membresía. Este método se define para poder graficar las funciones de membresía más facilmente.
+        Returns the center of the Gaussian MF, used for plotting.
         
         Args:
-            mu (float): Parámetro mu.
-            sigma (float): Parámetro sigma.
+            mu (float): Center of the Gaussian MF.
+            sigma (float): Standard deviation of the Gaussian MF.
             
         Returns:
-            float: Centro de la función de membresía.
+            float: Center of the membership function.
         """
         return mu
 
     def forward(self, x, premises):
         """
-        Paso hacia adelante de la función de membresía Gaussiana.
+        Forward pass of the Gaussian membership function.
         
         Args:
-            x (torch.tensor): Tensor de entrada. Debe tener la forma (batch_size, input_size).
-            premises (torch.tensor): Parámetros de las premisas. Debe tener la forma (input_size, num_mfs, len(self._params)).
+            x (torch.Tensor): Input tensor of shape ``(batch_size, input_size)``.
+            premises (torch.Tensor): Premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
         
         Returns:
-            torch.tensor: Salida de la función de membresía Gaussiana (valores de membresía). La forma de salida es (batch_size, input_size, num_mfs).
+            torch.Tensor: Membership degrees of shape ``(batch_size, input_size, num_mfs)``.
         """
         return torch.exp(-0.5 * torch.pow((x.unsqueeze(x.dim()) - premises[:, :, 0])/torch.where(premises[:, :, 1] == 0, torch.tensor(1e-6), premises[:, :, 1]), 2))
 
     def initialize_premises(self, x_train, num_mfs):
         """
-        Inicializa los parámetros de la función de membresía gaussiana basándose en los datos de entrada. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Initializes the Gaussian MF premise parameters from training data, assuming the same number of MFs for every input feature.
         
         Args:
-            x_train (torch.tensor): Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).
-            num_mfs (int): Número de funciones de membresía por característica de entrada.
+            x_train (torch.Tensor): Training input data of shape ``(n_samples, input_size)``.
+            num_mfs (int): Number of MFs per input feature.
             
         Returns:
-            torch.tensor: Parámetros de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+            torch.Tensor: Initialized premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
         """
         input_size = x_train.shape[1]
         premises = torch.zeros(input_size, num_mfs, len(self._params), dtype=x_train.dtype)
@@ -262,14 +272,14 @@ class Gaussian_MF(MembershipFunction):
     
     def general_initialize_premises(self, x_train, mf_distribution):
         """
-        Inicializa los parámetros de la función de membresía gaussiana basándose en los datos de entrada. Este método considera que cada característica de entrada puede tener un número distinto de funciones de membresía.
+        Initializes the Gaussian MF premise parameters from training data, allowing a different number of MFs per input feature.
         
         Args:
-            x_train (torch.tensor): Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).
-            mf_distribution (list): Número de funciones de membresía por característica de entrada en forma de lista.
+            x_train (torch.Tensor): Training input data of shape ``(n_samples, input_size)``.
+            mf_distribution (list[int]): Number of MFs for each input feature.
             
         Returns:
-            list: Lista de tensores con los parámetros de las funciones de membresía asociadas a cada feature de los datos de entrada. La forma del tensor i de la lista es (input_size, mf_distribution[i], len(self._params)).
+            list[torch.Tensor]: List of premise parameter tensors, one per input feature. The tensor at index ``i`` has shape ``(input_size, mf_distribution[i], len(self._params))``.
         """
         input_size = x_train.shape[1]
         premises = []
@@ -297,15 +307,15 @@ class Gaussian_MF(MembershipFunction):
     
     def random_premises(self, input_size, num_mfs, dtype):
         """
-        Genera parámetros aleatorios para las premisas en el rango [-1, 1], restringiendo el parámetro :math:`\\sigma` a valores positivos.
+        Generates randomly initialized premise parameters in the range ``[-1, 1]``, with :math:`\\sigma` constrained to positive values.
         
         Args:
-            input_size (int): Número de características de entrada.
-            num_mfs (int): Número de funciones de membresía por característica de entrada.
-            dtype (torch.dtype): Tipo de dato de las premisas.
+            input_size (int): Number of input features.
+            num_mfs (int): Number of MFs per input feature.
+            dtype (torch.dtype): Data type of the premise parameters.
             
         Returns:
-            torch.tensor: Parámetros aleatorios de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+            torch.Tensor: Randomly initialized premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
         """
         random_premises = 2 * torch.rand(input_size, num_mfs, len(self._params), dtype=dtype) - 1
         random_premises[:, :, 1] = torch.abs(random_premises[:, :, 1]) + 0.1
@@ -313,14 +323,15 @@ class Gaussian_MF(MembershipFunction):
     
     def random_single_feature_mfs(self, n_mfs, dtype):
         """
-        Genera parámetros aleatorios para una sola función de membresía Gaussiana en el rango [-1, 1], restringiendo el parámetro :math:`\\sigma` a valores positivos.
+        Generates randomly initialized premise parameters for a single input feature in the range ``[-1, 1]``, with :math:`\\sigma` 
+        constrained to positive values.
         
         Args:
-            n_mfs (int): Número de funciones de membresía.
-            dtype (torch.dtype): Tipo de dato de las premisas.
+            n_mfs (int): Number of MFs.
+            dtype (torch.dtype): Data type of the premise parameters.
             
         Returns:
-            torch.tensor: Parámetros aleatorios de las premisas. La forma de salida es (n_mfs, len(self._params)).
+            torch.Tensor: Randomly initialized premise parameters of shape ``(n_mfs, len(self._params))``.
         """
         single_feature_mf = 2 * torch.rand(n_mfs, len(self._params), dtype=dtype) - 1
         single_feature_mf[:, 1] = torch.abs(single_feature_mf[:, 1]) + 0.1
@@ -328,26 +339,28 @@ class Gaussian_MF(MembershipFunction):
 
     def _grow_new_premise_parameters(self, means, stds):
         """
-        Método utilizado en el algoritmo para la modificación de la estructura del modelo SONFIS. Genera nuevas premisas dado un conjunto de medias y desviaciones estándar en la forma de un tensor. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Generates new Gaussian MF premise parameters from provided means and standard 
+        deviations, used during  structural adaptation in the SONFIS algorithm 
+        (grow operation). Assumes the same number of MFs for every input feature.
         
         Args:
-            means (torch.tensor): Medias por característica de entrada y función de membresía. La dimensión de la entrada es (num_new_mfs, input_size), donde num_new_mfs es el número de nuevas funciones de membresía que se agregarán a cada feature de los datos de entrada.
-            stds (torch.tensor): Desviaciones estándar por característica de entrada y función de membresía. La dimensión de la entrada es (num_new_mfs, input_size), de la misma forma que el tensor means.
+            means (torch.Tensor): Per-feature MF centers of shape ``(num_new_mfs, input_size)``, where ``num_new_mfs`` is the number of new MFs to add to each input feature.
+            stds (torch.Tensor): Per-feature MF spreads of shape ``(num_new_mfs, input_size)``, matching the shape of ``means``.
             
         Returns:
-            torch.tensor: Nuevos parámetros de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+            torch.Tensor: New premise parameters of shape ``(input_size, num_new_mfs, len(self._params))``.
         """
         return torch.cat((means.t().unsqueeze(2), stds.t().unsqueeze(2)), dim=2)
     
     def _split_premise_parameters(self, premises):
         """
-        Método utilizado en el algoritmo para la modificación de la estructura del modelo SONFIS. Divide las premisas ingresadas en dos nuevas. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Splits each Gaussian MF in the given premises into two, used during structural adaptation in the SONFIS algorithm (split operation). Assumes the same number of MFs for every input feature.         
         
         Args:
-            premises (torch.tensor): Parámetros de las premisas. La forma de entrada es (input_size, num_mfs, len(self._params)).
+            premises (torch.Tensor): Premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
             
         Returns:
-            torch.tensor: Nuevos parámetros de las premisas. La forma de salida es (input_size, 2*num_mfs, len(self._params)).
+            torch.Tensor: Resultant premise parameters of shape ``(input_size, 2 * num_mfs, len(self._params))``, where each original MF has been replaced by two new MFs.
         """
         split1 = torch.clone(premises)
         split1[:,:,0] += premises[:,:,1]/2
@@ -363,17 +376,17 @@ class Gaussian_MF(MembershipFunction):
 
 class GeneralizedBell_MF(MembershipFunction):
     """
-    Función de membresía de tipo generalized bell-shaped. Está definida como:  
+    Generalized bell-shaped membership function, defined as: 
     
     .. math::
     
         generalized\\_bell(x) = \\frac{1}{1 + \\left(\\frac{|x - c|}{a}\\right)^{2b}}
         
-    donde:
-        - :math:`x` es la variable de entrada.
-        - :math:`a` es el parámetro de ancho.
-        - :math:`b` es el parámetro de pendiente.
-        - :math:`c` es el parámetro de centro.
+    where:
+        - :math:`x` is the input variable.
+        - :math:`a` is the width parameter.
+        - :math:`b` is the slope parameter.
+        - :math:`c` is the center parameter.
     
     """
     def __init__(self):
@@ -386,32 +399,32 @@ class GeneralizedBell_MF(MembershipFunction):
     
     def _simple_numpy_implementation(self, x, a, b, c):
         """
-        Implementación simple de la función de membresía Generalized Bell en numpy. Este método se define para poder graficar las funciones de membresía.
+        NumPy implementation of the Generalized Bell MF, used for plotting.
         
         Args:
-            x (numpy.ndarray): Tensor de entrada.
-            a (float): Parámetro a (ancho).
-            b (float): Parámetro b (pendiente).
-            c (float): Parámetro c (centro).
+            x (numpy.ndarray): Input array.
+            a (float): Width parameter.
+            b (float): Slope parameter.
+            c (float): Center parameter.
         
         Returns:
-            numpy.ndarray: Salida de la función de membresía Gaussiana.
+            numpy.ndarray: Membership degrees for each value in ``x``.
         
         """
         return 1/(1 + np.power(np.abs((x - c)/a), 2*b))
     
     def _simple_alpha_cut(self, alpha, a, b, c):
         """
-        Implementación simple de un alpha-cut.
+        Computes the alpha-cut interval of the Generalized Bell MF.
 
         Args:
-            alpha (float): Valor entre 0 y 1 que indica el grado de pertenencia mínimo que se desea usar para el corte
-            a (float): Parámetro a (ancho).
-            b (float): Parámetro b (pendiente).
-            c (float): Parámetro c (centro).
+            alpha (float): Membership degree threshold in the range ``[0, 1]``.
+            a (float): Width parameter.
+            b (float): Slope parameter.
+            c (float): Center parameter.
             
         Returns:
-            np.array: Array de 2 elementos que representa el intervalo en el que el grado de pertenencia de la función es mayor a alpha.
+            numpy.ndarray: Array of 2 elements representing the interval over which the membership degree is greater than ``alpha``.
         """
         a = abs(a)
         r = np.power(1.0/alpha - 1.0, 1.0/(2.0*b))
@@ -421,41 +434,41 @@ class GeneralizedBell_MF(MembershipFunction):
     
     def _get_center(self, a, b, c):
         """
-        Método simple para retornar el centro de la función de membresía. Este método se define para poder graficar las funciones de membresía más facilmente.
+        Returns the center of the Generalized Bell MF, used for plottin
         
         Args:
-            a (float): Parámetro a (ancho).
-            b (float): Parámetro b (pendiente).
-            c (float): Parámetro c (centro).
+            a (float): Width parameter.
+            b (float): Slope parameter.
+            c (float): Center parameter.
             
         Returns:
-            float: Centro de la función de membresía.
+            float: Center of the membership function.
         """
         return c
         
     def forward(self, x, premises):
         """
-        Paso hacia adelante de la función de membresía Generalized Bell.
+        Forward pass of the Generalized Bell membership function.
         
         Args:
-            x (torch.tensor): Tensor de entrada. Debe tener la forma (batch_size, input_size).
-            premises (torch.tensor): Parámetros de las premisas. Debe tener la forma (input_size, num_mfs, len(self._params)).
+            x (torch.Tensor): Input tensor of shape ``(batch_size, input_size)``.
+            premises (torch.Tensor): Premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
             
         Returns:
-            torch.tensor: Salida de la función de membresía Generalized Bell (valores de membresía). La forma de salida es (batch_size, input_size, num_mfs).
+            torch.Tensor: Membership degrees of shape ``(batch_size, input_size, num_mfs)``.
         """
         return 1/(1 + torch.pow(torch.abs((x.unsqueeze(x.dim()) - premises[:, :, 2])/torch.where(premises[:, :, 0] == 0, torch.tensor(1e-6), premises[:, :, 0])), 2*premises[:, :, 1]))
 
     def initialize_premises(self, x_train, num_mfs):
         """
-        Inicializa los parámetros de la función de membresía Generalized Bell basándose en los datos de entrada. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Initializes the Generalized Bell MF premise parameters from training data, assuming the same number of MFs for every input feature.
         
         Args:
-            x_train (torch.tensor): Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).
-            num_mfs (int): Número de funciones de membresía por característica de entrada.
+            x_train (torch.Tensor): Training input data of shape ``(n_samples, input_size)``.
+            num_mfs (int): Number of MFs per input feature.
             
         Returns:
-            torch.tensor: Parámetros de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+            torch.Tensor: Initialized premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
         """
         input_size = x_train.shape[1]
         premises = torch.zeros(input_size, num_mfs, len(self._params), dtype=x_train.dtype)
@@ -479,14 +492,14 @@ class GeneralizedBell_MF(MembershipFunction):
     
     def general_initialize_premises(self, x_train, mf_distribution):
         """
-        Inicializa los parámetros de la función de membresía Generalized Bell basándose en los datos de entrada. Este método considera que cada característica de entrada puede tener un número distinto de funciones de membresía.
+        Initializes the Generalized Bell MF premise parameters from training data, allowing a different number of MFs per input feature.
         
         Args:
-            x_train (torch.tensor): Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).
-            mf_distribution (list): Número de funciones de membresía por característica de entrada en forma de lista.
+            x_train (torch.Tensor): Training input data of shape ``(n_samples, input_size)``.
+            mf_distribution (list[int]): Number of MFs for each input feature.
             
         Returns:
-            list: Lista de tensores con los parámetros de las funciones de membresía asociadas a cada feature de los datos de entrada. La forma del tensor i de la lista es (input_size, mf_distribution[i], len(self._params)).
+            list[torch.Tensor]: List of premise parameter tensors, one per input feature. The tensor at index ``i`` has shape ``(input_size, mf_distribution[i], len(self._params))``.
         """
         input_size = x_train.shape[1]
         premises = []
@@ -515,15 +528,15 @@ class GeneralizedBell_MF(MembershipFunction):
     
     def random_premises(self, input_size, num_mfs, dtype):
         """
-        Genera parámetros aleatorios para las premisas en el rango [-1, 1], restringiendo a los parámetros de ancho y pendiente (**a** y **b**) a valores positivos. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Generates randomly initialized premise parameters in the range ``[-1, 1]``, with the width and slope parameters (:math:`a` and :math:`b`) constrained to positive values.
         
         Args:
-            input_size (int): Número de características de entrada.
-            num_mfs (int): Número de funciones de membresía por característica de entrada.
-            dtype (torch.dtype): Tipo de dato de las premisas.
+            input_size (int): Number of input features.
+            num_mfs (int): Number of MFs per input feature.
+            dtype (torch.dtype): Data type of the premise parameters.
             
         Returns:
-            torch.tensor: Parámetros aleatorios de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+            torch.Tensor: Randomly initialized premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
         """
         random_premises = 2 * torch.rand(input_size, num_mfs, len(self._params), dtype=dtype) - 1
         random_premises[:, :, :2] = torch.abs(random_premises[:, :, :2]) + 0.1
@@ -532,14 +545,14 @@ class GeneralizedBell_MF(MembershipFunction):
     
     def random_single_feature_mfs(self, n_mfs, dtype):
         """
-        Genera parámetros aleatorios para una sola función de membresía Generalized Bell en el rango [-1, 1], restringiendo a los parámetros de ancho y pendiente (**a** y **b**) a valores positivos.
+        Generates randomly initialized premise parameters for a single input feature in the range ``[-1, 1]``, with the width and slope parameters (:math:`a` and :math:`b`) constrained to positive values.
         
         Args:
-            n_mfs (int): Número de funciones de membresía.
-            dtype (torch.dtype): Tipo de dato de las premisas.
+            n_mfs (int): Number of MFs.
+            dtype (torch.dtype): Data type of the premise parameters.
             
         Returns:
-            torch.tensor: Parámetros aleatorios de las premisas. La forma de salida es (n_mfs, len(self._params)).
+            torch.Tensor: Randomly initialized premise parameters of shape ``(n_mfs, len(self._params))``.
         """
         random_premise = 2 * torch.rand(n_mfs, len(self._params), dtype=dtype) - 1
         random_premise[:, :2] = torch.abs(random_premise[:, :2]) + 0.1
@@ -548,26 +561,31 @@ class GeneralizedBell_MF(MembershipFunction):
     
     def _grow_new_premise_parameters(self, means, stds):
         """
-        Método utilizado en el algoritmo para la modificación de la estructura del modelo SONFIS. Genera nuevas premisas dado un conjunto de medias y desviaciones estándar en la forma de un tensor. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Generates new Generalized Bell MF premise parameters from provided means and standard deviations, 
+        used during structural adaptation in the SONFIS algorithm (grow operation). Assumes the same number of MFs
+        for every input feature. The slope parameter :math:`b` is initialized to ``4.0`` for all new MFs.
         
         Args:
-            means (torch.tensor): Medias por característica de entrada y función de membresía. La dimensión de la entrada es (num_new_mfs, input_size), donde num_new_mfs es el número de nuevas funciones de membresía que se agregarán a cada feature de los datos de entrada.
-            stds (torch.tensor): Desviaciones estándar por característica de entrada y función de membresía. La dimensión de la entrada es (num_new_mfs, input_size), de la misma forma que el tensor means.
-            
+            means (torch.Tensor): Per-feature MF centers of shape ``(num_new_mfs, input_size)``, where ``num_new_mfs`` is the number of new MFs to add to each input feature.
+            stds (torch.Tensor): Per-feature MF spreads of shape ``(num_new_mfs, input_size)``, matching the shape of ``means``.
+        
         Returns:
-            torch.tensor: Nuevos parámetros de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+            torch.Tensor: New premise parameters of shape ``(input_size, num_new_mfs, len(self._params))``.
         """
         return torch.cat((stds.t().unsqueeze(2), (torch.ones_like(stds) * 4.).t().unsqueeze(2), means.t().unsqueeze(2)), dim=2)
     
     def _split_premise_parameters(self, premises):
         """
-        Método utilizado en el algoritmo para la modificación de la estructura del modelo SONFIS. Divide las premisas ingresadas en dos nuevas. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Splits each Generalized Bell MF in the given premises into two, used during structural adaptation 
+        in the SONFIS algorithm (split operation). Each MF is split by halving its width parameter :math:`a` and 
+        shifting the center :math:`c` by the new half-width in opposite directions.
+        Assumes the same number of MFs for every input feature.
         
         Args:
-            premises (torch.tensor): Parámetros de las premisas. La forma de entrada es (input_size, num_mfs, len(self._params)).
+            premises (torch.Tensor): Premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
             
         Returns:
-            torch.tensor: Nuevos parámetros de las premisas. La forma de salida es (input_size, 2*num_mfs, len(self._params)).
+            torch.Tensor: Resultant premise parameters of shape ``(input_size, 2 * num_mfs, len(self._params))``, where each original MF has been replaced by two new MFs.
         """
         split1 = torch.clone(premises)
         split1[:,:,0] /= 2
@@ -583,16 +601,20 @@ class GeneralizedBell_MF(MembershipFunction):
 
 class HighSlopeBell_MF(MembershipFunction):
     """
-    Función de membresía de tipo generalized bell-shaped, pero el parámetro "b" relacionado con la "pendiente" de la campana está definido a 8.0 para establecer una forma determinada y estricta a las funciones de membresía. Está definida como:  
+    High-slope generalized bell-shaped membership function.
+
+    A variant of the Generalized Bell MF where the slope parameter
+    :math:`b` is fixed at ``8.0``, enforcing a strict and consistent
+    shape across all MFs. It is defined as:
     
     .. math::
     
         generalized\\_bell(x) = \\frac{1}{1 + \\left(\\frac{|x - c|}{a}\\right)^{2\\cdot 8}}
         
     donde:
-        - :math:`x` es la variable de entrada.
-        - :math:`a` es el parámetro de ancho.
-        - :math:`c` es el parámetro de centro.
+        - :math:`x` is the input variable.
+        - :math:`a` is the width parameter.
+        - :math:`c` is the center parameter.
     
     """
     def __init__(self):
@@ -605,15 +627,15 @@ class HighSlopeBell_MF(MembershipFunction):
     
     def _simple_numpy_implementation(self, x, a, c):
         """
-        Implementación simple de la función de membresía High Slope Bell en numpy. Este método se define para poder graficar las funciones de membresía.
+        NumPy implementation of the High-Slope Bell MF, used for plotting.
         
         Args:
-            x (numpy.ndarray): Tensor de entrada.
-            a (float): Parámetro a (ancho).
-            c (float): Parámetro c (centro).
+            x (numpy.ndarray): Input array.
+            a (float): Width parameter.
+            c (float): Center parameter.
         
         Returns:
-            numpy.ndarray: Salida de la función de membresía Gaussiana.
+            numpy.ndarray: Membership degrees for each value in ``x``.
         
         """
         if a == 0:
@@ -622,15 +644,15 @@ class HighSlopeBell_MF(MembershipFunction):
     
     def _simple_alpha_cut(self, alpha, a, c):
         """
-        Implementación simple de un alpha-cut.
+        Computes the alpha-cut interval of the High-Slope Bell MF.
 
         Args:
-            alpha (float): Valor entre 0 y 1 que indica el grado de pertenencia mínimo que se desea usar para el corte
-            a (float): Parámetro a (ancho).
-            c (float): Parámetro c (centro).
+            alpha (float): Membership degree threshold in the range ``[0, 1]``.
+            a (float): Width parameter.
+            c (float): Center parameter.
             
         Returns:
-            np.array: Array de 2 elementos que representa el intervalo en el que el grado de pertenencia de la función es mayor a alpha.
+            numpy.ndarray: Array of 2 elements representing the interval over which the membership degree is greater than ``alpha``.
         """
         a = abs(a)
         r = (1.0/alpha - 1.0)**(0.0625)
@@ -640,40 +662,40 @@ class HighSlopeBell_MF(MembershipFunction):
     
     def _get_center(self, a, c):
         """
-        Método simple para retornar el centro de la función de membresía. Este método se define para poder graficar las funciones de membresía más facilmente.
+        Returns the center of the High-Slope Bell MF, used for plotting.
         
         Args:
-            a (float): Parámetro a (ancho).
-            c (float): Parámetro c (centro).
+            a (float): Width parameter.
+            c (float): Center parameter.
             
         Returns:
-            float: Centro de la función de membresía.
+            float: Center of the membership function.
         """
         return c
         
     def forward(self, x, premises):
         """
-        Paso hacia adelante de la función de membresía High Slope Bell.
+        Forward pass of the High-Slope Bell membership function.
         
         Args:
-            x (torch.tensor): Tensor de entrada. Debe tener la forma (batch_size, input_size).
-            premises (torch.tensor): Parámetros de las premisas. Debe tener la forma (input_size, num_mfs, len(self._params)).
+            x (torch.Tensor): Input tensor of shape ``(batch_size, input_size)``.
+            premises (torch.Tensor): Premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
             
         Returns:
-            torch.tensor: Salida de la función de membresía High Slope Bell (valores de membresía). La forma de salida es (batch_size, input_size, num_mfs).
+            torch.Tensor: Membership degrees of shape ``(batch_size, input_size, num_mfs)``.
         """
         return 1/(1 + torch.pow(torch.abs((x.unsqueeze(x.dim()) - premises[:, :, 1])/torch.where(premises[:, :, 0] == 0, torch.tensor(1e-6), premises[:, :, 0])), 16.0))
 
     def initialize_premises(self, x_train, num_mfs):
         """
-        Inicializa los parámetros de la función de membresía High Slope Bell basándose en los datos de entrada. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Initializes the High-Slope Bell MF premise parameters from training data, assuming the same number of MFs for every input feature.
         
         Args:
-            x_train (torch.tensor): Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).
-            num_mfs (int): Número de funciones de membresía por característica de entrada.
+            x_train (torch.Tensor): Training input data of shape ``(n_samples, input_size)``.
+            num_mfs (int): Number of MFs per input feature.
             
         Returns:
-            torch.tensor: Parámetros de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+            torch.Tensor: Initialized premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
         """
         input_size = x_train.shape[1]
         premises = torch.zeros(input_size, num_mfs, len(self._params), dtype=x_train.dtype)
@@ -695,14 +717,14 @@ class HighSlopeBell_MF(MembershipFunction):
     
     def general_initialize_premises(self, x_train, mf_distribution):
         """
-        Inicializa los parámetros de la función de membresía High Slope Bell basándose en los datos de entrada. Este método considera que cada característica de entrada puede tener un número distinto de funciones de membresía.
+        Initializes the High-Slope Bell MF premise parameters from training data, allowing a different number of MFs per input feature.
         
         Args:
-            x_train (torch.tensor): Conjunto de datos de entrenamiento de entrada. Debe tener la forma (n_samples, input_size).
-            mf_distribution (list): Número de funciones de membresía por característica de entrada en forma de lista.
+            x_train (torch.Tensor): Training input data of shape ``(n_samples, input_size)``.
+            mf_distribution (list[int]): Number of MFs for each input feature.
             
         Returns:
-            list: Lista de tensores con los parámetros de las funciones de membresía asociadas a cada feature de los datos de entrada. La forma del tensor i de la lista es (input_size, mf_distribution[i], len(self._params)).
+            list[torch.Tensor]: List of premise parameter tensors, one per input feature. The tensor at index ``i`` has shape ``(input_size, mf_distribution[i], len(self._params))``.
         """
         input_size = x_train.shape[1]
         premises = []
@@ -729,15 +751,15 @@ class HighSlopeBell_MF(MembershipFunction):
     
     def random_premises(self, input_size, num_mfs, dtype):
         """
-        Genera parámetros aleatorios para las premisas en el rango [-1, 1], restringiendo el parámetro del ancho (**width**) a valores positivos. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Generates randomly initialized premise parameters in the range ``[-1, 1]``, with the width parameter (:math:`a`) constrained to positive values.
         
         Args:
-            input_size (int): Número de características de entrada.
-            num_mfs (int): Número de funciones de membresía por característica de entrada.
-            dtype (torch.dtype): Tipo de dato de las premisas.
+            input_size (int): Number of input features.
+            num_mfs (int): Number of MFs per input feature.
+            dtype (torch.dtype): Data type of the premise parameters.
             
         Returns:
-            torch.tensor: Parámetros aleatorios de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+            torch.Tensor: Randomly initialized premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
         """
         random_premises = 2 * torch.rand(input_size, num_mfs, len(self._params), dtype=dtype) - 1
         random_premises[:, :, 0] = torch.abs(random_premises[:, :, 0]) + 0.1
@@ -745,14 +767,14 @@ class HighSlopeBell_MF(MembershipFunction):
     
     def random_single_feature_mfs(self, n_mfs, dtype):
         """
-        Genera parámetros aleatorios para una sola función de membresía High Slope Bell en el rango [-1, 1], restringiendo el parámetro del ancho (**width**) a valores positivos.
+        Generates randomly initialized premise parameters for a single input feature in the range ``[-1, 1]``, with the width parameter (:math:`a`) constrained to positive values.
         
         Args:
-            n_mfs (int): Número de funciones de membresía.
-            dtype (torch.dtype): Tipo de dato de las premisas.
+            n_mfs (int): Number of MFs.
+            dtype (torch.dtype): Data type of the premise parameters.
             
         Returns:
-            torch.tensor: Parámetros aleatorios de las premisas. La forma de salida es (n_mfs, len(self._params)).
+            torch.Tensor: Randomly initialized premise parameters of shape ``(n_mfs, len(self._params))``.
         """
         random_premise = 2 * torch.rand(n_mfs, len(self._params), dtype=dtype) - 1
         random_premise[:, 0] = torch.abs(random_premise[:, 0]) + 0.1
@@ -760,26 +782,31 @@ class HighSlopeBell_MF(MembershipFunction):
     
     def _grow_new_premise_parameters(self, means, stds):
         """
-        Método utilizado en el algoritmo para la modificación de la estructura del modelo SONFIS. Genera nuevas premisas dado un conjunto de medias y desviaciones estándar en la forma de un tensor. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Generates new High-Slope Bell MF premise parameters from provided means and standard deviations,
+        used during structural adaptation in the SONFIS algorithm (grow operation). 
+        Assumes the same number of MFs for every input feature.
         
         Args:
-            means (torch.tensor): Medias por característica de entrada y función de membresía. La dimensión de la entrada es (num_new_mfs, input_size), donde num_new_mfs es el número de nuevas funciones de membresía que se agregarán a cada feature de los datos de entrada.
-            stds (torch.tensor): Desviaciones estándar por característica de entrada y función de membresía. La dimensión de la entrada es (num_new_mfs, input_size), de la misma forma que el tensor means.
+            means (torch.Tensor): Per-feature MF centers of shape ``(num_new_mfs, input_size)``, where ``num_new_mfs`` is the number of new MFs to add to each input feature.
+            stds (torch.Tensor): Per-feature MF spreads of shape ``(num_new_mfs, input_size)``, matching the shape of ``means``.
             
         Returns:
-            torch.tensor: Nuevos parámetros de las premisas. La forma de salida es (input_size, num_mfs, len(self._params)).
+            torch.Tensor: New premise parameters of shape ``(input_size, num_new_mfs, len(self._params))``.
         """
         return torch.cat((stds.t().unsqueeze(2), means.t().unsqueeze(2)), dim=2)
     
     def _split_premise_parameters(self, premises):
         """
-        Método utilizado en el algoritmo para la modificación de la estructura del modelo SONFIS. Divide las premisas ingresadas en dos nuevas. Este método considera que todas las características de entrada tienen el mismo número de funciones de membresía.
+        Splits each High-Slope Bell MF in the given premises into two, used during structural adaptation
+        in the SONFIS algorithm (split operation). Each MF is split by halving its width parameter :math:`a` 
+        and shifting the center :math:`c` by the new half-width in opposite directions.
+        Assumes the same number of MFs for every input feature.
         
         Args:
-            premises (torch.tensor): Parámetros de las premisas. La forma de entrada es (input_size, num_mfs, len(self._params)).
+            premises (torch.Tensor): Premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
             
         Returns:
-            torch.tensor: Nuevos parámetros de las premisas. La forma de salida es (input_size, 2*num_mfs, len(self._params)).
+            torch.Tensor: Resultant premise parameters of shape ``(input_size, 2 * num_mfs, len(self._params))``, where each original MF has been replaced by two new MFs.
         """
         split1 = torch.clone(premises)
         split1[:,:,0] /= 2
