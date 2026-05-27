@@ -8,29 +8,34 @@ from neuro_fuzzy_toolbox.training import (
 
 class base_model_trainer():
     """
-    Clase base para representar un algoritmo de entrenamiento para un modelo de aprendizaje automático.
-    
+    Base class for representing a training algorithm for a machine learning model.
+
     Warning:
-        No debe ser instanciada directamente. Solo sirve para ser heredada por otras clases. 
-        
+        This class should not be instantiated directly. It is intended to be
+        subclassed by other classes.
+
     Note:
-        Las clases que hereden de esta clase deben implementar las funciones:
-            - **_update_parameters(model, loader)**: ejecuta la actualización de parámetros durante una sola época el entrenamiento del modelo.
-            - **init_optimizer(self, model, optimizer, optim_params)**: instancia el optimizador a utilizar durante el entrenamiento del modelo.
+        Subclasses must implement the following methods:
+
+        - **_update_parameters(model, loader)**: executes the parameter update during a single training epoch.
+        - **init_optimizer(self, model, optimizer, optim_params)**: instantiates the optimizer to be used during training.
         
+        To be compatible with the SONFIS algorithm, subclasses must additionally implement:
+
+        - **_sonfis_update_parameters(model, train_loader, val_loader, freezed_subnets)**: applies the training algorithm within the SONFIS procedure.
+        - **_sonfis_init_optimizer(model, freezed_subnets)**: initializes the optimizer for use within the SONFIS procedure.
     """
     
     def __init__(self, epochs, loss_function, early_stopping=None, optimizer=torch.optim.Adam, optimizer_params={}):
         """
-        Inicializa una nueva instancia de la clase base_model_trainer.
-        
+        Initializes a new base_model_trainer instance.
+
         Args:
-            epochs (int): Número de épocas de entrenamiento.
-            loss_function (torch.nn.Module): Instancia de función de pérdida a utilizar en el entrenamiento.
-            early_stopping (EarlyStopping): Mecanismo de Early Stopping a utilizar en el entrenamiento (Default: None).
-            optimizer (torch.optim): Optimizador a utilizar en el entrenamiento (Default: torch.optim.Adam).
-            optimizer_params (dict): Parámetros a utilizar en el optimizador (Default: {}).
-        
+            epochs (int): Number of training epochs.
+            loss_function (torch.nn.Module): Instantiated loss function to use during training.
+            early_stopping (EarlyStopping): Early stopping mechanism to use during training. Defaults to ``None``.
+            optimizer (torch.optim.Optimizer): Optimizer class to use during training. Defaults to ``torch.optim.Adam``.
+            optimizer_params (dict): Parameters to pass to the optimizer. Defaults to ``{}``.
         """
         # Training parameters
         self.epochs = epochs
@@ -52,14 +57,13 @@ class base_model_trainer():
         
     def __call__(self, model, train_loader, val_loader=None, verbose=True):
         """
-        Entrena un modelo utilizando el algoritmo de entrenamiento.
-        
+        Trains a model using the training algorithm.
+
         Args:
-            model (torch.nn.Module): Modelo a entrenar.
-            train_loader (DataLoader): DataLoader con los datos de entrenamiento.
-            val_loader (DataLoader): Dataloader con los datos de validación (Default: None).
-            verbose (bool): Indica si se deben imprimir mensajes de aviso (Default: True).
-        
+            model (torch.nn.Module): Model to train.
+            train_loader (DataLoader): DataLoader containing the training data.
+            val_loader (DataLoader): DataLoader containing the validation data. Defaults to ``None``.
+            verbose (bool): If ``True``, prints progress messages during training. Defaults to ``True``.
         """
         self._init_optimizer(model)
         
@@ -93,14 +97,15 @@ class base_model_trainer():
             
     def _loss_function(self, model, pred, y):
         """
-        Ejecuta la función de pérdida.
-        
+        Computes the loss value.
+
         Args:
-            pred (torch.tensor): Tensor con las predicciones del modelo.
-            y (torch.tensor): Tensor con las etiquetas reales.
-            
+            model (torch.nn.Module): Model being trained.
+            pred (torch.Tensor): Tensor containing the model predictions.
+            y (torch.Tensor): Tensor containing the ground truth labels.
+
         Returns:
-            torch.tensor: Tensor con el valor de la pérdida.
+            torch.Tensor: Tensor containing the loss value.
         """
         
         '''preliminary fix for the dtype issue'''
@@ -119,15 +124,15 @@ class base_model_trainer():
     
     def _check_early_stop(self, model, loss, verbose):
         """
-        Verifica si se debe detener el entrenamiento del modelo (si hay mecanismo EarlyStopping).
-        
+        Checks whether training should be stopped via the early stopping mechanism, if one is set.
+
         Args:
-            model (torch.nn.Module): Modelo a entrenar.
-            loss (float): Pérdida actual del modelo.
-            verbose (bool): Indica si se deben imprimir mensajes de aviso.
-            
+            model (torch.nn.Module): Model being trained.
+            loss (float): Current loss value of the model.
+            verbose (bool): If ``True``, prints a warning message when early stopping is triggered.
+
         Returns:
-            bool: Indica si se debe detener el entrenamiento.
+            bool: ``True`` if training should be stopped, ``False`` otherwise.
         """
         if self.early_stopping is not None:
             self.early_stopping(model, loss, verbose)
@@ -139,16 +144,16 @@ class base_model_trainer():
     
     def _loss(self, model, train_loader, val_loader):
         """
-        Calcula el valor de la pérdida del modelo.
-        
+        Computes the training and validation loss values of the model.
+
         Args:
-            model (torch.nn.Module): Modelo a entrenar.
-            train_loader (DataLoader): DataLoader con los datos de entrenamiento.
-            val_loader (DataLoader): DataLoader con los datos de validación.
-        
+            model (torch.nn.Module): Model being trained.
+            train_loader (DataLoader): DataLoader containing the training data.
+            val_loader (DataLoader): DataLoader containing the validation data.
+
         Returns:
-            torch.tensor: Tensor con el valor de la pérdida.
-            torch.tensor: Tensor con el valor de la pérdida de validación.
+            torch.Tensor: Tensor containing the training loss value.
+            torch.Tensor: Tensor containing the validation loss value, or ``None`` if no validation data is provided.
         """
         val_loss = None
         x = train_loader.dataset.tensors[0]
@@ -167,13 +172,13 @@ class base_model_trainer():
     
     def _register_loss(self, model, train_loader, val_loader):
         """
-        Registra el valor de la pérdida en el historial. Si hay validación, también registra la pérdida de validación.
-        
+        Records the current loss value in the training history. If a validation
+        DataLoader is provided, also records the validation loss.
+
         Args:
-            model (torch.nn.Module): Modelo a entrenar.
-            train_loader (DataLoader): DataLoader con los datos de entrenamiento.
-            val_loader (DataLoader): DataLoader con los datos de valid
-        
+            model (torch.nn.Module): Model being trained.
+            train_loader (DataLoader): DataLoader containing the training data.
+            val_loader (DataLoader): DataLoader containing the validation data, or ``None`` if no validation data is used.
         """
         loss, val_loss = self._loss(model, train_loader, val_loader)
         self.history["loss"].append(loss.item())
@@ -184,31 +189,33 @@ class base_model_trainer():
 
 class Hybrid_learning_algorithm(base_model_trainer):
     """
-    Clase para representar un algoritmo de entrenamiento híbrido para un modelo de Sistema de Inferencia Neuro-Difuso Adaptativo (ANFIS).
+    Hybrid learning algorithm for training an Adaptive Neuro-Fuzzy Inference System (ANFIS) model.
     
     Note:
-        Este algoritmo está basado en el algoritmo de entrenamiento híbrido propuesto por Jang en 1993, para mas información ver: `ANFIS: adaptive-network-based fuzzy inference system <https://doi.org/10.1109/21.256541>`_.
-    
-    Pseudocódigo:
+        This algorithm is based on the hybrid training algorithm proposed by Jang in 1993. For more information, see:
+        `ANFIS: adaptive-network-based fuzzy inference system <https://doi.org/10.1109/21.256541>`_.
+
+    Pseudocode:
     
     .. image:: ../../_static/Hybrid_learning_algorithm_pseudocode.png
-        :alt: Pseudocódigo del algoritmo de entrenamiento híbrido.
+        :alt: Pseudocode of the hybrid learning algorithm.
         :align: center
         :width: 600px
     """
     def __init__(self, epochs, loss_function, driver=None, ridge_lambda=0., early_stopping=None, optimizer=torch.optim.Adam, optimizer_params={}):
         """
-        Inicializa una nueva instancia de la clase Hybrid_learning_algorithm.
-        
+        Initializes a new Hybrid_learning_algorithm instance.
+
         Args:
-            epochs (int): Número de épocas de entrenamiento.
-            loss_function (torch.nn.Module): Instancia de función de pérdida a utilizar en el entrenamiento.
-            driver (string): Chooses the backend function that will be used, vaild values are: 'gels', 'gelsy', 'gelsd', 'gelss'. If None, then uses 'gels' (Default: None)
-            ridge_lambda (float): Lambda usado para utilizar "Regularización Ridge" en la estimación de consecuentes con mínimos cuadrados. Si es 0, no se realiza regularización (Default: 0.).
-            early_stopping (EarlyStopping): Mecanismo de Early Stopping a utilizar en el entrenamiento (Default: None).
-            optimizer (torch.optim): Optimizador a utilizar en el entrenamiento (Default: torch.optim.Adam).
-            optimizer_params (dict): Parámetros a utilizar en el optimizador (Default: {}).
-        
+            epochs (int): Number of training epochs.
+            loss_function (torch.nn.Module): Instantiated loss function to use during training.
+            driver (str): Backend function to use for the least-squares estimation of the consequent parameters. 
+                Valid values are ``'gels'``, ``'gelsy'``, ``'gelsd'``, and ``'gelss'``. If ``None``, defaults to ``'gels'``.
+            ridge_lambda (float): Lambda value for Ridge regularization in the least-squares estimation. 
+                If ``0.``, no regularization is applied. Defaults to ``0.``.
+            early_stopping (EarlyStopping): Early stopping mechanism to use during training. Defaults to ``None``.
+            optimizer (torch.optim.Optimizer): Optimizer class to use during training. Defaults to ``torch.optim.Adam``.
+            optimizer_params (dict): Parameters to pass to the optimizer. Defaults to ``{}``.
         """
         super().__init__(epochs, loss_function, early_stopping, optimizer, optimizer_params)
         self.driver = driver
@@ -217,43 +224,44 @@ class Hybrid_learning_algorithm(base_model_trainer):
         
     def _init_optimizer(self, model):
         """
-        Inicializa el optimizador a utilizar en el entrenamiento, utilizando los parámetros de los antececentes del modelo ANFIS y los parámetros del optimizador especificados.
-        
+        Initializes the optimizer using only the premise parameters of the ANFIS model and the specified optimizer parameters.
+
         Args:
-            model (ANFIS | h_ANFIS): Modelo ANFIS a entrenar.
+            model (ANFIS | h_ANFIS | rule_reduced_ANFIS): ANFIS model to train.
         """
         self._optimizer_instance = self.optimizer(model.get_premises_as_parameters_list(), **self.optimizer_params)
 
     
     def _premises_update(self, ANFISmodel, loader):
         """
-        Actualiza los parámetros de los antecedentes del modelo ANFIS.
-        
+        Updates the premise parameters of the ANFIS model for one training epoch.
+
         Args:
-            ANFISmodel (ANFIS | h_ANFIS): Modelo ANFIS a entrenar.
-            loader (DataLoader): DataLoader con los datos de entrenamiento.
+            ANFISmodel (ANFIS | h_ANFIS | rule_reduced_ANFIS): ANFIS model to train.
+            loader (DataLoader): DataLoader containing the training data.
         """
         optimizer_training_epoch(ANFISmodel, loader, self._optimizer_instance, self.loss_function)
         
     
     def _consequents_update(self, ANFISmodel, loader):
         """
-        Actualiza los parámetros consecuentes del modelo ANFIS.
-        
+        Updates the consequent parameters of the ANFIS model using ordinary least squares estimation.
+
         Args:
-            ANFISmodel (ANFIS | h_ANFIS): Modelo ANFIS a entrenar.
-            loader (DataLoader): DataLoader con los datos de entrenamiento.
+            ANFISmodel (ANFIS | h_ANFIS | rule_reduced_ANFIS): ANFIS model to train.
+            loader (DataLoader): DataLoader containing the training data.
         """
         ANFISmodel.set_consequents(classical_consequents_estimation_with_OLS(ANFISmodel, loader, self.driver, self.ridge_lambda))
     
 
     def _update_parameters(self, ANFISmodel, loader):
         """
-        Actualiza los parámetros del modelo ANFIS (época única).
-        
+        Updates both the consequent and premise parameters of the ANFIS model for a single training epoch. 
+        The consequent update is performed first, followed by the premise update.
+
         Args:
-            ANFISmodel (ANFIS | h_ANFIS): Modelo ANFIS a entrenar.
-            loader (DataLoader): DataLoader con los datos de entrenamiento.
+            ANFISmodel (ANFIS | h_ANFIS | rule_reduced_ANFIS): ANFIS model to train.
+            loader (DataLoader): DataLoader containing the training data.
         """
         self._consequents_update(ANFISmodel, loader)
         self._premises_update(ANFISmodel, loader)
@@ -261,11 +269,15 @@ class Hybrid_learning_algorithm(base_model_trainer):
         
     def _sonfis_init_optimizer(self, model, freezed_subnets):
         """
-        Inicializa el optimizador a utilizar en el entrenamiento, utilizando algunos los parámetros de los antececentes del modelo ANFIS y los parámetros del optimizador especificados.
-        
+        Initializes the optimizer for use within the SONFIS training algorithm, using only the premise parameters 
+        of the subnets that are not frozen.
+
+        Note:
+            This method is intended exclusively for use within the SONFIS algorithm and should not be called directly in standard training.
+
         Args:
-            model (h_ANFIS [rule_reduced]): Modelo h_ANFIS que debe ser rule_reduced.
-            freezed_subnets (torch.tensor): Tensor booleano que indica que antecedentes no deben ser actualizados.
+            model (rule_reduced_ANFIS): Rule-reduced ANFIS model to train.
+            freezed_subnets (torch.Tensor): Boolean tensor indicating which subnets should not be updated.
         """
         premises_parameters_to_train = []
         
@@ -281,13 +293,19 @@ class Hybrid_learning_algorithm(base_model_trainer):
         
     def _sonfis_update_parameters(self, model, train_loader, val_loader, freezed_subnets):
         """
-        Aplica el algoritmo de entrenamiento de un modelo h_ANFIS dado un conjunto de subredes que no se deben actualizar.
+        Applies the hybrid learning algorithm within the SONFIS training procedure, updating only the subnets 
+        that are not frozen. After training, the consequent parameters of the frozen subnets are restored
+        to their values prior to the update.
+        
+        Note:
+            This method is intended exclusively for use within the SONFIS
+            algorithm and should not be called directly in standard training.
         
         Args:
-            model (h_ANFIS [rule_reduced]): Modelo h_ANFIS que debe ser rule_reduced.
-            train_loader (DataLoader): DataLoader con los datos de entrenamiento.
-            val_loader (DataLoader): DataLoader con los datos de validación.
-            freezed_subnets (torch.tensor): Tensor booleano que indica que subredes no deben ser actualizadas.
+            model (rule_reduced_ANFIS): Rule-reduced ANFIS model to train.
+            train_loader (DataLoader): DataLoader containing the training data.
+            val_loader (DataLoader): DataLoader containing the validation data, or ``None`` if no validation data is used.
+            freezed_subnets (torch.Tensor): Boolean tensor indicating which subnets should not be updated.
         """
         
         self._sonfis_init_optimizer(model, freezed_subnets)
@@ -319,59 +337,64 @@ class Hybrid_learning_algorithm(base_model_trainer):
 
 class Basic_optimizer_training_algorithm(base_model_trainer):
     """
-    Clase para representar un algoritmo de entrenamiento por optimización para un modelo de aprendizaje automático. Solo permite entrenar modelos de aprendizaje automático con un solo optimizador para todos los parámetros del modelo.
-    
-    Pseudocódigo:
-    
+    Optimizer-based training algorithm for a machine learning model. Trains all model parameters using a single optimizer.
+
+    Pseudocode:
+
     .. image:: ../../_static/Basic_optimizer_training_algorithm_pseudocode.png
-        :alt: Pseudocódigo del algorithmo de entrenamiento básico por optimización.
+        :alt: Pseudocode of the basic optimizer-based training algorithm.
         :align: center
         :width: 600px
     """
     
     def __init__(self, epochs, loss_function, early_stopping=None, optimizer=torch.optim.Adam, optimizer_params={}):
         """
-        Inicializa una nueva instancia de la clase Basic_optimizer_training_algorithm.
-        
+        Initializes a new Basic_optimizer_training_algorithm instance.
+
         Args:
-            epochs (int): Número de épocas de entrenamiento.
-            loss_function (torch.nn.Module): Instancia de función de pérdida a utilizar en el entrenamiento.
-            early_stopping (EarlyStopping): Mecanismo de Early Stopping a utilizar en el entrenamiento (Default: None).
-            optimizer (torch.optim): Optimizador a utilizar en el entrenamiento (Default: torch.optim.Adam).
-            optimizer_params (dict): Parámetros a utilizar en el optimizador (Default: {}).
-        
+            epochs (int): Number of training epochs.
+            loss_function (torch.nn.Module): Instantiated loss function to use during training.
+            early_stopping (EarlyStopping): Early stopping mechanism to use during training. Defaults to ``None``.
+            optimizer (torch.optim.Optimizer): Optimizer class to use during training. Defaults to ``torch.optim.Adam``.
+            optimizer_params (dict): Parameters to pass to the optimizer. Defaults to ``{}``.
         """
         super().__init__(epochs, loss_function, early_stopping, optimizer, optimizer_params)
         
     
     def _init_optimizer(self, model):
         """
-        Inicializa el optimizador a utilizar en el entrenamiento, utilizando los parámetros del modelo y los parámetros del optimizador especificados.
-        
+        Initializes the optimizer using all parameters of the model and the specified optimizer parameters.
+
         Args:
-            model (torch.nn.Module): Modelo a entrenar.
+            model (torch.nn.Module): Model to train.
         """
         self._optimizer_instance = self.optimizer(model.parameters(), **self.optimizer_params)
     
     
     def _update_parameters(self, model, loader):
         """
-        Actualiza los parámetros del modelo (época única).
-        
+        Updates all model parameters for a single training epoch.
+
         Args:
-            model (torch.nn.Module): Modelo a entrenar.
-            loader (DataLoader): DataLoader con los datos de entrenamiento.
+            model (torch.nn.Module): Model to train.
+            loader (DataLoader): DataLoader containing the training data.
         """
         optimizer_training_epoch(model, loader, self._optimizer_instance, self.loss_function)
         
         
     def _sonfis_init_optimizer(self, model, freezed_subnets):
         """
-        Inicializa el optimizador a utilizar en el entrenamiento, utilizando algunos los parámetros de los antececentes del modelo ANFIS y los parámetros del optimizador especificados.
+        Initializes the optimizer for use within the SONFIS training algorithm,
+        using both the premise and consequent parameters of the subnets that
+        are not frozen.
+        
+        Note:
+            This method is intended exclusively for use within the SONFIS
+            algorithm and should not be called directly in standard training.
         
         Args:
-            model (h_ANFIS [rule_reduced]): Modelo h_ANFIS que debe ser rule_reduced.
-            freezed_subnets (torch.tensor): Tensor booleano que indica que antecedentes no deben ser actualizados.
+            model (rule_reduced_ANFIS): Rule-reduced ANFIS model to train.
+            freezed_subnets (torch.Tensor): Boolean tensor indicating which subnets should not be updated.
         """
         parameters_to_train = []
         not_freezed = torch.where(~freezed_subnets)[0]
@@ -387,13 +410,18 @@ class Basic_optimizer_training_algorithm(base_model_trainer):
             
     def _sonfis_update_parameters(self, model, train_loader, val_loader, freezed_subnets):
         """
-        Aplica el algoritmo de entrenamiento de un modelo h_ANFIS dado un conjunto de subredes que no se deben actualizar.
+        Applies the optimizer-based training algorithm within the SONFIS
+        training procedure, updating only the subnets that are not frozen.
+        
+        Note:
+            This method is intended exclusively for use within the SONFIS
+            algorithm and should not be called directly in standard training.
         
         Args:
-            model (h_ANFIS [rule_reduced]): Modelo h_ANFIS que debe ser rule_reduced.
-            train_loader (DataLoader): DataLoader con los datos de entrenamiento.
-            val_loader (DataLoader): DataLoader con los datos de validación.
-            freezed_subnets (torch.tensor): Tensor booleano que indica que subredes no deben ser actualizadas.
+            model (rule_reduced_ANFIS): Rule-reduced ANFIS model to train.
+            train_loader (DataLoader): DataLoader containing the training data.
+            val_loader (DataLoader): DataLoader containing the validation data, or ``None`` if no validation data is used.
+            freezed_subnets (torch.Tensor): Boolean tensor indicating which subnets should not be updated.
         """
         self._sonfis_init_optimizer(model, freezed_subnets)
         
@@ -420,42 +448,34 @@ class Basic_optimizer_training_algorithm(base_model_trainer):
 
 class Double_optimizer_training_algorithm(base_model_trainer):
     """
-    Clase para representar un algoritmo de entrenamiento por optimización para un modelo de Sistema de Inferencia Neuro-Difuso Adaptativo (ANFIS).
-    La idea es que los antecedentes y los consecuentes del modelo ANFIS se actualicen con optimizadores diferentes.
+    Dual-optimizer training algorithm for an Adaptive Neuro-Fuzzy Inference
+    System (ANFIS) model. Uses separate optimizers to update the premise and
+    consequent parameters independently.
     
-    Pseudocódigo:
+    The update strategy is controlled by the ``mode`` parameter:
     
-    HAY QUE HACER EL PSEUDOCÓDIGO
-    HAY QUE HACER EL PSEUDOCÓDIGO
-    HAY QUE HACER EL PSEUDOCÓDIGO
-    HAY QUE HACER EL PSEUDOCÓDIGO
-    
-    .. image:: ../../_static/Basic_optimizer_training_algorithm_pseudocode.png
-        :alt: Pseudocódigo del algorithmo de entrenamiento básico por optimización.
-        :align: center
-        :width: 600px
-        
-    HAY QUE HACER EL PSEUDOCÓDIGO
-    HAY QUE HACER EL PSEUDOCÓDIGO
-    HAY QUE HACER EL PSEUDOCÓDIGO
-    HAY QUE HACER EL PSEUDOCÓDIGO
-    
+    - **Mode 0**: In each epoch, a single forward pass is performed and both
+      the premise and consequent parameters are updated simultaneously using
+      their respective optimizers.
+    - **Mode 1**: Each epoch consists of two sequential passes through the
+      data. In the first pass, only the consequent parameters are updated;
+      in the second pass, only the premise parameters are updated.
     """
     
     def __init__(self, epochs, loss_function, early_stopping=None, mode=0, prems_optim=torch.optim.Adam, prems_optim_params={}, cons_optim=torch.optim.Adam, cons_optim_params={}):
         """
-        Inicializa una nueva instancia de la clase Basic_optimizer_training_algorithm.
+        Initializes a new Double_optimizer_training_algorithm instance.
         
         Args:
-            epochs (int): Número de épocas de entrenamiento.
-            loss_function (torch.nn.Module): Instancia de función de pérdida a utilizar en el entrenamiento.
-            validation (float): Proporción de los datos de entrenamiento a utilizar como datos de validación (Default: 0).
-            early_stopping (EarlyStopping): Mecanismo de Early Stopping a utilizar en el entrenamiento (Default: None).
-            mode (int):
-            prems_optim (torch.optim):
-            prems_optim_params (dict):
-            cons_optim (torch.optim):
-            cons_optim_params (dict):
+            epochs (int): Number of training epochs.
+            loss_function (torch.nn.Module): Instantiated loss function to use during training.
+            early_stopping (EarlyStopping): Early stopping mechanism to use during training. Defaults to ``None``.
+            mode (int): Update strategy to use. ``0`` updates premises and consequents simultaneously in a single pass; 
+                ``1`` updates them sequentially in two separate passes per epoch. Defaults to ``0``.
+            prems_optim (torch.optim.Optimizer): Optimizer class to use for the premise parameters. Defaults to ``torch.optim.Adam``.
+            prems_optim_params (dict): Parameters to pass to the premise optimizer. Defaults to ``{}``.
+            cons_optim (torch.optim.Optimizer): Optimizer class to use for the consequent parameters. Defaults to ``torch.optim.Adam``.
+            cons_optim_params (dict): Parameters to pass to the consequent optimizer. Defaults to ``{}``.
         """
         super().__init__(epochs, loss_function, early_stopping, optimizer=None, optimizer_params={})
         self.prems_optim = prems_optim
@@ -474,10 +494,11 @@ class Double_optimizer_training_algorithm(base_model_trainer):
     
     def _init_optimizer(self, model):
         """
-        Inicializa el optimizador a utilizar en el entrenamiento, utilizando los parámetros del modelo y los parámetros del optimizador especificados.
+        Initializes both optimizers using the premise and consequent parameters of the model, respectively,
+        along with the specified optimizer parameters.
         
         Args:
-            model (torch.nn.Module): Modelo a entrenar.
+            model (ANFIS | h_ANFIS | rule_reduced_ANFIS): ANFIS model to train.
         """
         self._prems_optimizer_instance = self.prems_optim(model.get_premises_as_parameters_list(), **self.prems_optim_params)
         self._cons_optimizer_instance = self.cons_optim(model.get_consequents_as_parameters_list(), **self.cons_optim_params)
@@ -485,11 +506,12 @@ class Double_optimizer_training_algorithm(base_model_trainer):
     
     def _update_parameters_0(self, model, loader):
         """
-        Actualiza los parámetros del modelo (época única).
+        Updates both the premise and consequent parameters simultaneously for
+        a single training epoch, using a single forward pass per batch.
         
         Args:
-            model (torch.nn.Module): Modelo a entrenar.
-            loader (DataLoader): DataLoader con los datos de entrenamiento.
+            model (ANFIS | h_ANFIS | rule_reduced_ANFIS): ANFIS model to train.
+            loader (DataLoader): DataLoader containing the training data.
         """
         for batch_x, batch_y in loader:
             batch_y_copy = batch_y.clone().detach()
@@ -518,11 +540,13 @@ class Double_optimizer_training_algorithm(base_model_trainer):
             
     def _update_parameters_1(self, model, loader):
         """
-        Actualiza los parámetros del modelo en 2 épocas: en la primera solo actualiza los parámetros consecuentes, en la segunda solo las premisas.
-        
+        Updates the premise and consequent parameters sequentially for a single training epoch, using two separate passes
+        through the data. In the first pass, only the consequent parameters are updated; in the second pass, only the 
+        premise parameters are updated.
+
         Args:
-            model (torch.nn.Module): Modelo a entrenar.
-            loader (DataLoader): DataLoader con los datos de entrenamiento.
+            model (ANFIS | h_ANFIS | rule_reduced_ANFIS): ANFIS model to train.
+            loader (DataLoader): DataLoader containing the training data.
         """
         for batch_x, batch_y in loader:
             batch_y_copy = batch_y.clone().detach()
@@ -573,11 +597,15 @@ class Double_optimizer_training_algorithm(base_model_trainer):
     
     def _sonfis_init_optimizer(self, model, freezed_subnets):
         """
-        Inicializa el optimizador a utilizar en el entrenamiento, utilizando algunos los parámetros de los antececentes del modelo ANFIS y los parámetros del optimizador especificados.
-        
+        Initializes both optimizers for use within the SONFIS training algorithm, using the premise and 
+        consequent parameters of the subnets that are not frozen.
+
+        Note:
+            This method is intended exclusively for use within the SONFIS algorithm and should not be called directly in standard training.
+
         Args:
-            model (h_ANFIS [rule_reduced]): Modelo h_ANFIS que debe ser rule_reduced.
-            freezed_subnets (torch.tensor): Tensor booleano que indica que antecedentes no deben ser actualizados.
+            model (rule_reduced_ANFIS): Rule-reduced ANFIS model to train.
+            freezed_subnets (torch.Tensor): Boolean tensor indicating which subnets should not be updated.
         """
         parameters_to_train = []
         not_freezed = torch.where(~freezed_subnets)[0]
@@ -595,13 +623,16 @@ class Double_optimizer_training_algorithm(base_model_trainer):
     
     def _sonfis_update_parameters(self, model, train_loader, val_loader, freezed_subnets):
         """
-        Aplica el algoritmo de entrenamiento de un modelo h_ANFIS dado un conjunto de subredes que no se deben actualizar.
-        
+        Applies the dual-optimizer training algorithm within the SONFIS training procedure, updating only the subnets that are not frozen.
+
+        Note:
+            This method is intended exclusively for use within the SONFIS algorithm and should not be called directly in standard training.
+
         Args:
-            model (h_ANFIS [rule_reduced]): Modelo h_ANFIS que debe ser rule_reduced.
-            train_loader (DataLoader): DataLoader con los datos de entrenamiento.
-            val_loader (DataLoader): DataLoader con los datos de validación.
-            freezed_subnets (torch.tensor): Tensor booleano que indica que subredes no deben ser actualizadas.
+            model (rule_reduced_ANFIS): Rule-reduced ANFIS model to train.
+            train_loader (DataLoader): DataLoader containing the training data.
+            val_loader (DataLoader): DataLoader containing the validation data, or ``None`` if no validation data is used.
+            freezed_subnets (torch.Tensor): Boolean tensor indicating which subnets should not be updated.
         """
         self._sonfis_init_optimizer(model, freezed_subnets)
         

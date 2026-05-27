@@ -3,19 +3,22 @@ import torch.nn as nn
 
 def classical_consequents_estimation_with_OLS(ANFISmodel, loader, driver, ridge_lambda):
     """
-    Estima los parámetros consecuentes de un modelo ANFIS utilizando mínimos cuadrados ordinarios.
-    
+    Estimates the consequent parameters of an ANFIS model using ordinary least squares.
+
     Note:
-        Específicamente, se usa la descomposición QR con pivoteo para resolver el problema de mínimos cuadrados. Para más información, ver: https://pytorch.org/docs/stable/generated/torch.linalg.lstsq.html.
-      
+        Specifically, QR decomposition with pivoting is used to solve the least-squares
+        problem. For more information, see: https://pytorch.org/docs/stable/generated/torch.linalg.lstsq.html.
+
     Args:
-        ANFISmodel (ANFIS | h_ANFIS): Modelo ANFIS a entrenar.
-        loader (DataLoader): DataLoader con los datos de entrenamiento.
-        driver (string): Chooses the backend function that will be used, vaild values are: 'gels', 'gelsy', 'gelsd', 'gelss'. If None, then uses 'gels' (Default: None)
-        ridge_lambda (float): Lambda usado para utilizar "Regularización Ridge" en la estimación de consecuentes con mínimos cuadrados. Si es 0, no se realiza regularización.
-        
+        ANFISmodel (ANFIS | h_ANFIS): ANFIS model whose consequent parameters are to be estimated.
+        loader (DataLoader): DataLoader containing the training data.
+        driver (str): Backend function to use for the least-squares estimation. 
+            Valid values are ``'gels'``, ``'gelsy'``, ``'gelsd'``, and ``'gelss'``. If ``None``, defaults to ``'gels'``.
+        ridge_lambda (float): Lambda value for Ridge regularization in the least-squares estimation.
+            If ``0.``, no regularization is applied.
+
     Returns:
-        torch.tensor: Tensor con los nuevos parámetros consecuentes.
+        torch.Tensor: Tensor containing the new consequent parameters.
     """
     x = loader.dataset.tensors[0]
     y = loader.dataset.tensors[1]
@@ -56,14 +59,14 @@ def classical_consequents_estimation_with_OLS(ANFISmodel, loader, driver, ridge_
 
 def optimizer_training_epoch(model, loader, optimizer, loss_function):
     """
-    Actualiza los parámetros de un modelo utilizando un optimizador (ya instanciado) y una función de pérdida dados como parámetros. Los parámetros a actualizar son indicados por el optimizador (ya instanciado).
-    
+    Updates the parameters of a model for one training epoch using a given optimizer and loss function. 
+    The parameters to be updated are determined by the optimizer.
+
     Args:
-        model (ANFIS | h_ANFIS | rule_reduced_ANFIS): Modelo ANFIS a entrenar.
-        loader (DataLoader): DataLoader con los datos de entrenamiento.
-        optimizer (torch.optim.Optimizer): Optimizador instanciado a utilizar.
-        loss_function (torch.nn.Module): Función de pérdida a utilizar.
-    
+        model (ANFIS | h_ANFIS | rule_reduced_ANFIS): ANFIS model to train.
+        loader (DataLoader): DataLoader containing the training data.
+        optimizer (torch.optim.Optimizer): Instantiated optimizer to use.
+        loss_function (torch.nn.Module): Loss function to use.
     """
     for batch_x, batch_y in loader:
         batch_y_copy = batch_y.clone().detach()

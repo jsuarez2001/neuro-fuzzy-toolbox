@@ -1,16 +1,17 @@
 class EarlyStopping():
     """
-    Mecanismo Early Stopping para detener el entrenamiento de un modelo de aprendizaje automático (torch.nn.Module).
+    Early stopping mechanism for halting the training of a machine learning model (``torch.nn.Module``) when no 
+    sufficient improvement is observed.
     """
     def __init__(self, patience, delta=0, last_state=False):
         """
-        Inicializa una nueva instancia de la clase EarlyStopping.
+        Initializes a new EarlyStopping instance.
         
         Args:
-            patience (int): Número de épocas sin mejora antes de detener el entrenamiento.
-            delta (float): Valor mínimo de mejora para considerar que hubo mejora en el entrenamiento (Default: 0).
-            last_state (bool): Indica si se debe restaurar el último estado del modelo o el mejor estado encontrado (Default: False).
-
+            patience (int): Number of epochs without improvement before stopping training.
+            delta (float): Minimum improvement required to consider that the model has improved. Defaults to ``0``.
+            last_state (bool): If ``True``, restores the last model state when stopping instead of the best state 
+                found during training. Defaults to ``False``.
         """
         #Parameters
         self.patience = patience
@@ -25,12 +26,13 @@ class EarlyStopping():
 
     def __call__(self, model, loss, verbose=False):
         """
-        Llama al mecanismo de Early Stopping para evaluar si se debe detener el entrenamiento del modelo. En caso de que así sea, el atributo stop se actualiza a True.
+        Evaluates whether training should be stopped. If the stopping criterion
+        is met, the ``stop`` attribute is updated to ``True``.
         
         Args:
-            model (torch.nn.Module): Modelo a evaluar
-            loss (float): Pérdida actual del modelo.
-            verbose (bool): Indica si se deben imprimir mensajes de aviso (Default: False).
+            model (torch.nn.Module): Model to evaluate.
+            loss (float): Current loss value of the model.
+            verbose (bool): If ``True``, prints a warning message when early stopping is triggered. Defaults to ``False``.
         """
         if self._best_loss is None:
             self._best_loss = loss
@@ -52,7 +54,7 @@ class EarlyStopping():
 
     def reset(self):
         """
-        Reinicia el mecanismo de Early Stopping.
+        Resets the early stopping mechanism to its initial state.
         """
         self._counter = 0
         self._best_loss = None
@@ -62,6 +64,9 @@ class EarlyStopping():
     @property
     def stop(self):
         """
-        Booleano que indica si el entrenamiento debe detenerse.
+        Indicates whether training should be stopped.
+        
+        Returns:
+            bool: ``True`` if the stopping criterion has been met, ``False`` otherwise.
         """
         return self._stop
