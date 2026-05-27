@@ -3,7 +3,9 @@
 Consequent Layer
 ================
 
-En este módulo se encuentra la capa de consecuente implementada en el Toolbox. Esta capa se utiliza para calcular los valores de salida de cada regla generada por el sistema en base a los niveles de disparo de los conjuntos difusos.
+This module contains the consequent layer implemented in the toolbox.
+This layer computes the output value of each rule using the normalized
+firing levels produced by the preceding layers.
 
 .. automodule:: neuro_fuzzy_toolbox.layers.consequent_layer
    :members:

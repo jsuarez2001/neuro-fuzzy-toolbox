@@ -1,22 +1,31 @@
 .. _ANFIS:
 
-ANFIS models
+ANFIS Models
 ============
 
-En este módulo se encuentra la documentación de los modelos ANFIS implementados en el Toolbox.
+This module contains the documentation for the ANFIS model classes
+implemented in the toolbox.
 
-Todas las clases aquí presentes heredan de la clase base llamada *base_ANFIS*, la cual define la estructura general de los modelos ANFIS y ciertos métodos comunes.
-
-.. autoclass:: neuro_fuzzy_toolbox.models.anfis.h_ANFIS
-   :members:
-   :inherited-members:
-   :show-inheritance:
+All classes below inherit from the base class ``base_ANFIS``, which
+defines the general structure of ANFIS models and their shared methods
+(see :ref:`base_ANFIS <base-anfis>`).
 
 .. autoclass:: neuro_fuzzy_toolbox.models.anfis.ANFIS
    :members:
    :inherited-members:
    :show-inheritance:
 
+.. autoclass:: neuro_fuzzy_toolbox.models.anfis.h_ANFIS
+   :members:
+   :inherited-members:
+   :show-inheritance:
+
+.. autoclass:: neuro_fuzzy_toolbox.models.anfis.rule_reduced_ANFIS
+   :members:
+   :inherited-members:
+   :show-inheritance:
+
+.. _base-anfis:
 .. autoclass:: neuro_fuzzy_toolbox.models.anfis.base_ANFIS
    :members:
    :show-inheritance:

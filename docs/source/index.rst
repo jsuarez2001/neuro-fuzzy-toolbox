@@ -4,9 +4,9 @@
    contain the root `toctree` directive.
 
 Neuro-Fuzzy Toolbox documentation
-=================================
+==================================
 
-Bienvenido a la documentación de Neuro-Fuzzy Toolbox.
+Welcome to the Neuro-Fuzzy Toolbox documentation.
 
 .. toctree::
    :maxdepth: 2

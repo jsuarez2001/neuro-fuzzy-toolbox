@@ -1,7 +1,10 @@
+.. _Layers:
+
 Layers
 ======
 
-En este módulo se encuentran las capas de los modelos de tipo ANFIS implementados en el Toolbox.
+This module contains the layers of the ANFIS-based models implemented
+in the toolbox.
 
 .. toctree::
    :maxdepth: 2

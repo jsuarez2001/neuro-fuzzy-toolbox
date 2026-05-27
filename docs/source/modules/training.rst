@@ -1,7 +1,10 @@
+.. _Training API:
+
 Training
 ========
 
-Este módulo contiene información sobre los algoritmos de entrenamiento para los modelos disponibles en Neuro-Fuzzy Toolbox.
+This module contains the documentation for the training algorithms
+available in Neuro-Fuzzy Toolbox.
 
 .. toctree::
    :maxdepth: 2

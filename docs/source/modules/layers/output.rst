@@ -3,7 +3,9 @@
 Output Layer
 ============
 
-En este módulo se encuentra la capa de salida implementada en el Toolbox. Esta capa se utiliza para calcular los valores de salida del sistema en base a las salidas de cada regla difusa del mismo.
+This module contains the output layer implemented in the toolbox. This
+layer computes the final model output by aggregating the individual
+outputs of each fuzzy rule.
 
 .. automodule:: neuro_fuzzy_toolbox.layers.output_layer
    :members:

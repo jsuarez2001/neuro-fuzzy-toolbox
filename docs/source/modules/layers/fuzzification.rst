@@ -3,8 +3,9 @@
 Fuzzification Layers
 ====================
 
-En este módulo se encuentran las capas de fuzzificación implementadas en el Toolbox.
-Estas capas se utilizan para transformar las entradas del sistema en valores de pertenencia a los conjuntos difusos.
+This module contains the fuzzification layers implemented in the toolbox.
+These layers transform the model inputs into membership values with respect
+to the defined fuzzy sets.
 
 .. automodule:: neuro_fuzzy_toolbox.layers.fuzzification_layer
    :members:

@@ -1,7 +1,10 @@
+.. _Functions:
+
 Functions
 =========
 
-Este módulo contiene las funciones de membresía y consecuentes utilizadas en el Toolbox.
+This module contains the membership functions and consequent functions
+used in the toolbox.
 
 .. toctree::
    :maxdepth: 2

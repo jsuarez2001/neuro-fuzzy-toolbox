@@ -3,10 +3,11 @@
 Update Strategies
 =================
 
-Este módulo contiene las implementaciones de las estrategias de actualización de parámetros utilizadas en el entrenamiento de los modelos ANFIS.
+This module contains the implementations of the parameter update
+strategies used in the training of ANFIS models.
 
 OLS Estimation for Consequents
-------------------------------
+-------------------------------
 .. autofunction:: neuro_fuzzy_toolbox.training.update_strategies.classical_consequents_estimation_with_OLS
 
 Optimizer Training Epoch

@@ -1,60 +1,58 @@
+.. _basic_optimizer:
+
 Basic Optimizer Training Algorithm
-==================================
-Algoritmo de entrenamiento basado en optimizadores. 
+===================================
+A gradient-based training algorithm compatible with any custom model that
+inherits from PyTorch's ``nn.Module`` base class.
 
 .. image:: ../../_static/Basic_optimizer_training_algorithm_pseudocode.png
     :width: 100%
     :align: center
 
-Es aplicable a cualquier modelo personalizado que herede de la clase base nn.Module de PyTorch.
-
 .. note::
-    - Para más información sobre su implementación en el toolbox, ver :ref:`Basic Optimizer Based Training Algorithm`.
-    - Puede ver ejemplos de uso :ref:`aquí <optimizer_training_examples>`.
+    - For more details on its implementation in the toolbox, see :ref:`Basic Optimizer Based Training Algorithm`.
 
-Instanciación
+Instantiation
 -------------
-Para instanciar el algoritmo de entrenamiento basado en optimizadores, se deben pasar los siguientes argumentos:
+The following parameters are available when instantiating this training
+algorithm:
 
-- `epochs` (int): Número de épocas de entrenamiento.
-- `loss_function` (torch.nn.functional): Función de pérdida a utilizar durante el entrenamiento.
-- `validation` (float): Proporción de los datos de entrenamiento a utilizar como conjunto de validación (opcional).
-- `early_stopping` (nft.EarlyStopping): Mecanismo de parada temprana a utilizar durante el entrenamiento (opcional).
-- `optimizer` (torch.optim.Optimizer): Optimizador a utilizar durante el entrenamiento.
-- `optimizer_params` (dict): Parámetros adicionales a pasar al optimizador (opcional).
+- **epochs** (``int``): Number of training epochs.
+- **loss_function** (``torch.nn.Module``): Instantiated loss function to use
+  during training (e.g., ``torch.nn.CrossEntropyLoss()``).
+- **early_stopping** (``nft.EarlyStopping``): Early stopping mechanism to use
+  during training (Default: ``None``).
+- **optimizer** (``torch.optim.Optimizer``): Optimizer class to use during
+  training.
+- **optimizer_params** (``dict``): Additional parameters to pass to the
+  optimizer (Default: ``{}``).
 
-Llamado
--------
-Para llamar al algoritmo de entrenamiento, se debe pasar el modelo a entrenar y el DataLoader con los datos de entrenamiento.
+Example
+^^^^^^^
+Instantiating the algorithm:
 
-Ejemplo
-#######
-Para instanciar el algoritmo:
-
-.. code:: python
+.. code-block:: python
 
     import neuro_fuzzy_toolbox as nft
-
-    epochs = 500
-    loss_fn = nn.functional.mse_loss
-    optimizer = torch.optim.AdamW
-    params = {'lr': 0.0001, 'weight_decay': 0.001}
-    validation = 0.3
-    early_stopping = nft.EarlyStopping(patience=30, delta=0.001)
+    import torch
+    import torch.nn as nn
 
     trainer = nft.Basic_optimizer_training_algorithm(
-        epochs=epochs,
-        loss_function=loss_fn,
-        optimizer=optimizer,
-        optimizer_params=params,
-        validation=validation,
-        early_stopping=early_stopping
+        epochs=500,
+        loss_function=nn.CrossEntropyLoss(),
+        optimizer=torch.optim.AdamW,
+        optimizer_params={'lr': 1e-3, 'weight_decay': 1e-2},
+        early_stopping=nft.EarlyStopping(patience=30, delta=1e-4)
     )
 
-Ahora, asumiendo que ya se tiene un modelo instanciado y que se cuenta con un DataLoader de Pytorch con los datos de entrenamiento, se puede proceder con el entrenamiento del modelo:
+Assuming ``model`` is an instantiated ANFIS model and ``train_loader``
+and ``val_loader`` are PyTorch DataLoaders, training is invoked as follows:
 
-.. code:: python
+.. code-block:: python
 
-    # Considerando que "model" es el modelo instanciado en cuestión
-    # y que "train_loader" es el DataLoader con los datos de entrenamiento
-    trainer(model, train_loader)
+    trainer(model, train_loader, val_loader)
+
+.. important::
+    The training batch size is determined by the DataLoader, so this should
+    be taken into account when defining it (see
+    :ref:`PyTorch DataLoaders <DataLoaders_usage>`).

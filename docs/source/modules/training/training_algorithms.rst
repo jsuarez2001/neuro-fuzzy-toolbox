@@ -3,7 +3,8 @@
 Training Algorithms
 ===================
 
-Este módulo contiene información sobre los algoritmos de entrenamiento para los modelos disponibles en Neuro-Fuzzy Toolbox.
+This module contains the documentation for the training algorithms
+available in Neuro-Fuzzy Toolbox.
 
 .. _Hybrid Learning Algorithm:
 
@@ -27,7 +28,20 @@ Basic Optimizer Based Training Algorithm
    :show-inheritance:
    :special-members: __call__
 
-base model training class
--------------------------
+.. _Double Optimizer Training Algorithm:
+
+Double Optimizer Based Training Algorithm
+-----------------------------------------
+
+.. autoclass:: neuro_fuzzy_toolbox.training.training_algorithms.Double_optimizer_training_algorithm
+   :members:
+   :inherited-members:
+   :show-inheritance:
+   :special-members: __call__
+
+.. _base-model-trainer:
+
+Base Model Trainer
+------------------
 .. autoclass:: neuro_fuzzy_toolbox.training.training_algorithms.base_model_trainer
    :members: __call__

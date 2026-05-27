@@ -3,11 +3,12 @@
 Models
 ======
 
-Esta sección contiene una guía sobre los modelos neurodifusos implementados en Neuro-Fuzzy Toolbox.
+This section contains a guide to the neuro-fuzzy models implemented in
+Neuro-Fuzzy Toolbox.
 
 .. toctree::
    :maxdepth: 2
 
-   models/anfis
-   models/h_anfis
-   models/rule_reduced_anfis
+   models/basics
+   models/variants
+   models/output_types

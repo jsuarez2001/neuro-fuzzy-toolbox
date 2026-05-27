@@ -1,15 +1,20 @@
 .. _SONFIS:
 
 SONFIS
-========
+======
 
-Este módulo contiene 2 implementaciones de la red SONFIS (Self-Organizing Neuro-Fuzzy Inference System) que es una red auto-organizada que combina el algoritmo para la actualización de parámetros clásico del modelo ANFIS con
-una serie de operaciones para el crecimiento y poda de subredes. Este método solo es aplicable a modelos ANFIS homogéneos con reglas reducidas.
+This module contains the implementation of the SONFIS (Self-Organizing
+Neuro-Fuzzy Inference System) algorithm, which combines a parameter
+learning algorithm with structural adaptation operators for rule growing,
+splitting, and pruning. This algorithm is only applicable to
+:class:`neuro_fuzzy_toolbox.models.anfis.rule_reduced_ANFIS` models.
 
-Para más detalles sobre el algoritmo SONFIS, puede consultar el artículo original: `SONFIS: Structure Identification and Modeling with a Self-Organizing Neuro-Fuzzy Inference System <https://doi.org/10.1080/18756891.2016.1175809>`_.
+For more details on the SONFIS algorithm, refer to the original paper:
+`SONFIS: Structure Identification and Modeling with a Self-Organizing
+Neuro-Fuzzy Inference System <https://doi.org/10.1080/18756891.2016.1175809>`_.
 
 .. image:: ../../_static/SONFIS_pseudocode.png
-   :alt: Pseudocódigo del algoritmo SONFIS.
+   :alt: SONFIS algorithm pseudocode.
    :align: center
    :width: 600px
 
@@ -20,9 +25,6 @@ Para más detalles sobre el algoritmo SONFIS, puede consultar el artículo origi
 .. raw:: latex
 
    \newline
-
-SONFIS
-------
 
 .. autoclass:: neuro_fuzzy_toolbox.training.sonfis.SONFIS
    :members:

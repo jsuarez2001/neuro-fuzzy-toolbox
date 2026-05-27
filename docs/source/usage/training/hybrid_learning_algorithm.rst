@@ -1,68 +1,80 @@
+.. _hybrid_learning_usage:
+
 Hybrid Learning Algorithm
 =========================
-Algoritmo híbrido de aprendizaje clásico para los modelos ANFIS. Combina la estimación por mínimos cuadrados para los parámetros consecuentes con un mecanismo 
-de entrenamiento basado en optimizadores para los parámetros de las funciones de membresía. 
+The classical hybrid learning algorithm for ANFIS models. It combines least
+squares estimation for the consequent parameters with an optimizer-based
+training mechanism for the premise parameters.
 
-.. image:: ../../_static/Hybrid_learning_algorithm_pseudocode.png
+.. figure:: ../../_static/Hybrid_learning_algorithm_pseudocode.png
     :width: 100%
     :align: center
 
+    Hybrid Learning Algorithm pseudocode (source: adapted from Jang (1993)).
+
 .. important::
-    Es aplicable a todos los modelos ANFIS disponibles en Neuro-Fuzzy Toolbox (modelos que hereden de la base_ANFIS, es decir, ANFIS y h_ANFIS).
+    This algorithm is applicable to all ANFIS models available in
+    Neuro-Fuzzy Toolbox (i.e., any model that inherits from ``base_ANFIS``:
+    ``ANFIS``, ``h_ANFIS``, and ``rule_reduced_ANFIS``).
 
 .. note::
-    - Este algoritmo es una implementación de una variante del algoritmo de aprendizaje híbrido propuesto por Jang en 1993. Para más información, se recomienda revisar el artículo original: `ANFIS: Adaptive-Network-Based Fuzzy Inference System <https://doi.org/10.1109/21.256541>`_.
-    - Para más detalles sobre su implementación en el toolbox, ver :ref:`Hybrid Learning Algorithm`.
-    - Puede ver ejemplos de uso :ref:`aquí <hybrid_learning_algorithm_examples>`.
+    - This algorithm is an implementation of a variant of the hybrid learning
+      procedure proposed by Jang in 1993. For more information, refer to the
+      original paper:
+      `ANFIS: Adaptive-Network-Based Fuzzy Inference System <https://doi.org/10.1109/21.256541>`_.
+    - For more details on its implementation in the toolbox, see
+      :ref:`Hybrid Learning Algorithm`.
 
-Instanciación
+Instantiation
 -------------
-Para instanciar el algoritmo de entrenamiento basado en optimizadores, se deben pasar los siguientes argumentos:
+The following parameters are available when instantiating this training
+algorithm:
 
-- `epochs` (int): Número de épocas de entrenamiento.
-- `loss_function` (torch.nn.functional): Función de pérdida a utilizar durante el entrenamiento.
-- `validation` (float): Proporción de los datos de entrenamiento a utilizar como conjunto de validación (opcional).
-- `early_stopping` (nft.EarlyStopping): Mecanismo de parada temprana a utilizar durante el entrenamiento (opcional).
-- `optimizer` (torch.optim.Optimizer): Optimizador a utilizar durante el entrenamiento.
-- `optimizer_params` (dict): Parámetros adicionales a pasar al optimizador (opcional).
+- **epochs**: Number of training epochs.
+- **loss_function**: Instantiated loss function to use during training
+  (e.g., ``torch.nn.MSELoss()``).
+- **driver**: Backend function used for least squares estimation. Valid values
+  are ``'gels'``, ``'gelsy'``, ``'gelsd'``, and ``'gelss'``. If ``None``,
+  defaults to ``'gels'`` (Default: ``None``).
+- **ridge_lambda**: Lambda value for Ridge regularization in the least squares
+  estimation of consequents. If 0, no regularization is applied
+  (Default: ``0.``).
+- **early_stopping**: Early stopping mechanism to use during training
+  (Default: ``None``).
+- **optimizer**: Optimizer class to use during training
+  (Default: ``torch.optim.Adam``).
+- **optimizer_params**: Parameters to pass to the optimizer (Default: ``{}``).
 
-Llamado
--------
-Para llamar al algoritmo de entrenamiento, se debe pasar el modelo a entrenar y el DataLoader con los datos de entrenamiento. 
-Adicionalmente, se puede especificar si se desea mostrar información del progreso del entrenamiento con el argumento `verbose`.
-
-Ejemplo
-#######
-Para instanciar el algoritmo:
-
-.. code:: python
+.. code-block:: python
 
     import neuro_fuzzy_toolbox as nft
-
-    epochs = 500
-    loss_fn = nn.functional.mse_loss
-    optimizer = torch.optim.AdamW
-    params = {'lr': 0.0001, 'weight_decay': 0.001}
-    validation = 0.3
-    early_stopping = nft.EarlyStopping(patience=30, delta=0.001)
+    import torch
+    import torch.nn as nn
 
     trainer = nft.Hybrid_learning_algorithm(
-        epochs=epochs,
-        loss_function=loss_fn,
-        optimizer=optimizer,
-        optimizer_params=params,
-        validation=validation,
-        early_stopping=early_stopping
+        epochs=500,
+        loss_function=nn.MSELoss(),
+        optimizer=torch.optim.AdamW,
+        optimizer_params={'lr': 1e-3, 'weight_decay': 1e-2},
+        early_stopping=nft.EarlyStopping(patience=30, delta=1e-4)
     )
 
-Ahora, asumiendo que ya se tiene un modelo ANFIS instanciado y que se cuenta con un DataLoader de Pytorch con los datos de entrenamiento, se puede proceder con el entrenamiento del modelo:
+The following arguments are available when calling the training algorithm
+via ``__call__``:
 
-.. code:: python
+- **model**: ANFIS model to train.
+- **train_loader**: DataLoader with the training data.
+- **val_loader**: DataLoader with the validation data (Default: ``None``).
+- **verbose**: Whether to print progress messages (Default: ``True``).
 
-    # Considerando que "model" es el modelo ANFIS instanciado en cuestión
-    # y que "train_loader" es el DataLoader con los datos de entrenamiento
+.. code-block:: python
 
-    trainer(model, train_loader, verbose=True) # Esto ejecutará el entrenamiento del modelo
+    # Assuming "model" is the instantiated ANFIS model,
+    # "train_loader" and "val_loader" are PyTorch DataLoaders
+
+    trainer(model, train_loader, val_loader)
 
 .. important::
-    Recordar que el tamaño del batch de entrenamiento es definido por el DataLoader, por lo que es importante tener en cuenta este aspecto al momento de instanciarlo (ver :ref:`DataLoaders de PyTorch <DataLoaders_usage>`).
+    The training batch size is determined by the DataLoader, so this should
+    be taken into account when defining it (see
+    :ref:`PyTorch DataLoaders <DataLoaders_usage>`).

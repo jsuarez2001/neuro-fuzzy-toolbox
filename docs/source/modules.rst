@@ -3,7 +3,8 @@
 API Reference
 =============
 
-Esta sección contiene la documentación de las clases, funciones y módulos del proyecto.
+This section contains the documentation for the classes, functions, and
+modules of the project.
 
 .. toctree::
    :maxdepth: 2
@@ -12,3 +13,4 @@ Esta sección contiene la documentación de las clases, funciones y módulos del
    modules/layers
    modules/models
    modules/training
+   modules/rule_analyzer

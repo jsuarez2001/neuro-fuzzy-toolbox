@@ -1,7 +1,9 @@
+.. _Models:
+
 Models
 ======
 
-En este módulo se encuentran los modelos implementados en el Toolbox.
+This module contains the model classes implemented in the toolbox.
 
 .. toctree::
    :maxdepth: 2
