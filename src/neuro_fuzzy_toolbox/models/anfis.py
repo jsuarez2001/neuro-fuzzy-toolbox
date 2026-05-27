@@ -26,22 +26,25 @@ import itertools
 
 class base_ANFIS(nn.Module):
     """
-    Clase base para un sistema de inferencia neuro-difuso adaptativo (ANFIS). Esta clase contiene los métodos y atributos comunes en los modelos ANFIS implementados en el toolbox. 
-    Las clases ANFIS y h_ANFIS heredan de esta clase y añaden funcionalidades específicas.
+    Base class for an Adaptive Neuro-Fuzzy Inference System (ANFIS).
+    
+    Contains the common methods and attributes shared across the ANFIS model
+    variants implemented in this toolbox. The ANFIS, h_ANFIS and rule_reduced_ANFIS classes inherit
+    from this class and extend it with variant-specific functionality.
     
     Warning:
-        Esta clase no debe ser instanciada directamente.
-    
+        This class should not be instantiated directly.
     """
     
     def forward(self, x, return_probs=False):
         """
-        Realiza un paso hacia adelante a través del modelo.
+        Forward pass through the model.
         
         Args:
-            x (torch.tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
-            return_probs (bool): Indica si el resultado pasará por una función Softmax para obtener probabilidades. Solo se aplica si el tipo de salida es 'softmax', en caso contrario, se ignora (Default: False).
-        
+            x (torch.Tensor): Input data tensor of shape ``(batch_size, input_size)``.
+            return_probs (bool): If ``True``, the output is passed through a Softmax
+                function to obtain class probabilities. Only applies when the model's
+                output type is ``'softmax'``; ignored otherwise. Defaults to ``False``.
         """
         output = self._fuzzification_layer(x)
         output = self._consequent_layer(x, self._normalization_layer(self._firing_levels_layer(output)))
@@ -52,10 +55,10 @@ class base_ANFIS(nn.Module):
     # ---- Initialize parameters ----
     def init_premises(self, x):
         """
-        Inicializa los parámetros de las funciones de membresía de la capa de fuzzificación del modelo a partir de los datos ingresados.
+        Initializes the premise parameters of the model's fuzzification layer from the provided data.
         
         Args:
-            x (torch.tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
+            x (torch.Tensor): Input data tensor of shape ``(batch_size, input_size)``.
         """
         self._dtype = x.dtype
         self._consequent_layer._to_dtype(x.dtype) # Set dtype to consequents
@@ -64,20 +67,27 @@ class base_ANFIS(nn.Module):
     
     def init_consequents(self, x, y, driver=None, ridge_lambda=0.):
         """
-        Inicializa los parámetros consecuentes del modelo usando una estimación de mínimos cuadrados.
+        Initializes the consequent parameters of the model using a least-squares estimate.
         
         Note:
-            Específicamente, el método utilizado se indica con el parámetro "driver". Para más información, ver: https://pytorch.org/docs/stable/generated/torch.linalg.lstsq.html.
+            The backend method used for the least-squares estimation is specified by the
+            ``driver`` parameter. For more information, see:
+            https://pytorch.org/docs/stable/generated/torch.linalg.lstsq.html.
         
         Args:
-            x (torch.tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
-            y (torch.tensor): Tensor con los datos de salida. Es de tamaño (batch_size, outputs).
-            driver (string): Chooses the backend function that will be used, vaild values are: 'gels', 'gelsy', 'gelsd', 'gelss'. If None, then uses 'gels' (Default: None)
-            ridge_lambda (float): Lambda usado para utilizar "Regularización Ridge" en la estimación de consecuentes con mínimos cuadrados. Si es 0, no se realiza regularización (Default: 0.).
+            x (torch.Tensor): Input data tensor of shape ``(batch_size, input_size)``.
+            y (torch.Tensor): Output data tensor of shape ``(batch_size, outputs)``.
+            driver (str): Backend function to use for the least-squares estimation. Valid values are
+                ``'gels'``, ``'gelsy'``, ``'gelsd'``, and ``'gelss'``. If ``None``, defaults to ``'gels'``.
+            ridge_lambda (float): Lambda value for Ridge regularization in the least-squares estimation.
+                If ``0.``, no regularization is applied. Defaults to ``0.``.
         
         Important:
-            Si el modelo tiene *output_type='softmax'*, se espera que las etiquetas de las clases en *y* sean enteros que representen las clases a predecir, y se realizará una codificación one-hot de estas etiquetas interna para la estimación de mínimos cuadrados.
-            Si estas etiquetas no son [0, 1, 2...], el modelo se ajustará automáticamente a las etiquetas presentes en *y* y se establecerán como las clases que el modelo intentará predecir. Esto es útil para casos en los que las clases a predecir no son representables como enteros consecutivos, pero se debe tener cuidado de que estas etiquetas sean consistentes a lo largo del entrenamiento y uso del modelo.
+            If the model has ``output_type='softmax'``, the class labels in ``y`` are expected to be integers representing
+            the target classes, and a one-hot encoding of these labels will be performed internally for the least-squares
+            estimation. If the labels are not of the form ``[0, 1, 2, ...]``, the model will automatically adjust to the labels
+            present in ``y`` and set them as the classes it will attempt to predict. This is useful when users prefer to work
+            with custom class labels directly. The target class labels can also be set manually using :meth:`set_custom_classes_ids`.
         """
         w_norm = self.get_firing_levels(x, normalized=True)
         xe = torch.cat([x, torch.ones(x.shape[0], 1, dtype=self._dtype)], dim=1)
@@ -119,13 +129,13 @@ class base_ANFIS(nn.Module):
     # ---- Model predict ----
     def predict(self, x):
         """
-        Realiza una predicción con el modelo. Ajusta la salida a la forma esperada según el tipo de salida del modelo.
+        Runs inference on the input data and adjusts the output to the expected format based on the model's output type.
         
         Args:
-            x (torch.tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
+            x (torch.Tensor): Input data tensor of shape ``(batch_size, input_size)``.
             
         Returns:
-            torch.tensor: Predicciones del modelo.
+            torch.Tensor: Model predictions.
         """
         if self._output_type == 'default':
             with torch.no_grad():
@@ -156,30 +166,31 @@ class base_ANFIS(nn.Module):
     @property
     def classes(self):
         """
-        Retorna las clases que el modelo intenta predecir.
-        
+        Returns the class labels that the model attempts to predict.
+
         Returns:
-            torch.tensor: Tensor con las ids de las clases que el modelo intenta predecir.
+            torch.Tensor: Tensor containing the class labels that the model attempts to predict.
         """
         return self._classes
     
     def set_custom_classes_ids(self, new_classes_ids):
         """
-        Cambia las ids de las clases que el modelo intenta predecir.
-        
-        Important:
-            Solo es utilizable si el modelo tiene *output_type='softmax'*
-        
+        Sets custom labels for the classes that the model attempts to predict.
+
         Note:
-            Considerando que el problema es de *C* clases, las que intenta predecir el modelo son, por defecto, de la forma [0, 1, ..., C].
-            Esta función permite establecer ids de clases personalizados, pero las dejará siempre en orden ascendente.
-            
+            By default, for a problem with ``C`` classes, the model uses labels of
+            the form ``[0, 1, ..., C-1]``. This method allows setting custom class
+            labels, which will always be stored in ascending order.
+
+        Important:
+            Only applicable when the model has ``output_type='softmax'``.
+
         Args:
-            new_classes_ids (list): Lista con las ids de las nuevas clases
+            new_classes_ids (list[int]): List containing the new class labels.
         """
         outputs = self._outputs
         if len(new_classes_ids) != outputs:
-            raise ValueError(f"Lista entregada de largo {len(new_classes_ids)} no concuerda con la cantidad de clases: {self._outputs}")
+            raise ValueError(f"Provided list of length {len(new_classes_ids)} does not match the number of classes: {self._outputs}")
         
         self._classes = torch.tensor(new_classes_ids, dtype=torch.long).sort().values
         
@@ -193,13 +204,14 @@ class base_ANFIS(nn.Module):
     # ---- Intermediate values ----
     def get_firing_levels(self, x, normalized=False):
         """
-        Retorna los niveles de disparo del modelo para los datos de entrada dados.
+        Returns the firing levels of the model for the given input data.
         
         Args:
-            x (torch.tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
+            x (torch.Tensor): Input data tensor of shape ``(batch_size, input_size)``.
+            normalized (bool): If ``True``, returns the normalized firing levels. Defaults to ``False``.
 
         Returns:
-            torch.tensor: Niveles de disparo del modelo. Es de tamaño (batch_size, num_rules).
+            torch.Tensor: Firing levels of shape ``(batch_size, num_rules)``.
         """
         with torch.no_grad():
             w = self._fuzzification_layer(x)
@@ -210,14 +222,14 @@ class base_ANFIS(nn.Module):
     
     def get_all_consequents_outputs(self, x, weighted=True):
         """
-        Retorna las salidas individuales de las reglas del modelo para los datos de entrada dados.
+        Returns the individual rule outputs of the model for the given input data.
         
         Args:
-            x (torch.tensor): Tensor con los datos de entrada. Es de tamaño (batch_size, input_size).
-            weighted (bool): True si las salidas de las reglas se retornarán ponderadas por los firing levels, False en caso contrario (Default: True)
-        
+            x (torch.Tensor): Input data tensor of shape ``(batch_size, input_size)``.
+            weighted (bool): If ``True``, the rule outputs are weighted by their corresponding firing levels. Defaults to ``True``.
+            
         Returns:
-            torch.tensor: Salidas individuales de las reglas del modelo. Es de tamaño (outputs, batch_size, num_rules).
+            torch.Tensor: Individual rule outputs of shape ``(outputs, batch_size, num_rules)``.
         """
         if weighted:
             with torch.no_grad():
@@ -234,30 +246,30 @@ class base_ANFIS(nn.Module):
     @property
     def num_mfs(self):
         """
-        Retorna la cantidad de funciones de membresía por feature.
+        Returns the number of membership functions per input feature.
         
         Returns:
-            int: Cantidad de funciones de membresía que tiene cada feature.
+            int: Number of membership functions per input feature.
         """
         return self._fuzzification_layer.num_mfs
     
     @property
     def rules(self):
         """
-        Retorna la cantidad de reglas del modelo ANFIS.
-        
+        Returns the number of rules in the ANFIS model.
+
         Returns:
-            int: Cantidad de reglas.
+            int: Number of rules.
         """
         return self.get_consequents().shape[1]
     
     @property
     def outputs(self):
         """
-        Retorna el número de outputs del modelo
+        Returns the number of outputs of the model.
 
         Returns:
-            int: Cantidad de outputs
+            int: Number of outputs.
         """
         return self.get_consequents().shape[0]
     
@@ -265,28 +277,32 @@ class base_ANFIS(nn.Module):
     # ----- Premises seters and getters -----
     def get_premises(self):
         """
-        Retorna los antecedentes del modelo.
-        
+        Returns the premise parameters of the model.
+
         Returns:
-            torch.tensor: Tensor con los antecedentes del modelo. Su forma es (input_size, num_mfs, mf_params).
+            torch.Tensor: Tensor containing the premise parameters of shape
+            ``(input_size, num_mfs, mf_params)``.
         """
         return self._fuzzification_layer.get_premises()
     
     def set_premises(self, premises):
         """
-        Setea los parámetros de las funciones de membresía de la capa de fuzzificación del modelo.
-        
+        Sets the membership function parameters of the model's fuzzification layer.
+
         Args:
-            premises (torch.tensor): Tensor con los parámetros de las funciones de membresía. Su forma debe ser (input_size, num_mfs, mf_params), donde mf_params es el número de parámetros de la función de membresía.
+            premises (torch.Tensor): Tensor containing the premise parameters of shape ``(input_size, num_mfs, mf_params)``,
+                where ``mf_params`` is the number of parameters of the membership function.
         """
         self._fuzzification_layer.set_premises(premises)
     
     def get_premises_as_parameters_list(self):
         """
-        Retorna los antecedentes del modelo como una lista de parámetros. Esto es útil para algoritmos de optimización.
-        
+        Returns the premise parameters of the model as a list of parameters.
+        This is useful for optimization algorithms (using PyTorch optimizers).
+    
         Returns:
-            list: Lista de 1 solo elemento (nn.Parameter) que contiene los parámetros de los antecedentes.
+            list[nn.Parameter]: A list containing a single element (``nn.Parameter``) with the
+            premise parameters.
         """
         return self._fuzzification_layer.get_premises_as_parameters_list()
     
@@ -294,28 +310,29 @@ class base_ANFIS(nn.Module):
     # ----- Consequents seters and getters -----
     def set_consequents(self, consequents):
         """
-        Setea los parámetros consecuentes del modelo.
-        
+        Sets the consequent parameters of the model.
+
         Args:
-            consequents (torch.tensor): Tensor con los parámetros consecuentes. Su forma debe ser (outputs, rules, input_size + 1).
+            consequents (torch.Tensor): Tensor containing the consequent parameters of shape ``(outputs, rules, input_size + 1)``.
         """
         self._consequent_layer.set_consequents(consequents)
     
     def get_consequents(self):
         """
-        Retorna los parámetros consecuentes del modelo.
-        
+        Returns the consequent parameters of the model.
+
         Returns:
-            torch.tensor: Tensor con los parámetros consecuentes. Su forma es (outputs, rules, input_size + 1).
+            torch.Tensor: Tensor containing the consequent parameters of shape ``(outputs, rules, input_size + 1)``.
         """
         return self._consequent_layer.get_consequents()
     
     def get_consequents_as_parameters_list(self):
         """
-        Retorna los parámetros consecuentes del modelo como una lista de parámetros. Esto es útil para algoritmos de optimización.
-        
+        Returns the consequent parameters of the model as a list of parameters.
+        This is useful for optimization algorithms (using PyTorch optimizers).
+
         Returns:
-            list: Lista de 1 solo elemento (nn.Parameter) que contiene los parámetros consecuentes.
+            list[nn.Parameter]: A list containing a single element (``nn.Parameter``) with the consequent parameters.
         """
         return self._consequent_layer.get_consequents_as_parameters_list()
     
@@ -323,19 +340,21 @@ class base_ANFIS(nn.Module):
     # ----- Parameters dataframes -----
     def get_premises_structure(self):
         """
-        Retorna la estructura de los parámetros de las funciones de membresía.
-        
+        Returns the structure of the premise parameters.
+
         Returns:
-            pandas.DataFrame: DataFrame con la estructura de los parámetros de las funciones de membresía.
+            pandas.DataFrame: DataFrame containing the structure of the premise
+            parameters.
         """
         return self._fuzzification_layer.get_premises_structure
     
     def get_consequents_structure(self):
         """
-        Retorna la estructura de los parámetros consecuentes.
-        
+        Returns the structure of the consequent parameters.
+
         Returns:
-            list: Lista de DataFrames de pandas que contienen la estructura de los parámetros consecuentes.
+            list[pandas.DataFrame]: A list of pandas DataFrames containing the structure of the
+            consequent parameters.
         """
         return self._consequent_layer.get_consequents_structure
     
@@ -343,13 +362,16 @@ class base_ANFIS(nn.Module):
     # ----- Plot premises -----
     def plot_premises(self, mf=None, input_dim=None, group_by_dim=False, linestyles='-', linewidths=2.5):
         """
-        Plotea las funciones de membresía de los antecedentes del modelo.
+        Plots the membership functions of the model's premises.
         
         Args:
-            mf (int): Índice de la función de membresía a plotear. Si es None, se plotean todas las funciones de membresía.
-            input_dim (int): Dimensión de la entrada a plotear. Si es None, se plotean todas las dimensiones.
-            group_by_dim (bool): Si es True, agrupa las funciones de membresía en un solo gráfico por cada dimensión de entrada. (Default: False)
-            linestyles (string | list): String o lista de strings que representan los tipos de linea para representar las funciones de membresía. Si se usa una lista, los tipos de linea se irán alternando. Los caracteres permitidos son: ['-', '--', '-.', ':']. (Default: '-')
+            mf (int): Index of the membership function to plot. If ``None``, all membership functions are plotted. Defaults to ``None``.
+            input_dim (int): Input feature dimension to plot. If ``None``, all dimensions are plotted. Defaults to ``None``.
+            group_by_dim (bool): If ``True``, groups all membership functions into a single plot per input dimension. Defaults to ``False``.
+            linestyles (str | list[str]): A string or list of strings specifying the line styles used to represent the membership functions. 
+                If a list is provided, the styles are applied cyclically. Valid values are: ``'-'``, ``'--'``, ``'-.'``, ``':'``. 
+                Defaults to ``'-'``.
+            linewidths (float): Line width used to plot the membership functions. Defaults to ``2.5``.
         """
         self._fuzzification_layer.plot_premises(mf, input_dim, group_by_dim, linestyles, linewidths)
     
@@ -357,26 +379,34 @@ class base_ANFIS(nn.Module):
 
 class h_ANFIS(base_ANFIS):
     """
-    Clase para un sistema de inferencia neuro-difuso adaptativo (ANFIS) homogéneo, es decir, con la misma cantidad de funciones de membresía para cada feature de los datos de entrada, 
-    limitando a que cada uno con el mismo número de variables lingüisticas.
-    
-    Esta clase tiene un parámetro especial 'rule_reduced' que permite reducir en número de reglas generadas en el cálculo de los niveles de disparo. Esto se logra evitando hacer la combinatoria completa para las multiplicaciones de los valores de pertenencia.
-    El procedimiento en este caso se realizaría solo multiplicando entre sí los valores de pertenencia *i* de cada feature, dando como resultado una cantidad de reglas igual al número de funciones de membresía de cada feature. (esto se detalla de mejor manera en :ref:`rule-reduced ANFIS <rule-reduced ANFIS>`).
+    Homogeneous Adaptive Neuro-Fuzzy Inference System (ANFIS).
+
+    Implements an ANFIS model where every input feature shares the same number
+    of membership functions, restricting each feature to the same number of
+    linguistic variables.
+
+    Supports an optional rule-reduced mode that avoids the full combinatorial
+    expansion when computing firing levels. In this mode, only the membership
+    degrees at matching indices across features are multiplied together, yielding
+    a number of rules equal to the number of membership functions per feature
+    rather than ``num_mfs ** input_size``. For further details, see
+    :ref:`rule-reduced ANFIS <rule-reduced ANFIS>`.
     """
     
     def __init__(self, input_size, num_mfs, outputs=1, membership_function=GeneralizedBell_MF(), output_type="default", rule_reduced=False, features=None, dtype=torch.float32):
         """
-        Inicializa un modelo ANFIS homogéneo.
-        
+        Initializes a homogeneous ANFIS model.
+
         Args:
-            input_size (int): Número de features de los datos de entrada.
-            num_mfs (int): Número de funciones de membresía por feature.
-            outputs (int): Número de salidas del modelo (Default: 1).
-            membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
-            output_type (str): Tipo de salida del modelo (Default: 'default').
-            rule_reduced (bool): True si se desea instanciar un ANFIS de reglas reducidas, False en caso contrario (Default: False).
-            features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
-            dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).
+            input_size (int): Number of input features.
+            num_mfs (int): Number of membership functions per input feature.
+            outputs (int): Number of model outputs. Defaults to ``1``.
+            membership_function (MembershipFunction): Membership function to use. Defaults to ``GeneralizedBell_MF``.
+            output_type (str): Output type of the model. Defaults to ``'default'``.
+            rule_reduced (bool): If ``True``, instantiates a rule-reduced ANFIS model. Defaults to ``False``.
+            features (iterable): Iterable of strings containing the names of the input features considered by the model.
+                Must be of length ``input_size``. Defaults to ``None``.
+            dtype (torch.dtype): Data type to use in the model. Defaults to ``torch.float32``.
         """
         super(h_ANFIS, self).__init__()
         if rule_reduced:
@@ -431,10 +461,10 @@ class h_ANFIS(base_ANFIS):
     # ----- Load state dict -----
     def load_state_dict(self, state_dict):
         """
-        Carga un estado del modelo.
-        
+        Loads a model state dictionary.
+
         Args:
-            state_dict (dict): Diccionario con el estado del modelo.
+            state_dict (dict): Dictionary containing the model state.
         """
         self.set_premises(state_dict['_fuzzification_layer._premises'])
         self.set_consequents(state_dict['_consequent_layer._consequents'])
@@ -442,6 +472,18 @@ class h_ANFIS(base_ANFIS):
         
     # ----- Rules -----
     def get_rules_structure(self):
+        """
+        Returns a combined summary of the premises and consequent parameters for
+        each rule in the model.
+
+        The resulting DataFrame organizes each rule as a row, with columns grouped
+        first by premises (showing the membership function parameters of each input
+        feature) and then by the consequent parameters of each model output.
+
+        Returns:
+            pandas.DataFrame: DataFrame with a MultiIndex column structure, where the top-level groups correspond to ``'premises'`` and
+            ``'output i consequents'`` for each output ``i``, and rows correspond to individual rules.
+        """
         premises_df = self.get_premises_structure()
         
         variables = premises_df.columns.get_level_values(0).unique()
@@ -481,21 +523,21 @@ class h_ANFIS(base_ANFIS):
 
 class ANFIS(base_ANFIS):
     """
-    Clase para un sistema de inferencia neuro-difuso adaptativo (ANFIS) con una cantidad de funciones de membresía arbitraria para cada feature de los datos de entrada.
+    Adaptive Neuro-Fuzzy Inference System (ANFIS) with an arbitrary number of membership functions per input feature.
     """
     
     def __init__(self, mf_distribution, outputs=1, membership_function=GeneralizedBell_MF(), output_type="default", features=None, dtype=torch.float32):
         """
-        Inicializa un modelo ANFIS.
-        
+        Initializes an ANFIS model.
+
         Args:
-            mf_distribution (list): Lista con la cantidad de funciones de membresía por feature de los datos de entrada.
-            outputs (int): Número de salidas del modelo (Default: 1).
-            membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
-            output_type (str): Tipo de salida del modelo (Default: 'default').
-            features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
-            dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).
-            
+            mf_distribution (list[int]): List containing the number of membership functions per input feature.
+            outputs (int): Number of model outputs. Defaults to ``1``.
+            membership_function (MembershipFunction): Membership function to use. Defaults to ``GeneralizedBell_MF``.
+            output_type (str): Output type of the model. Defaults to ``'default'``.
+            features (iterable): Iterable of strings containing the names of the input features considered by the model. 
+                Must be of length ``input_size``. Defaults to ``None``.
+            dtype (torch.dtype): Data type to use in the model. Defaults to ``torch.float32``.
         """
         super(ANFIS, self).__init__()
         # Input data info
@@ -544,28 +586,39 @@ class ANFIS(base_ANFIS):
     # ----- Premises seters and getters -----
     def get_premises(self):
         """
-        Retorna los antecedentes del modelo.
-        
+        Returns the premise parameters of the model.
+
         Returns:
-            list: Lista de tensores con los antecedentes del modelo asociados a cada feature (por lo que el largo de la lista es input_size). Cada tensor tiene forma (num_mfs, mf_params), donde num_mfs es la cantidad de funciones de membresía para el feature asociado en cuestión y mf_params es el número de parámetros de la función usada.
+            list[torch.Tensor]: List of tensors containing the premise parameters
+            associated with each input feature, so the list length equals
+            ``input_size``. Each tensor has shape ``(num_mfs, mf_params)``, where
+            ``num_mfs`` is the number of membership functions for the corresponding
+            feature and ``mf_params`` is the number of parameters of the membership
+            function used.
         """
         return super().get_premises()
     
     def set_premises(self, premises):
         """
-        Setea los parámetros de las funciones de membresía de la capa de fuzzificación del modelo.
+        Sets the membership function parameters of the model's fuzzification layer.
         
         Args:
-            premises (list): Lista de tensores con los parámetros de las funciones de membresía. Cada tensor debe tener forma (num_mfs, mf_params), donde mf_params es el número de parámetros de la función de membresía.
+            premises (list[torch.Tensor]): List of tensors containing the premise
+                parameters. Each tensor must have shape ``(num_mfs, mf_params)``,
+                where ``num_mfs`` is the number of membership functions for the
+                corresponding feature and ``mf_params`` is the number of parameters
+                of the membership function used.
         """
         super().set_premises(premises)
             
     def get_premises_as_parameters_list(self):
         """
-        Retorna los antecedentes del modelo como una lista de parámetros. Esto es útil para algoritmos de optimización.
+        Returns the premise parameters of the model as a list of parameters.
+        This is useful for optimization algorithms (using PyTorch optimizers).
         
         Returns:
-            nn.ParameterList: Lista de parámetros que contiene los antecedentes.
+            nn.ParameterList: A ParameterList containing the premise parameters
+            for each input feature.
         """
         return super().get_premises_as_parameters_list()
 
@@ -574,10 +627,10 @@ class ANFIS(base_ANFIS):
     @property
     def num_mfs(self):
         """
-        Retorna la cantidad de funciones de membresía por feature.
+        Returns the number of membership functions per input feature.
         
         Returns:
-            torch.tensor: Tensor con la cantidad de funciones de membresía por feature.
+            torch.Tensor: Tensor containing the number of membership functions for each input feature.
         """
         super().num_mfs
     
@@ -585,10 +638,10 @@ class ANFIS(base_ANFIS):
     # ----- Load state dict -----
     def load_state_dict(self, state_dict):
         """
-        Carga un estado del modelo.
+        Loads a model state dictionary.
         
         Args:
-            state_dict (dict): Diccionario con el estado del modelo.
+            state_dict (dict): Dictionary containing the model state.
         """
         prems = []
         for i in range(self._input_size):
@@ -599,6 +652,20 @@ class ANFIS(base_ANFIS):
         
     # ----- Rules -----
     def get_rules_structure(self):
+        """
+        Returns a combined summary of the premises and consequent parameters for
+        each rule in the model.
+
+        The resulting DataFrame organizes each rule as a row, with columns grouped
+        first by premises (showing the membership function parameters of each input
+        feature) and then by the consequent parameters of each model output.
+
+        Returns:
+            pandas.DataFrame: DataFrame with a MultiIndex column structure, where
+            the top-level groups correspond to ``'premises'`` and
+            ``'output i consequents'`` for each output ``i``, and rows correspond
+            to individual rules.
+        """
         premises_df = self.get_premises_structure()
         
         variables = premises_df.columns.get_level_values(0).unique()
@@ -640,41 +707,43 @@ class ANFIS(base_ANFIS):
     
 class rule_reduced_ANFIS(base_ANFIS):
     """
-    Clase para un sistema de inferencia neuro-difuso adaptativo (ANFIS) homogéneo, es decir, con la misma cantidad de funciones de membresía para cada feature de los datos de entrada, 
-    limitando a que cada uno con el mismo número de variables lingüisticas. Tiene la particularidad de que el número de reglas generadas en el cálculo de los niveles de disparo es reducido. 
-    En vez de hacer la combinatoria completa para las multiplicaciones de los valores de pertenencia, el procedimiento se realizaría solo multiplicando entre sí los valores de pertenencia *i* 
-    entre los features, dando como resultado una cantidad de reglas igual al número de funciones de membresía (en cada feature). Esto se detalla de mejor manera en :ref:`rule-reduced ANFIS <rule-reduced ANFIS>`.
-    
-    Cuenta con un parámetro experimental 'default_rule' que permite agregar un nivel de disparo extra para capturar todas las combinaciones que el conjunto de reglas del modelo 
-    en sí no captura (por el hecho de estar reducido).
-    
-    .. note::
-        Cuenta con un parámetro ``default_rule`` que está actualmente marcado como **experimental**. Este permite agregar un nivel de disparo extra para capturar todas las combinaciones que el conjunto de reglas del modelo no captura (por el hecho de estar reducido).
-        Su funcionalidad no está completamente implementada en el toolbox y está sujeto a cambios en futuras versiones.
-    
-    .. warning::
-        El uso de ``default_rule=True`` no está soportado en todas las operaciones
-        del toolbox y puede generar comportamientos inesperados.
+    Rule-reduced Adaptive Neuro-Fuzzy Inference System (ANFIS).
+
+    Implements a homogeneous ANFIS model where every input feature shares the same number of membership functions, 
+    restricting each feature to the same number of linguistic variables. Unlike the standard ANFIS, the number of
+    rules is reduced by avoiding the full combinatorial expansion when computing firing levels. Instead, only the 
+    membership degrees at matching indices across features are multiplied together, yielding a number of rules equal
+    to the number of membership functions per feature. For further details, see :ref:`rule-reduced ANFIS <rule-reduced ANFIS>`.
+
+    Note:
+        Includes an experimental ``default_rule`` parameter that appends an extra firing level to capture input 
+        combinations not covered by the reduced rule set. This functionality is not fully supported across all
+        toolbox operations and is subject to change in future versions.
+
+    Warning:
+        The use of ``default_rule=True`` is experimental, is not supported in all toolbox operations, and may 
+        produce unexpected behavior.
     """
     
     def __init__(self, input_size, num_mfs, outputs=1, default_rule=False, membership_function=GeneralizedBell_MF(), output_type="default", features=None, dtype=torch.float32):
         """
-        Inicializa un modelo ANFIS homogéneo.
-        
+        Initializes a rule-reduced ANFIS model.
+
         Args:
-            input_size (int): Número de features de los datos de entrada.
-            num_mfs (int): Número de funciones de membresía por feature.
-            outputs (int): Número de salidas del modelo (Default: 1).
-            membership_function (MembershipFunction): Función de membresía a utilizar (Default: GeneralizedBell_MF).
-            output_type (str): Tipo de salida del modelo (Default: 'default').
-            classes (list): Lista que define las clases a predecir por el modelo. Si es None, se usan [0, 1, 2, ...]. Utilizable solo si *output_type* es 'softmax'. (Default: None).
-            default_rule (bool): **EXPERIMENTAL** - True si se desea agregar la regla por defecto, False en caso contrario (Default: False).
-            features (iterable): Iterable que contiene los nombres de las características de las variables de entrada como strings consideradas en el modelo (input features). Debe ser de largo input_size (Default: None).
-            dtype (torch.dtype): Tipo de dato a utilizar en el modelo (Default: torch.float32).
-        
-        .. caution::
-            El parámetro ``default_rule`` está en desarrollo activo. Su comportamiento puede cambiar y algunas funcionalidades pueden no estar disponibles.
-            
+            input_size (int): Number of input features.
+            num_mfs (int): Number of membership functions per input feature.
+            outputs (int): Number of model outputs. Defaults to ``1``.
+            default_rule (bool): If ``True``, appends an extra firing level representing a default rule to capture 
+                input combinations not covered by the reduced rule set. Defaults to ``False``.
+            membership_function (MembershipFunction): Membership function to use. Defaults to ``GeneralizedBell_MF``.
+            output_type (str): Output type of the model. Defaults to ``'default'``.
+            features (iterable): Iterable of strings containing the names of the input features considered by the model. 
+                Must be of length ``input_size``. Defaults to ``None``.
+            dtype (torch.dtype): Data type to use in the model. Defaults to ``torch.float32``.
+
+        .. caution:
+            The ``default_rule`` parameter is under active development. Its
+            behavior may change and some functionalities may not yet be available.
         """
         super(rule_reduced_ANFIS, self).__init__()
         self._rule_reduced = True
@@ -723,10 +792,11 @@ class rule_reduced_ANFIS(base_ANFIS):
     # ----- Premises seters and getters -----
     def get_premises_as_parameters_list(self):
         """
-        Retorna los antecedentes del modelo como una lista de parámetros. Esto es útil para algoritmos de optimización.
+        Returns the premise parameters of the model as a list of parameters.
+        This is useful for optimization algorithms.
         
         Returns:
-            nn.ParameterList: Lista de parámetros de las funciones de membresía de los antecedentes.
+            nn.ParameterList: A ParameterList containing the premise parameters of the membership functions.
         """
         return super().get_premises_as_parameters_list()
     
@@ -734,10 +804,10 @@ class rule_reduced_ANFIS(base_ANFIS):
     # ----- Load state dict -----
     def load_state_dict(self, state_dict):
         """
-        Carga un estado del modelo.
+        Loads a model state dictionary.
         
         Args:
-            state_dict (dict): Diccionario con el estado del modelo.
+            state_dict (dict): Dictionary containing the model state.
         """
         prems = []
         cons = []
@@ -752,6 +822,18 @@ class rule_reduced_ANFIS(base_ANFIS):
     
     # ----- Rules -----
     def get_rules_structure(self):
+        """
+        Returns a combined summary of the premises and consequent parameters for each rule in the model.
+
+        The resulting DataFrame organizes each rule as a row, with columns grouped first by premises 
+        (showing the membership function parameters of each input feature) and then by the consequent 
+        parameters of each model output. Since this is a rule-reduced model, the number of rows equals 
+        the number of membership functions per feature.
+
+        Returns:
+            pandas.DataFrame: DataFrame with a MultiIndex column structure, where the top-level groups correspond 
+            to ``'premises'`` and ``'output i consequents'`` for each output ``i``, and rows correspond to individual rules.
+        """
         premises_df = self.get_premises_structure()
         premises_df.index = [f"rule {i+1}" for i in range(len(premises_df))]
         
@@ -769,3 +851,56 @@ class rule_reduced_ANFIS(base_ANFIS):
 
         return pd.concat(rules_dfs, axis=1)
     
+    
+    # ---- rule reduced ANFIS rules operations ----
+    def add_rules(self, means, stds):
+        """
+        Adds new rules to the rule-reduced ANFIS model by generating new membership
+        functions from the provided means and standard deviations. The consequent
+        parameters for the new rules are initialized randomly.
+        
+        Note:
+            This method is agnostic to the membership function type used. Each
+            membership function has a specific transformation function to convert
+            the provided means and standard deviations into the corresponding
+            membership function parameters.
+        
+        Args:
+            means (torch.Tensor): Tensor containing the means for generating the
+                new rules, of shape ``(num_new_rules, input_size)``, where
+                ``num_new_rules`` is the number of rules to add and ``input_size``
+                is the number of input features of the model.
+            stds (torch.Tensor): Tensor containing the standard deviations for
+                generating the new rules, of shape ``(num_new_rules, input_size)``,
+                where ``num_new_rules`` is the number of rules to add and
+                ``input_size`` is the number of input features of the model.
+        """
+        new_premises = self._fuzzification_layer._membership_function._grow_new_premise_parameters(means, stds)
+        
+        n_new_rules = new_premises.shape[1]
+        
+        new_consequents = self._consequent_layer._consequent_function.random_consequents(self._outputs, n_new_rules, self._input_size, self._dtype)
+        
+        self.set_premises(torch.cat((self.get_premises(), new_premises), dim=1))
+        self.set_consequents(torch.cat((self.get_consequents(), new_consequents), dim=1))
+        
+    def remove_rules(self, rules_idxs):
+        """
+        Removes rules from the rule-reduced ANFIS model at the specified indices.
+    
+        Args:
+            rules_idxs (list[int]): List of indices of the rules to remove. Each
+                index must be an integer between ``0`` and ``num_rules - 1``, where
+                ``num_rules`` is the current number of rules in the model.
+        """
+        premises = self.get_premises()
+        consequents = self.get_consequents()
+        
+        mask = torch.ones(self.rules, dtype=torch.bool)
+        mask[rules_idxs] = False
+        
+        new_premises = premises[:, mask, :]
+        new_consequents = consequents[:, mask, :]
+        
+        self.set_premises(new_premises)
+        self.set_consequents(new_consequents)
