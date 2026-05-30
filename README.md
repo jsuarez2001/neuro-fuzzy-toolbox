@@ -32,5 +32,7 @@ basis for building custom training procedures and deep neuro-fuzzy architectures
 
 ## Documentation
 
+[![Documentation Status](https://readthedocs.org/projects/neuro-fuzzy-toolbox/badge/?version=latest)](https://neuro-fuzzy-toolbox.readthedocs.io/en/latest/)
+
 Full documentation including a usage guide, API reference, and end-to-end
-examples is available at: *(link pending)*
+examples is available at: **https://neuro-fuzzy-toolbox.readthedocs.io/en/latest/**
