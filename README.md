@@ -1,10 +1,21 @@
 # Neuro-Fuzzy Toolbox
 
+[![PyPI version](https://badge.fury.io/py/neuro-fuzzy-toolbox.svg)](https://pypi.org/project/neuro-fuzzy-toolbox/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/neuro-fuzzy-toolbox)](https://pypi.org/project/neuro-fuzzy-toolbox/)
+[![Documentation Status](https://readthedocs.org/projects/neuro-fuzzy-toolbox/badge/?version=latest)](https://neuro-fuzzy-toolbox.readthedocs.io/en/latest/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A PyTorch-based library for the design, training, and analysis of ANFIS-based
 neuro-fuzzy models. The toolbox provides ready-to-use model variants and training
 algorithms, a structural adaptation algorithm, and utilities for rule inspection
 and local contribution analysis. Its modular design also makes it a flexible
 basis for building custom training procedures and deep neuro-fuzzy architectures.
+
+## Installation
+
+```bash
+pip install neuro-fuzzy-toolbox
+```
 
 ## Features
 
@@ -24,15 +35,13 @@ basis for building custom training procedures and deep neuro-fuzzy architectures
   at runtime.
 
 ## Requirements
- - torch >= 2.5 (tested in 2.5.1)
- - numpy >= 2.2 (tested in 2.2.1)
- - pandas >= 2.2 (tested in 2.2.3)
- - matplotlib >= 3.10 (tested in 3.10.0)
 
+- torch >= 2.5 (tested with 2.5.1)
+- numpy >= 2.2 (tested with 2.2.1)
+- pandas >= 2.2 (tested with 2.2.3)
+- matplotlib >= 3.10 (tested with 3.10.0)
 
 ## Documentation
-
-[![Documentation Status](https://readthedocs.org/projects/neuro-fuzzy-toolbox/badge/?version=latest)](https://neuro-fuzzy-toolbox.readthedocs.io/en/latest/)
 
 Full documentation including a usage guide, API reference, and end-to-end
 examples is available at: **https://neuro-fuzzy-toolbox.readthedocs.io/en/latest/**

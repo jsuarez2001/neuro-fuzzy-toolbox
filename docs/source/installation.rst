@@ -3,16 +3,19 @@
 Installation
 ============
 
-Para la instalación de Neuro-Fuzzy Toolbox, se recomienda el uso de un entorno virtual de Python. Para más información sobre la creación de entornos virtuales, consulta la `documentación oficial <https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#create-and-use-virtual-environments>`_.
+It is recommended to install Neuro-Fuzzy Toolbox inside a Python virtual environment.
+For more information on creating virtual environments, refer to the `official documentation <https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#create-and-use-virtual-environments>`_.
 
-Puedes instalar Neuro-Fuzzy Toolbox de la siguiente manera:
+You can install Neuro-Fuzzy Toolbox as follows:
 
 .. code-block:: bash
 
-   pip install -i https://test.pypi.org/simple/ neuro-fuzzy-toolbox
+   pip install neuro-fuzzy-toolbox
 
 .. note::
+   All required dependencies will be installed automatically. However, if you prefer
+   to install them manually, refer to the
+   `requirements.txt <https://github.com/jsuarez2001/neuro-fuzzy-toolbox/blob/main/requirements.txt>`_
+   file in the repository.
 
-   Las dependencias necesarias se instalarán automáticamente al instalar el toolbox. Sin embargo, si deseas instalar las dependencias manualmente, puedes utilizar el archivo `requirements.txt <https://github.com/edge-mirage/neuro-fuzzy-toolbox/blob/main/requirements.txt>`_.
-
-Para más información sobre el uso de la herramienta, consulta la sección :ref:`Usage`.
+For more information on how to use the toolbox, see the :ref:`Usage` section.
