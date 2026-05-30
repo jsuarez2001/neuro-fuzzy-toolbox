@@ -13,9 +13,9 @@ import inspect
 sys.path.insert(0, os.path.abspath('../../src'))
 
 project = 'Neuro-Fuzzy Toolbox'
-copyright = '2025, Juan Suárez'
+copyright = '2026, Juan Suárez'
 author = 'Juan Suárez'
-release = '0.0.1'
+release = '0.1.0'
 
 language = "en"
 

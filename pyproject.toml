@@ -1,7 +1,7 @@
 [project]
 name = "neuro-fuzzy-toolbox"
-version = "0.0.3"
-description = "A toolbox for the development of Adaptive Neuro Fuzzy Inference Systems based on PyTorch. With this toolbox you would be able to build and train ANFIS models variations and design hybrid architectures.s"
+version = "0.1.0"
+description = "PyTorch-based toolbox for designing, training, and analyzing ANFIS-based neuro-fuzzy models. Includes classical and rule-reduced ANFIS variants, hybrid and optimizer-based training strategies, SONFIS structural adaptation, and rule-inspection utilities."
 readme = "README.md"
 requires-python = ">=3.10,<3.13"
 authors = [
@@ -12,8 +12,8 @@ license = "MIT"
 license-files = ["LICEN[CS]E*"]
 
 classifiers = [
-  "Development Status :: 2 - Pre-Alpha",
-  # "Development Status :: 3 - Alpha",
+  # "Development Status :: 2 - Pre-Alpha",
+  "Development Status :: 3 - Alpha",
   # "Development Status :: 4 - Beta",
   # "Development Status :: 5 - Production/Stable",
   
@@ -37,8 +37,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/edge-mirage/neuro-fuzzy-toolbox"
-Issues = "https://github.com/edge-mirage/neuro-fuzzy-toolbox/issues"
+Homepage = "https://github.com/jsuarez2001/neuro-fuzzy-toolbox"
+Documentation = "https://neuro-fuzzy-toolbox.readthedocs.io/en/latest/"
+Issues   = "https://github.com/jsuarez2001/neuro-fuzzy-toolbox/issues"
 
 [build-system]
 requires = ["hatchling >= 1.26"]
