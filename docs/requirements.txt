@@ -1,0 +1,4 @@
+# for Read the Docs documentation
+
+sphinx>=7.2,<9.0
+sphinx-rtd-theme>=2.0.0

@@ -22,6 +22,20 @@ language = "en"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
+autodoc_mock_imports = [
+    "torch",
+    "torch.nn",
+    "torch.nn.functional",
+    "torch.utils",
+    "torch.utils.data",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "matplotlib.pyplot",
+    "matplotlib.axes",
+    "matplotlib.figure",
+]
+
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
@@ -30,34 +44,27 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon']
 
-latex_engine = "xelatex"   # mejor soporte unicode
+latex_engine = "xelatex"
 
 latex_elements = {
-    # Tamaño de papel y cuerpo
     "papersize": "a4paper",
     "pointsize": "11pt",
 
-    # Envuelve líneas largas en bloques de código e inline-literals
     "sphinxsetup": (
-        "verbatimwrapslines=true, "   # envuelve líneas en code-block
-        "verbatimforcewraps=true, "   # fuerza quiebre si aún no alcanza
-        "inlineliteralwraps=true"     # permite quiebres en ``inline code``
+        "verbatimwrapslines=true, "
+        "verbatimforcewraps=true, "
+        "inlineliteralwraps=true"
     ),
 
-    # Ajustes LaTeX de bajo nivel
     "preamble": r"""
 \setlength{\emergencystretch}{3em} % ayuda contra overfull \hbox
 \setlength{\headheight}{14pt}      % elimina el warning de fancyhdr
 \providecommand{\tightlist}{}      % evita avisos con listas "compactas"
 
-% Hace \newline más tolerante si aparece "fuera de línea"
 \let\orignewline\newline
 \renewcommand{\newline}{\leavevmode\orignewline}
 """,
 
-    # --- OPCIONAL ---
-    # Si NO quieres instalar FreeSerif en el sistema,
-    # descomenta las 3 líneas siguientes para usar DejaVu:
     # "fontpkg": r"""
     # \setmainfont{DejaVu Serif}
     # \setsansfont{DejaVu Sans}
@@ -67,7 +74,7 @@ latex_elements = {
 
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False 
-napoleon_include_init_with_doc = True  # Incluye docstrings de __init__
+napoleon_include_init_with_doc = True
 
 templates_path = ['_templates']
 exclude_patterns = []
@@ -85,7 +92,7 @@ html_static_path = ['_static']
 
 def skip_pytorch_methods(app, what, name, obj, skip, options):
     """
-    Omite miembros cuyo código fuente se encuentre en la instalación de PyTorch.
+    Ignore methods that are part of PyTorch's API when generating documentation with autodoc.
     """
     try:
         source_file = inspect.getsourcefile(obj)
