@@ -125,13 +125,13 @@ Both classes are instantiated for comparison:
 
     anfis_model = nft.ANFIS(
         mf_distribution=[3, 3, 3, 3],  # MF distribution across features
-        membership_function=nft.Gaussian_MF
+        membership_function=nft.Gaussian_MF()
     )
 
     h_anfis = nft.h_ANFIS(
         input_size=x_train.shape[1],
         num_mfs=3,                      # same number of MFs per feature
-        membership_function=nft.Gaussian_MF
+        membership_function=nft.Gaussian_MF()
     )
 
     # Initialize premises of both models with the same values for comparison
@@ -288,7 +288,7 @@ As mentioned above, the rule-reduced ANFIS model can be instantiated using
     rule_reduced_anfis = nft.h_ANFIS(
         input_size=x_train.shape[1],  # number of features, in this case 3
         num_mfs=3,                    # same number of MFs per feature
-        membership_function=nft.GeneralizedBell_MF,
+        membership_function=nft.GeneralizedBell_MF(),
         rule_reduced=True             # enables rule-reduced mode
     )
 
@@ -359,14 +359,14 @@ the same. The following example instantiates two rule-reduced ANFIS models
     h_anfis_rule_reduced = nft.h_ANFIS(
         input_size=x_train.shape[1],  # number of features, in this case 4
         num_mfs=3,                    # same number of MFs per feature
-        membership_function=nft.Gaussian_MF,
+        membership_function=nft.Gaussian_MF(),
         rule_reduced=True
     )
 
     rule_reduced_anfis = nft.rule_reduced_ANFIS(
         input_size=x_train.shape[1],  # number of features, in this case 4
         num_mfs=3,                    # same number of MFs per feature
-        membership_function=nft.Gaussian_MF
+        membership_function=nft.Gaussian_MF()
     )
 
     # Set both models to the same parameter values for comparison

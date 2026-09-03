@@ -107,7 +107,7 @@ The model can then be instantiated using the defined distribution:
     model = nft.ANFIS(
         mf_distribution=mf_distribution,
         outputs=1,                               # 1 output
-        membership_function=nft.GeneralizedBell_MF,
+        membership_function=nft.GeneralizedBell_MF(),
         output_type='default'
     )
 
