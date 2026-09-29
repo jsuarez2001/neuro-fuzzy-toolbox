@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+from ._loader_utils import get_loader_tensors
+
 def classical_consequents_estimation_with_OLS(ANFISmodel, loader, driver, ridge_lambda):
     """
     Estimates the consequent parameters of an ANFIS model using ordinary least squares.
@@ -20,8 +22,7 @@ def classical_consequents_estimation_with_OLS(ANFISmodel, loader, driver, ridge_
     Returns:
         torch.Tensor: Tensor containing the new consequent parameters.
     """
-    x = loader.dataset.tensors[0]
-    y = loader.dataset.tensors[1]
+    x, y = get_loader_tensors(loader)
     
     # Least squares problem construction
     w_norm = ANFISmodel.get_firing_levels(x, normalized=True)
@@ -73,7 +74,7 @@ def optimizer_training_epoch(model, loader, optimizer, loss_function):
         
         '''preliminary fix for the dtype issue'''
         if not isinstance(loss_function, nn.CrossEntropyLoss): #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
-            if loader.dataset.tensors[0].dtype != loader.dataset.tensors[1].dtype:
+            if batch_x.dtype != batch_y.dtype:
                 batch_y_copy = batch_y_copy.to(batch_x.dtype)
         else:
             batch_y_copy = batch_y_copy.long()

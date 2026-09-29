@@ -66,10 +66,20 @@ detailed information, refer to the official PyTorch documentation:
     x_train = torch.rand(200, 3)
     y_train = torch.rand(200, )
 
-When defining a DataLoader, the first argument must be a ``TensorDataset``
+When defining a DataLoader, the first argument is a dataset yielding
+``(inputs, targets)`` pairs. The recommended choice is a ``TensorDataset``
 object wrapping the input and output data. The ``batch_size`` parameter
 defines the number of samples used in each training iteration. Setting
 ``shuffle=True`` shuffles the data at each iteration; this is optional.
+
+.. note::
+    Some steps of the training algorithms (such as the least-squares
+    estimation of the consequents or the structural operators of SONFIS)
+    need the whole dataset at once. With a ``TensorDataset`` its tensors are
+    used directly. Any other dataset, such as a custom ``Dataset`` or the
+    ``Subset`` objects returned by ``torch.utils.data.random_split``, is also
+    supported, but it is read completely into memory each time those steps are
+    executed, which is slower for large datasets.
 
 .. code-block:: python
 

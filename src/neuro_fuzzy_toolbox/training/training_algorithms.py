@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+from ._loader_utils import get_loader_tensors
+
 from neuro_fuzzy_toolbox.training import (
     classical_consequents_estimation_with_OLS,
     optimizer_training_epoch
@@ -156,14 +158,12 @@ class base_model_trainer():
             torch.Tensor: Tensor containing the validation loss value, or ``None`` if no validation data is provided.
         """
         val_loss = None
-        x = train_loader.dataset.tensors[0]
-        y = train_loader.dataset.tensors[1]
+        x, y = get_loader_tensors(train_loader)
         with torch.no_grad():
             pred = model(x)
             loss = self._loss_function(model, pred, y)
         if val_loader is not None:
-            x = val_loader.dataset.tensors[0]
-            y = val_loader.dataset.tensors[1]
+            x, y = get_loader_tensors(val_loader)
             with torch.no_grad():
                 pred = model(x)
                 val_loss = self._loss_function(model, pred, y)
@@ -518,7 +518,7 @@ class Double_optimizer_training_algorithm(base_model_trainer):
 
             '''preliminary fix for the dtype issue'''
             if not isinstance(self.loss_function, nn.CrossEntropyLoss):
-                if loader.dataset.tensors[0].dtype != loader.dataset.tensors[1].dtype:
+                if batch_x.dtype != batch_y.dtype:
                     batch_y_copy = batch_y_copy.to(batch_x.dtype)
             else: 
                 batch_y_copy = batch_y_copy.to(torch.int64) #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
@@ -553,7 +553,7 @@ class Double_optimizer_training_algorithm(base_model_trainer):
 
             '''preliminary fix for the dtype issue'''
             if not isinstance(self.loss_function, nn.CrossEntropyLoss):
-                if loader.dataset.tensors[0].dtype != loader.dataset.tensors[1].dtype:
+                if batch_x.dtype != batch_y.dtype:
                     batch_y_copy = batch_y_copy.to(batch_x.dtype)
             else: 
                 batch_y_copy = batch_y_copy.to(torch.int64) #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
@@ -576,7 +576,7 @@ class Double_optimizer_training_algorithm(base_model_trainer):
 
             '''preliminary fix for the dtype issue'''
             if not isinstance(self.loss_function, nn.CrossEntropyLoss):
-                if loader.dataset.tensors[0].dtype != loader.dataset.tensors[1].dtype:
+                if batch_x.dtype != batch_y.dtype:
                     batch_y_copy = batch_y_copy.to(batch_x.dtype)
             else: 
                 batch_y_copy = batch_y_copy.to(torch.int64) #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
@@ -607,18 +607,21 @@ class Double_optimizer_training_algorithm(base_model_trainer):
             model (rule_reduced_ANFIS): Rule-reduced ANFIS model to train.
             freezed_subnets (torch.Tensor): Boolean tensor indicating which subnets should not be updated.
         """
-        parameters_to_train = []
+        premises_parameters_to_train = []
+        consequents_parameters_to_train = []
         not_freezed = torch.where(~freezed_subnets)[0]
+        premises_list = model.get_premises_as_parameters_list()
+        consequents_list = model.get_consequents_as_parameters_list()
         for i in not_freezed:
-            parameters_to_train.append(model.get_premises_as_parameters_list()[i.item()])
-            parameters_to_train.append(model.get_consequents_as_parameters_list()[i.item()])
+            premises_parameters_to_train.append(premises_list[i.item()])
+            consequents_parameters_to_train.append(consequents_list[i.item()])
             
         if not_freezed.size(0) == 0:
             self._prems_optimizer_instance = None
             self._cons_optimizer_instance = None
         else:
-            self._prems_optimizer_instance = self.prems_optim(parameters_to_train, **self.prems_optim_params)
-            self._cons_optimizer_instance = self.cons_optim(parameters_to_train, **self.cons_optim_params)
+            self._prems_optimizer_instance = self.prems_optim(premises_parameters_to_train, **self.prems_optim_params)
+            self._cons_optimizer_instance = self.cons_optim(consequents_parameters_to_train, **self.cons_optim_params)
             
     
     def _sonfis_update_parameters(self, model, train_loader, val_loader, freezed_subnets):

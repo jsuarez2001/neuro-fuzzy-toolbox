@@ -1,3 +1,5 @@
+import copy
+
 class EarlyStopping():
     """
     Early stopping mechanism for halting the training of a machine learning model (``torch.nn.Module``) when no 
@@ -36,7 +38,7 @@ class EarlyStopping():
         """
         if self._best_loss is None:
             self._best_loss = loss
-            self._best_state_dict = model.state_dict()
+            self._best_state_dict = copy.deepcopy(model.state_dict())
 
         elif loss + self.delta > self._best_loss:
             self._counter += 1
@@ -49,7 +51,7 @@ class EarlyStopping():
 
         else:
             self._best_loss = loss
-            self._best_state_dict = model.state_dict()
+            self._best_state_dict = copy.deepcopy(model.state_dict())
             self._counter = 0
 
     def reset(self):

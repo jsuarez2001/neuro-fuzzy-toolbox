@@ -142,7 +142,7 @@ SONFIS
 ------
 SONFIS is configured with rule growing, splitting, and pruning thresholds
 appropriate for this dataset. Enabling ``lse_for_new_consequents`` ensures
-that the consequent parameters of any rule added by GrowNet or SplitSubNet
+that the consequent parameters of any rule added by GrowNet or SplitNet
 are initialized via least-squares estimation rather than randomly, which
 tends to reduce the number of gradient updates needed to integrate the new
 rule into the model. A separate early stopping mechanism is provided at the

@@ -632,7 +632,7 @@ class ANFIS(base_ANFIS):
         Returns:
             torch.Tensor: Tensor containing the number of membership functions for each input feature.
         """
-        super().num_mfs
+        return super().num_mfs
     
     
     # ----- Load state dict -----
