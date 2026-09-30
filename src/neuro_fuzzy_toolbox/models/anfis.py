@@ -96,11 +96,15 @@ class base_ANFIS(nn.Module):
         
         '''preliminary fix for the dtype issue'''
         if self._output_type == 'softmax':
-            if not torch.equal(torch.unique(y), torch.arange(self._outputs)):
-                y = torch.searchsorted(torch.unique(y), y)
-                if not self._custom_classes:
-                    self.set_custom_classes_ids(torch.unique(y))
+            y = y.to(torch.int64)
+            if not self._custom_classes:
+                observed_classes = torch.unique(y)
+                # Labels outside [0, outputs - 1] are treated as custom class labels
+                if not torch.all((observed_classes >= 0) & (observed_classes < self._outputs)):
+                    self.set_custom_classes_ids(observed_classes)
                     print(f"Custom classes set to: {self._classes}")
+            if self._custom_classes:
+                y = torch.searchsorted(self._classes, y)
             y = torch.nn.functional.one_hot(y, self._outputs)
         if y.dtype != X.dtype:
             y = y.to(X.dtype)

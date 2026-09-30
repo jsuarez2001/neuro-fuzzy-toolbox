@@ -485,6 +485,8 @@ class SONFIS(base_model_trainer):
             '''preliminary fix for the dtype issue'''
             if ANFISmodel._output_type == 'softmax':
                 y = y.to(torch.int64)
+                if ANFISmodel._custom_classes:
+                    y = torch.searchsorted(ANFISmodel.classes, y)
                 y = torch.nn.functional.one_hot(y, ANFISmodel._outputs)
             if y.dtype != xe.dtype:
                 y = y.to(xe.dtype)
@@ -693,6 +695,8 @@ class SONFIS(base_model_trainer):
         '''preliminary fix for the dtype issue'''
         if ANFISmodel._output_type == 'softmax':
             y = y.to(torch.int64)
+            if ANFISmodel._custom_classes:
+                y = torch.searchsorted(ANFISmodel.classes, y)
             y = torch.nn.functional.one_hot(y, ANFISmodel._outputs)
         if y.dtype != X.dtype:
             y = y.to(X.dtype)
