@@ -396,6 +396,14 @@ least-squares estimation:
 
     model.init_consequents(x_train, y_train)
 
+By default, all the consequents are estimated jointly (``estimation='global'``).
+With ``estimation='local'``, the consequents of each rule are estimated
+separately by least squares weighted by the rule's firing level:
+
+.. code-block:: python
+
+    model.init_consequents(x_train, y_train, estimation='local')
+
 .. note::
     For more information on this method and its implementation, see
     :ref:`ANFIS API reference <ANFIS>`.

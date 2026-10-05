@@ -131,8 +131,11 @@ invoked as follows:
 .. note::
     In each iteration, only the subnets that are not frozen are updated. When
     ``Hybrid_learning_algorithm`` is used as ``ANFIStrainer``, the consequent
-    parameters of those subnets are estimated by least squares on the residual
-    left by the frozen subnets, so the frozen subnets are never modified.
+    parameters of those subnets are estimated by least squares, either on the
+    residual left by the frozen subnets (``consequents_estimation='global'``)
+    or separately for each subnet (``consequents_estimation='local'``, as in
+    the original SONFIS formulation). In both cases, the frozen subnets are
+    never modified.
 
 .. important::
     The training batch size is determined by the DataLoader, so this should

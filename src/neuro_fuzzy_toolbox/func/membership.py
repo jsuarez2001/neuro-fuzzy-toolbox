@@ -457,7 +457,10 @@ class GeneralizedBell_MF(MembershipFunction):
         Returns:
             torch.Tensor: Membership degrees of shape ``(batch_size, input_size, num_mfs)``.
         """
-        return 1/(1 + torch.pow(torch.abs((x.unsqueeze(x.dim()) - premises[:, :, 2])/torch.where(premises[:, :, 0] == 0, torch.tensor(1e-6), premises[:, :, 0])), 2*premises[:, :, 1]))
+        u = torch.abs((x.unsqueeze(x.dim()) - premises[:, :, 2])/torch.where(premises[:, :, 0] == 0, torch.tensor(1e-6), premises[:, :, 0]))
+        # Numerically stable form of 1/(1 + u^(2b)): computing u^(2b) directly overflows for very narrow functions
+        # (small width a), which produces infinite values and NaN gradients during training.
+        return torch.sigmoid(-2*premises[:, :, 1]*torch.log(torch.clamp(u, min=1e-12)))
 
     def initialize_premises(self, x_train, num_mfs):
         """
@@ -684,7 +687,9 @@ class HighSlopeBell_MF(MembershipFunction):
         Returns:
             torch.Tensor: Membership degrees of shape ``(batch_size, input_size, num_mfs)``.
         """
-        return 1/(1 + torch.pow(torch.abs((x.unsqueeze(x.dim()) - premises[:, :, 1])/torch.where(premises[:, :, 0] == 0, torch.tensor(1e-6), premises[:, :, 0])), 16.0))
+        u = torch.abs((x.unsqueeze(x.dim()) - premises[:, :, 1])/torch.where(premises[:, :, 0] == 0, torch.tensor(1e-6), premises[:, :, 0]))
+        # Numerically stable form of 1/(1 + u^16) (see GeneralizedBell_MF.forward)
+        return torch.sigmoid(-16.0*torch.log(torch.clamp(u, min=1e-12)))
 
     def initialize_premises(self, x_train, num_mfs):
         """

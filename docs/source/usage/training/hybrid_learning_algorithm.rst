@@ -34,8 +34,8 @@ algorithm:
 - **loss_function**: Instantiated loss function to use during training
   (e.g., ``torch.nn.MSELoss()``).
 - **driver**: Backend function used for least squares estimation. Valid values
-  are ``'gels'``, ``'gelsy'``, ``'gelsd'``, and ``'gelss'``. If ``None``,
-  defaults to ``'gels'`` (Default: ``None``).
+  are ``'gels'``, ``'gelsy'``, ``'gelsd'``, and ``'gelss'``. If ``None``, the
+  default of ``torch.linalg.lstsq`` is used (Default: ``None``).
 - **ridge_lambda**: Lambda value for Ridge regularization in the least squares
   estimation of consequents. If 0, no regularization is applied
   (Default: ``0.``).
@@ -44,6 +44,19 @@ algorithm:
 - **optimizer**: Optimizer class to use during training
   (Default: ``torch.optim.Adam``).
 - **optimizer_params**: Parameters to pass to the optimizer (Default: ``{}``).
+- **consequents_estimation**: How the consequent parameters are estimated
+  (Default: ``'global'``).
+
+  - ``'global'``: all the consequents are estimated jointly by least squares,
+    minimizing the error of the whole model, as in the original hybrid
+    learning rule of Jang (1993).
+  - ``'local'``: the consequents of each rule are estimated separately by
+    least squares weighted by the rule's firing level, so that each rule fits
+    a local linear model of the target over the region it covers. This is
+    the estimation used by the original SONFIS formulation. It usually yields
+    a higher training error than ``'global'``, but each consequent can be
+    interpreted on its own, and its cost grows linearly with the number of
+    rules.
 
 .. code-block:: python
 

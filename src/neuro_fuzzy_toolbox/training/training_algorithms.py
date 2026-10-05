@@ -5,6 +5,7 @@ from ._loader_utils import get_loader_tensors
 
 from neuro_fuzzy_toolbox.training import (
     classical_consequents_estimation_with_OLS,
+    local_consequents_estimation_with_WLS,
     optimizer_training_epoch
 )
 
@@ -202,7 +203,7 @@ class Hybrid_learning_algorithm(base_model_trainer):
         :align: center
         :width: 600px
     """
-    def __init__(self, epochs, loss_function, driver=None, ridge_lambda=0., early_stopping=None, optimizer=torch.optim.Adam, optimizer_params={}):
+    def __init__(self, epochs, loss_function, driver=None, ridge_lambda=0., early_stopping=None, optimizer=torch.optim.Adam, optimizer_params={}, consequents_estimation='global'):
         """
         Initializes a new Hybrid_learning_algorithm instance.
 
@@ -216,10 +217,23 @@ class Hybrid_learning_algorithm(base_model_trainer):
             early_stopping (EarlyStopping): Early stopping mechanism to use during training. Defaults to ``None``.
             optimizer (torch.optim.Optimizer): Optimizer class to use during training. Defaults to ``torch.optim.Adam``.
             optimizer_params (dict): Parameters to pass to the optimizer. Defaults to ``{}``.
+            consequents_estimation (str): Least-squares estimation of the consequent parameters. With ``'global'``, all the
+                consequents are estimated jointly, minimizing the error of the whole model (original ANFIS hybrid learning rule;
+                see :func:`classical_consequents_estimation_with_OLS`). With ``'local'``, the consequents of each rule are estimated
+                separately by weighted least squares, so that each rule fits a local linear model of the target (estimation used
+                by the original SONFIS formulation; see :func:`local_consequents_estimation_with_WLS`). Defaults to ``'global'``.
         """
         super().__init__(epochs, loss_function, early_stopping, optimizer, optimizer_params)
         self.driver = driver
         self.ridge_lambda = ridge_lambda
+        
+        if consequents_estimation not in ('global', 'local'):
+            raise ValueError(f"consequents_estimation='{consequents_estimation}' is not a valid option. Use 'global' or 'local'.")
+        self.consequents_estimation = consequents_estimation
+        if consequents_estimation == 'global':
+            self._consequents_estimation_function = classical_consequents_estimation_with_OLS
+        else:
+            self._consequents_estimation_function = local_consequents_estimation_with_WLS
         
         
     def _init_optimizer(self, model):
@@ -251,7 +265,7 @@ class Hybrid_learning_algorithm(base_model_trainer):
             ANFISmodel (ANFIS | h_ANFIS | rule_reduced_ANFIS): ANFIS model to train.
             loader (DataLoader): DataLoader containing the training data.
         """
-        ANFISmodel.set_consequents(classical_consequents_estimation_with_OLS(ANFISmodel, loader, self.driver, self.ridge_lambda))
+        ANFISmodel.set_consequents(self._consequents_estimation_function(ANFISmodel, loader, self.driver, self.ridge_lambda))
     
 
     def _update_parameters(self, ANFISmodel, loader):
@@ -295,8 +309,9 @@ class Hybrid_learning_algorithm(base_model_trainer):
         """
         Applies the hybrid learning algorithm within the SONFIS training procedure, updating only the subnets 
         that are not frozen. In each epoch, the consequent parameters of the non-frozen subnets are estimated by 
-        least squares on the residual left by the frozen subnets (see :func:`classical_consequents_estimation_with_OLS`), 
-        and their premise parameters are then updated with the optimizer. The parameters of the frozen subnets 
+        least squares, either jointly on the residual left by the frozen subnets (``consequents_estimation='global'``, see
+        :func:`classical_consequents_estimation_with_OLS`) or separately for each subnet (``consequents_estimation='local'``,
+        see :func:`local_consequents_estimation_with_WLS`), and their premise parameters are then updated with the optimizer. The parameters of the frozen subnets 
         are never modified, so the model trained in each epoch is the same model that is finally kept.
         
         Note:
@@ -317,7 +332,7 @@ class Hybrid_learning_algorithm(base_model_trainer):
         
         ep = 0
         while ep < self.epochs:
-            model.set_consequents(classical_consequents_estimation_with_OLS(model, train_loader, self.driver, self.ridge_lambda, freezed_subnets))
+            model.set_consequents(self._consequents_estimation_function(model, train_loader, self.driver, self.ridge_lambda, freezed_subnets))
             self._premises_update(model, train_loader)
             
             if (val_loader is not None) and (self.early_stopping is not None):

@@ -65,7 +65,7 @@ class base_ANFIS(nn.Module):
         self._fuzzification_layer.init_premises(x)
         
     
-    def init_consequents(self, x, y, driver=None, ridge_lambda=0.):
+    def init_consequents(self, x, y, driver=None, ridge_lambda=0., estimation='global'):
         """
         Initializes the consequent parameters of the model using a least-squares estimate.
         
@@ -81,6 +81,9 @@ class base_ANFIS(nn.Module):
                 ``'gels'``, ``'gelsy'``, ``'gelsd'``, and ``'gelss'``. If ``None``, defaults to ``'gels'``.
             ridge_lambda (float): Lambda value for Ridge regularization in the least-squares estimation.
                 If ``0.``, no regularization is applied. Defaults to ``0.``.
+            estimation (str): With ``'global'``, all the consequents are estimated jointly, minimizing the error of the whole
+                model. With ``'local'``, the consequents of each rule are estimated separately by weighted least squares (see
+                :func:`~neuro_fuzzy_toolbox.training.update_strategies.local_consequents_estimation_with_WLS`). Defaults to ``'global'``.
         
         Important:
             If the model has ``output_type='softmax'``, the class labels in ``y`` are expected to be integers representing
@@ -89,6 +92,20 @@ class base_ANFIS(nn.Module):
             present in ``y`` and set them as the classes it will attempt to predict. This is useful when users prefer to work
             with custom class labels directly. The target class labels can also be set manually using :meth:`set_custom_classes_ids`.
         """
+        if estimation not in ('global', 'local'):
+            raise ValueError(f"estimation='{estimation}' is not a valid option. Use 'global' or 'local'.")
+        
+        if estimation == 'local':
+            if self._output_type == 'softmax' and not self._custom_classes:
+                observed_classes = torch.unique(y.to(torch.int64))
+                # Labels outside [0, outputs - 1] are treated as custom class labels
+                if not torch.all((observed_classes >= 0) & (observed_classes < self._outputs)):
+                    self.set_custom_classes_ids(observed_classes)
+                    print(f"Custom classes set to: {self._classes}")
+            from neuro_fuzzy_toolbox.training.update_strategies import _local_consequents_estimation
+            self.set_consequents(_local_consequents_estimation(self, x, y, driver, ridge_lambda))
+            return
+        
         w_norm = self.get_firing_levels(x, normalized=True)
         xe = torch.cat([x, torch.ones(x.shape[0], 1, dtype=self._dtype)], dim=1)
         fs = w_norm.unsqueeze(2).repeat(1, 1, xe.shape[1]).view(w_norm.shape[0], -1)
