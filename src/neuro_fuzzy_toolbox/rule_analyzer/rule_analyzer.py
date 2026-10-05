@@ -102,7 +102,34 @@ class RulesAnalyzer:
         return dict_output
     
     
-    def _classification_rule_scores(self, logits, probs, rules_contributions, class_idx):
+    def _leave_one_rule_out_logits(self, firing_levels, consequent_outputs):
+        """
+        Computes, for each rule, the logits that the model would produce for the analyzed sample if that rule were
+        removed from the model.
+        
+        Removing a rule changes the normalization of the firing levels, so the normalized firing levels of the
+        remaining rules are recomputed (including the default rule, if the model has one). The result is exactly
+        the output of the model after removing the rule, without building a new model or retraining it.
+        
+        Args:
+            firing_levels (torch.Tensor): Firing levels of the rules for the analyzed sample, before normalization and
+                without the default rule, of shape ``(n_rules,)``.
+            consequent_outputs (torch.Tensor): Unweighted output of each rule for each class, of shape ``(n_classes, n_rules)``.
+        
+        Returns:
+            torch.Tensor: Tensor of shape ``(n_rules, n_classes)`` whose ``r``-th row contains the logits of the model
+            without rule ``r``.
+        """
+        n_rules = firing_levels.shape[0]
+        keep = ~torch.eye(n_rules, dtype=torch.bool)
+        w = firing_levels.unsqueeze(0) * keep # (n_rules, n_rules): row r contains the firing levels without rule r
+        total = w.sum(dim=1, keepdim=True)
+        if getattr(self.model, '_default_rule', False):
+            total = total + torch.pow(1 - w.max(dim=1, keepdim=True).values, self.model._input_size)
+        total = torch.where(total == 0, torch.ones_like(total), total) # same safeguard as the normalization layer
+        return (w / total) @ consequent_outputs.t()
+    
+    def _classification_rule_scores(self, logits, probs, rules_contributions, class_idx, logits_without_rule):
         """
         Computes post-hoc rule relevance measures for a specific class.
 
@@ -111,6 +138,8 @@ class RulesAnalyzer:
             probs (torch.Tensor): Final model probabilities for the analyzed sample, of shape ``(n_classes,)``.
             rules_contributions (torch.Tensor): Contribution of each rule to each class in the logit space, of shape ``(n_classes, n_rules)``.
             class_idx (int): Index of the target class :math:`c`.
+            logits_without_rule (torch.Tensor): Logits of the model without each rule, of shape ``(n_rules, n_classes)``
+                (see :meth:`_leave_one_rule_out_logits`).
 
         Returns:
             tuple[torch.Tensor, torch.Tensor, torch.Tensor]: A tuple of three tensors of shape ``(n_rules,)`` containing
@@ -154,11 +183,15 @@ class RulesAnalyzer:
                 =
                 p_c(\\mathbf{z})
                 -
-                p_c(\\mathbf{z} - \\Delta \\mathbf{z}_r)
+                p_c(\\mathbf{z}^{(-r)}),
+                \\qquad
+                \\mathbf{z}^{(-r)} = \\frac{\\mathbf{z} - \\Delta \\mathbf{z}_r}{1 - \\bar{w}_r}
 
             where :math:`p_c(\\mathbf{z})` is the softmax probability of the target class using all rules, and
-            :math:`p_c(\\mathbf{z} - \\Delta \\mathbf{z}_r)` is the probability obtained by removing the contribution of rule
-            :math:`r`.
+            :math:`p_c(\\mathbf{z}^{(-r)})` is the probability given by the model after removing rule :math:`r`. When a rule
+            is removed, its normalized firing level :math:`\\bar{w}_r` is redistributed among the remaining rules, which is why
+            :math:`\\mathbf{z}^{(-r)}` is not simply :math:`\\mathbf{z} - \\Delta \\mathbf{z}_r` (the expression above holds for
+            models without a default rule; with a default rule, its firing level is also recomputed).
             
             A positive value indicates that the rule supports the probability of the target class; a negative value indicates that
             it harms it.
@@ -170,16 +203,7 @@ class RulesAnalyzer:
         
         I_logit_margin_mean = pred_class_contribution - torch.mean(no_pred_classes_contributions, dim=0)
         
-        I_prob = (probs - nn.functional.softmax(logits - rules_contributions.t(), dim=1))[:, class_idx] # leave one rule out -> probs
-        """ this is the same as:
-            I_prob = []
-            for i in range(model4.rules):
-                z_without_r = logits - contribution[:,i]
-                p_without_r = nn.functional.softmax(z_without_r, dim=0)
-                I_prob_r = real_prob[pred_idx] - p_without_r[pred_idx]
-                I_prob.append(I_prob_r)
-            I_prob = torch.tensor(I_prob)
-        """
+        I_prob = (probs - nn.functional.softmax(logits_without_rule, dim=1))[:, class_idx] # leave one rule out -> probs
 
         return I_logit_margin_max, I_logit_margin_mean, I_prob
     
@@ -220,7 +244,7 @@ class RulesAnalyzer:
             - ``'rules_outputs'``: Sorts by each rule's individual output before weighting by firing levels.
             - ``'abs_contribution'``: Sorts by the absolute value of each rule's contribution to the final output (:math:`f(x) \\cdot w`).
             - ``'contribution'``: Sorts by each rule's contribution to the final output.
-            - ``'leave_one_rule_out'`` (``output_type='softmax'`` only): Sorts by the impact on the target class probability when the rule is removed, computed as the difference between the full-model probability and the leave-one-out probability.
+            - ``'leave_one_rule_out'`` (``output_type='softmax'`` only): Sorts by the impact on the target class probability when the rule is removed from the model, computed as the difference between the full-model probability and the probability given by the model without the rule (whose normalized firing levels are recomputed over the remaining rules).
             - ``'logit_margin'`` (``output_type='softmax'`` only): Sorts by the difference between the rule's contribution to the target class logit and its contribution to the highest-scoring alternative class.
             - ``'logit_margin_mean'`` (``output_type='softmax'`` only): Sorts by the difference between the rule's contribution to the target class logit and the mean of its contributions to all other classes.
         """
@@ -254,13 +278,16 @@ class RulesAnalyzer:
         if self.is_classification:
             logits = all_layers_outputs['logits'].squeeze(0)  # (C,)
             pred_probs = all_layers_outputs['final output'].squeeze(0)  # (C,)
+            raw_firing_levels = all_layers_outputs['firing levels'].squeeze(0)[:self.model.rules]  # (R,), without default rule
+            logits_without_rule = self._leave_one_rule_out_logits(raw_firing_levels, consequent_outputs)  # (R, C)
             
             for out_idx in outputs_to_analyze:
                 I_logit_margin_max, I_logit_margin_mean, I_prob = self._classification_rule_scores(
                     logits=logits,
                     probs=pred_probs,
                     rules_contributions=rules_contributions,
-                    class_idx=out_idx
+                    class_idx=out_idx,
+                    logits_without_rule=logits_without_rule
                 )
             
                 if sort_by == "firing_levels":

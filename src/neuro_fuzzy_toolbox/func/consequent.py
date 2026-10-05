@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 
-class ConsequentFunction(nn.Module):
+class ConsequentFunction(nn.Module, metaclass=ABCMeta):
     """
     Abstract base class for consequent functions.
 

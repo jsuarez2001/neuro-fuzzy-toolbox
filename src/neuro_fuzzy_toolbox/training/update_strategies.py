@@ -3,32 +3,47 @@ import torch.nn as nn
 
 from ._loader_utils import get_loader_tensors
 
-def classical_consequents_estimation_with_OLS(ANFISmodel, loader, driver, ridge_lambda):
+def classical_consequents_estimation_with_OLS(ANFISmodel, loader, driver, ridge_lambda, freezed_subnets=None):
     """
     Estimates the consequent parameters of an ANFIS model using ordinary least squares.
+    
+    If ``freezed_subnets`` is provided, only the consequent parameters of the rules that are not frozen are
+    estimated, and the frozen rules keep their current consequents. In that case, the least-squares problem is
+    solved on the residual left by the frozen rules (the targets minus the contribution of the frozen rules to
+    the model output), which yields the consequents of the active rules that minimize the squared error of the
+    whole model given the frozen ones.
 
     Note:
         Specifically, QR decomposition with pivoting is used to solve the least-squares
         problem. For more information, see: https://pytorch.org/docs/stable/generated/torch.linalg.lstsq.html.
 
     Args:
-        ANFISmodel (ANFIS | h_ANFIS): ANFIS model whose consequent parameters are to be estimated.
+        ANFISmodel (ANFIS | h_ANFIS | rule_reduced_ANFIS): ANFIS model whose consequent parameters are to be estimated.
         loader (DataLoader): DataLoader containing the training data.
         driver (str): Backend function to use for the least-squares estimation. 
             Valid values are ``'gels'``, ``'gelsy'``, ``'gelsd'``, and ``'gelss'``. If ``None``, defaults to ``'gels'``.
         ridge_lambda (float): Lambda value for Ridge regularization in the least-squares estimation.
             If ``0.``, no regularization is applied.
+        freezed_subnets (torch.Tensor, optional): Boolean tensor of length ``num_rules`` indicating which rules keep
+            their current consequent parameters. If ``None``, the consequents of all the rules are estimated.
+            Defaults to ``None``.
 
     Returns:
-        torch.Tensor: Tensor containing the new consequent parameters.
+        torch.Tensor: Tensor containing the new consequent parameters, of shape ``(outputs, rules, input_size + 1)``.
     """
     x, y = get_loader_tensors(loader)
     
-    # Least squares problem construction
+    if freezed_subnets is None:
+        freezed_subnets = torch.zeros(ANFISmodel.rules, dtype=torch.bool)
+    freezed_subnets = freezed_subnets.bool()
+    active_subnets = ~freezed_subnets
+    n_active = int(active_subnets.sum())
+    
+    # Least squares problem construction (only the columns of the active rules)
     w_norm = ANFISmodel.get_firing_levels(x, normalized=True)
     xe = torch.cat([x, torch.ones(x.shape[0], 1)], dim=1)
-    fs = w_norm.unsqueeze(2).repeat(1, 1, xe.shape[1]).view(w_norm.shape[0], -1)
-    X = xe.repeat(1, ANFISmodel.rules)
+    fs = w_norm[:, active_subnets].unsqueeze(2).repeat(1, 1, xe.shape[1]).view(w_norm.shape[0], -1)
+    X = xe.repeat(1, n_active)
         
     '''preliminary fix for the dtype issue'''
     if ANFISmodel._output_type == 'softmax':
@@ -39,6 +54,13 @@ def classical_consequents_estimation_with_OLS(ANFISmodel, loader, driver, ridge_
     if y.dtype != X.dtype:
         y = y.to(X.dtype)
     '''preliminary fix for the dtype issue'''
+    
+    # The frozen rules keep their consequents: their contribution is subtracted from the targets
+    current_consequents = ANFISmodel.get_consequents()
+    if freezed_subnets.any():
+        frozen_contribution = torch.einsum('nk,nd,okd->no', w_norm[:, freezed_subnets], xe,
+                                           current_consequents[:, freezed_subnets, :].to(xe.dtype)) # (n_samples, outputs)
+        y = y - (frozen_contribution[:, 0] if y.dim() == 1 else frozen_contribution)
     
     A = X * fs
     
@@ -55,8 +77,13 @@ def classical_consequents_estimation_with_OLS(ANFISmodel, loader, driver, ridge_
     
     # Solve least squares problem using QR decomposition with pivoting
     C, _, _, _ = torch.linalg.lstsq(A, y, rcond=None, driver=driver)
-    new_consequents = C.t().reshape(ANFISmodel._outputs, ANFISmodel.rules, xe.shape[1])
+    new_active_consequents = C.t().reshape(ANFISmodel._outputs, n_active, xe.shape[1])
     
+    if not freezed_subnets.any():
+        return new_active_consequents
+    
+    new_consequents = current_consequents.clone()
+    new_consequents[:, active_subnets, :] = new_active_consequents.to(new_consequents.dtype)
     return new_consequents
 
 

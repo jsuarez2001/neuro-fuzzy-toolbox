@@ -133,7 +133,9 @@ where:
 - ``contribution``: weighted rule output (:math:`\bar{w}_r \cdot f_r(x)`), i.e., the rule's contribution to the final model output.
 - ``I_logit_margin_max``: difference between the rule's contribution to the target class logit and its contribution to the highest-scoring alternative class.
 - ``I_logit_margin_mean``: difference between the rule's contribution to the target class logit and the mean of its contributions to all other classes.
-- ``I_prob``: change in the predicted class probability when the rule is removed (leave-one-rule-out).
+- ``I_prob``: change in the predicted class probability when the rule is removed from the model (leave-one-rule-out). The
+  normalized firing levels of the remaining rules are recomputed, so this is exactly the probability given by the model
+  without the rule, obtained from the same forward pass and without retraining.
 
 Sorting criteria
 ^^^^^^^^^^^^^^^^

@@ -294,8 +294,10 @@ class Hybrid_learning_algorithm(base_model_trainer):
     def _sonfis_update_parameters(self, model, train_loader, val_loader, freezed_subnets):
         """
         Applies the hybrid learning algorithm within the SONFIS training procedure, updating only the subnets 
-        that are not frozen. After training, the consequent parameters of the frozen subnets are restored
-        to their values prior to the update.
+        that are not frozen. In each epoch, the consequent parameters of the non-frozen subnets are estimated by 
+        least squares on the residual left by the frozen subnets (see :func:`classical_consequents_estimation_with_OLS`), 
+        and their premise parameters are then updated with the optimizer. The parameters of the frozen subnets 
+        are never modified, so the model trained in each epoch is the same model that is finally kept.
         
         Note:
             This method is intended exclusively for use within the SONFIS
@@ -313,11 +315,10 @@ class Hybrid_learning_algorithm(base_model_trainer):
         if self._optimizer_instance is None: # There is a possibility that no subnets are created or divided, but some may vanish. 
             return                           # This would cause the list of parameters to be empty, which is not allowed in PyTorch.
         
-        current_consequents = model.get_consequents()
-        
         ep = 0
         while ep < self.epochs:
-            self._update_parameters(model, train_loader)
+            model.set_consequents(classical_consequents_estimation_with_OLS(model, train_loader, self.driver, self.ridge_lambda, freezed_subnets))
+            self._premises_update(model, train_loader)
             
             if (val_loader is not None) and (self.early_stopping is not None):
                 _, val_loss = self._loss(model, train_loader, val_loader)
@@ -326,10 +327,6 @@ class Hybrid_learning_algorithm(base_model_trainer):
                     break
                 
             ep += 1
-        
-        new_consequents = model.get_consequents()
-        new_consequents[:, freezed_subnets, :] = current_consequents[:, freezed_subnets, :]
-        model.set_consequents(new_consequents)
         
         if self.early_stopping is not None:
             self.early_stopping.reset()

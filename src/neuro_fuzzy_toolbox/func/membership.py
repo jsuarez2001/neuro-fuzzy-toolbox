@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 
-class MembershipFunction(nn.Module):
+class MembershipFunction(nn.Module, metaclass=ABCMeta):
     """
     Abstract base class for membership functions.
     
