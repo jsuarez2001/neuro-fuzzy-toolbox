@@ -11,7 +11,7 @@ binarized — distinguishing the presence from the absence of heart disease —
 and a ``rule_reduced_ANFIS`` model is trained from a small initial rule base
 that SONFIS then adapts through rule growing, splitting, and pruning.
 
-This example also illustrates the use of ``lse_for_new_consequents=True``,
+This example also illustrates the use of ``lse_for_new_consequents``,
 which initializes the consequent parameters of newly created rules using
 least-squares estimation rather than random initialization, providing a
 better starting point for subsequent gradient-based updates.
@@ -141,7 +141,7 @@ parameters at each structural adaptation iteration.
 SONFIS
 ------
 SONFIS is configured with rule growing, splitting, and pruning thresholds
-appropriate for this dataset. Enabling ``lse_for_new_consequents`` ensures
+appropriate for this dataset. Setting ``lse_for_new_consequents`` ensures
 that the consequent parameters of any rule added by GrowNet or SplitNet
 are initialized via least-squares estimation rather than randomly, which
 tends to reduce the number of gradient updates needed to integrate the new
@@ -160,7 +160,7 @@ SONFIS iteration level, independent of the one used by the ``ANFIStrainer``.
         max_iterations=100,
         ANFIStrainer=anfis_trainer,
         early_stopping=nft.EarlyStopping(patience=25),
-        lse_for_new_consequents=True,
+        lse_for_new_consequents='isolated',
         lse_for_new_consequents_lambda=1e-1,
         last_training_iteration=False
     )

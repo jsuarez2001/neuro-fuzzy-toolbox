@@ -192,7 +192,7 @@ allowing the model to readapt its parameters to the final rule structure.
         max_iterations=100,
         ANFIStrainer=anfis_trainer,
         early_stopping=nft.EarlyStopping(patience=15),
-        lse_for_new_consequents=True,
+        lse_for_new_consequents='isolated',
         lse_for_new_consequents_lambda=1e-1,
         last_training_iteration=True
     )

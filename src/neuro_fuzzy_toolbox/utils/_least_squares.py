@@ -262,12 +262,18 @@ def _local_consequents_estimation(model, x, y, driver, ridge_lambda, freezed_sub
     return new_consequents
 
 
-def _rules_consequents_estimation(model, x, y, rules, driver, ridge_lambda):
+def _rules_consequents_estimation(model, x, y, rules, driver, ridge_lambda, residual_of=None):
     """
-    Estimates jointly the consequent parameters of some rules of a model, ignoring the contribution of the others.
+    Estimates jointly the consequent parameters of some rules of a model.
 
-    Used by SONFIS to initialize the consequents of the rules created by GrowNet and SplitNet from the samples that
-    originated them (see ``lse_for_new_consequents``).
+    Solves the joint problem (see :func:`_joint_least_squares`) for the rules in ``rules`` only. If ``residual_of`` is
+    ``None``, the targets are fitted directly, ignoring the contribution of every other rule. Otherwise, the
+    contribution of the rules in ``residual_of`` (with their current consequents) is subtracted from the targets, so
+    that the estimated rules fit the residual those rules leave. The rules in neither list do not contribute, although
+    their firing levels still take part in the normalization.
+
+    Used by SONFIS to initialize the consequents of the rules created by GrowNet and SplitNet (see
+    ``lse_for_new_consequents``).
 
     Args:
         model (rule_reduced_ANFIS): ANFIS model.
@@ -276,11 +282,16 @@ def _rules_consequents_estimation(model, x, y, rules, driver, ridge_lambda):
         rules (list[int]): Indices of the rules to estimate.
         driver (str): Backend of :func:`torch.linalg.lstsq`.
         ridge_lambda (float): Ridge coefficient. If ``0.``, no regularization is applied.
+        residual_of (list[int], optional): Indices of the rules whose contribution is subtracted from the targets.
+            Defaults to ``None``.
 
     Returns:
         torch.Tensor: Consequent parameters of the given rules, of shape ``(outputs, len(rules), input_size + 1)``.
     """
-    w_norm = model.get_firing_levels(x, normalized=True)[:, rules]
+    w_norm = model.get_firing_levels(x, normalized=True)
     xe = _extended_inputs(x)
     Y = _encode_targets(model, y, xe.dtype)
-    return _joint_least_squares(w_norm, xe, Y, ridge_lambda, driver)
+    if residual_of is not None and len(residual_of) > 0:
+        consequents = model.get_consequents()[:, residual_of, :].to(xe.dtype)
+        Y = Y - torch.einsum('nk,nd,okd->no', w_norm[:, residual_of], xe, consequents)
+    return _joint_least_squares(w_norm[:, rules], xe, Y, ridge_lambda, driver)
