@@ -1,8 +1,8 @@
 import torch
-import torch.nn as nn
 
 from neuro_fuzzy_toolbox.utils._loader import get_loader_tensors
 from neuro_fuzzy_toolbox.utils._least_squares import _global_consequents_estimation, _local_consequents_estimation
+from neuro_fuzzy_toolbox.utils._targets import _compute_loss, _check_finite_loss
 
 def classical_consequents_estimation_with_OLS(ANFISmodel, loader, driver, ridge_lambda, freezed_subnets=None):
     """
@@ -87,28 +87,17 @@ def optimizer_training_epoch(model, loader, optimizer, loss_function):
         loader (DataLoader): DataLoader containing the training data.
         optimizer (torch.optim.Optimizer): Instantiated optimizer to use.
         loss_function (torch.nn.Module): Loss function to use.
+
+    Raises:
+        ValueError: If the loss of a batch is not finite (``NaN`` or infinite). The error is raised before the parameters
+            are updated with that batch.
     """
     for batch_x, batch_y in loader:
-        batch_y_copy = batch_y.clone().detach()
-        
-        '''preliminary fix for the dtype issue'''
-        if not isinstance(loss_function, nn.CrossEntropyLoss): #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
-            if batch_x.dtype != batch_y.dtype:
-                batch_y_copy = batch_y_copy.to(batch_x.dtype)
-        else:
-            batch_y_copy = batch_y_copy.long()
-        '''preliminary fix for the dtype issue'''
-        
-        if isinstance(loss_function, nn.CrossEntropyLoss) and model._custom_classes:
-            batch_y_copy = torch.searchsorted(model.classes, batch_y_copy).long()
-        
         optimizer.zero_grad()
         pred = model(batch_x)
         
-        loss = loss_function(pred, batch_y_copy)
+        loss = _compute_loss(model, loss_function, pred, batch_y)
+        _check_finite_loss(loss)
         loss.backward()
         
         optimizer.step()
-        
-        if torch.isnan(loss):
-            raise ValueError('Loss is NaN')

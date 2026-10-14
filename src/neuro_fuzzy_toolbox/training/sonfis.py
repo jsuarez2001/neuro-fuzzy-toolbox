@@ -6,6 +6,7 @@ from neuro_fuzzy_toolbox.training import (
 from neuro_fuzzy_toolbox.models.anfis import rule_reduced_ANFIS
 from neuro_fuzzy_toolbox.utils._loader import get_loader_tensors
 from neuro_fuzzy_toolbox.utils._least_squares import _rules_consequents_estimation, _local_consequents_estimation
+from neuro_fuzzy_toolbox.utils._targets import _compute_loss
 
 import pandas as pd
 import numpy as np
@@ -573,11 +574,8 @@ class SONFIS(base_model_trainer):
             model_outputs_list = [model_outputs[rule] for rule in rules]
             targets_list = [targets[rule] for rule in rules]
                 
-            # compute loss 
-            if ANFISmodel._output_type == "softmax" and ANFISmodel._custom_classes: # if classes are not [0, 1, 2, ...] 
-                loss_values = torch.stack([self.loss_function(model_outputs_list[i], torch.searchsorted(ANFISmodel.classes, targets_list[i]).long()) for i in range(len(rules))]) # for each of the considered subnets with ONLY its associated samples
-            else:
-                loss_values = torch.stack([self.loss_function(model_outputs_list[i], targets_list[i]) for i in range(len(rules))]) # for each of the considered subnets with ONLY its associated samples
+            # loss of the samples associated with each of the considered subnets
+            loss_values = torch.stack([_compute_loss(ANFISmodel, self.loss_function, model_outputs_list[i], targets_list[i]) for i in range(len(rules))])
             
             eSplit_mask = loss_values > self.eSplit
             

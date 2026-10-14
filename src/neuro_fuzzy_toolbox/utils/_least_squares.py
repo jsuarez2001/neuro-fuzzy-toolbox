@@ -17,6 +17,8 @@ Every tensor created here is placed on the device of the input data.
 """
 import torch
 
+from ._targets import _lse_targets
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Primitives
@@ -146,31 +148,6 @@ def _weighted_least_squares(w, xe, Y, ridge_lambda, driver):
 # Model-level estimations
 # ----------------------------------------------------------------------------------------------------------------------
 
-def _encode_targets(model, y, dtype):
-    """
-    Converts the targets of a model into the matrix used by the least-squares problems.
-
-    For ``output_type='softmax'``, the class labels are mapped to their indices (if the model uses custom class labels)
-    and one-hot encoded. Otherwise the targets are used as they are.
-
-    Args:
-        model (ANFIS | h_ANFIS | rule_reduced_ANFIS): ANFIS model.
-        y (torch.Tensor): Targets of shape ``(n_samples,)`` or ``(n_samples, outputs)``, or class labels.
-        dtype (torch.dtype): Dtype of the result.
-
-    Returns:
-        torch.Tensor: Targets of shape ``(n_samples, outputs)``.
-    """
-    if model._output_type == 'softmax':
-        y = y.to(torch.int64)
-        if model._custom_classes:
-            y = torch.searchsorted(model.classes, y)
-        y = torch.nn.functional.one_hot(y, model._outputs)
-    if y.dim() == 1:
-        y = y.unsqueeze(1)
-    return y.to(dtype)
-
-
 def _global_consequents_estimation(model, x, y, driver, ridge_lambda, freezed_subnets=None):
     """
     Estimates jointly the consequent parameters of all the rules of a model (global estimation).
@@ -198,7 +175,7 @@ def _global_consequents_estimation(model, x, y, driver, ridge_lambda, freezed_su
 
     w_norm = model.get_firing_levels(x, normalized=True)
     xe = _extended_inputs(x)
-    Y = _encode_targets(model, y, xe.dtype)
+    Y = _lse_targets(model, y, xe.dtype)
 
     # The frozen rules keep their consequents: their contribution is subtracted from the targets
     current_consequents = model.get_consequents()
@@ -246,7 +223,7 @@ def _local_consequents_estimation(model, x, y, driver, ridge_lambda, freezed_sub
         return current_consequents
 
     xe = _extended_inputs(x)
-    Y = _encode_targets(model, y, xe.dtype)
+    Y = _lse_targets(model, y, xe.dtype)
 
     # Unnormalized firing levels of the active rules (the default rule, if any, is excluded): (n_active, n_samples)
     w = model.get_firing_levels(x)[:, :n_rules][:, active_idx].t().to(xe.dtype)
@@ -290,7 +267,7 @@ def _rules_consequents_estimation(model, x, y, rules, driver, ridge_lambda, resi
     """
     w_norm = model.get_firing_levels(x, normalized=True)
     xe = _extended_inputs(x)
-    Y = _encode_targets(model, y, xe.dtype)
+    Y = _lse_targets(model, y, xe.dtype)
     if residual_of is not None and len(residual_of) > 0:
         consequents = model.get_consequents()[:, residual_of, :].to(xe.dtype)
         Y = Y - torch.einsum('nk,nd,okd->no', w_norm[:, residual_of], xe, consequents)

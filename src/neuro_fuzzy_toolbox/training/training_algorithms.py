@@ -1,7 +1,7 @@
 import torch
-import torch.nn as nn
 
 from neuro_fuzzy_toolbox.utils._loader import get_loader_tensors
+from neuro_fuzzy_toolbox.utils._targets import _compute_loss, _check_finite_loss
 
 from neuro_fuzzy_toolbox.training import (
     classical_consequents_estimation_with_OLS,
@@ -111,18 +111,7 @@ class base_model_trainer():
             torch.Tensor: Tensor containing the loss value.
         """
         
-        '''preliminary fix for the dtype issue'''
-        if not isinstance(self.loss_function, nn.CrossEntropyLoss): #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
-            if y.dtype != pred.dtype:
-                y = y.to(pred.dtype)
-        else: 
-            y = y.type(torch.int64)
-        '''preliminary fix for the dtype issue'''
-        
-        if isinstance(self.loss_function, nn.CrossEntropyLoss) and model._custom_classes:
-            y = torch.searchsorted(model.classes, y).long()
-        
-        return self.loss_function(pred, y)
+        return _compute_loss(model, self.loss_function, pred, y)
     
     
     def _check_early_stop(self, model, loss, verbose):
@@ -526,29 +515,14 @@ class Double_optimizer_training_algorithm(base_model_trainer):
             loader (DataLoader): DataLoader containing the training data.
         """
         for batch_x, batch_y in loader:
-            batch_y_copy = batch_y.clone().detach()
-
-            '''preliminary fix for the dtype issue'''
-            if not isinstance(self.loss_function, nn.CrossEntropyLoss):
-                if batch_x.dtype != batch_y.dtype:
-                    batch_y_copy = batch_y_copy.to(batch_x.dtype)
-            else: 
-                batch_y_copy = batch_y_copy.to(torch.int64) #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
-            '''preliminary fix for the dtype issue'''
-            
-            if isinstance(self.loss_function, nn.CrossEntropyLoss) and model._custom_classes:
-                batch_y_copy = torch.searchsorted(model.classes, batch_y_copy).long()
-
             self._prems_optimizer_instance.zero_grad()
             self._cons_optimizer_instance.zero_grad()
             pred = model(batch_x)
-            loss = self.loss_function(pred, batch_y_copy)
+            loss = _compute_loss(model, self.loss_function, pred, batch_y)
+            _check_finite_loss(loss)
             loss.backward()
             self._prems_optimizer_instance.step()
             self._cons_optimizer_instance.step()
-
-            if torch.isnan(loss):
-                raise ValueError('Loss is NaN')
             
     def _update_parameters_1(self, model, loader):
         """
@@ -561,50 +535,20 @@ class Double_optimizer_training_algorithm(base_model_trainer):
             loader (DataLoader): DataLoader containing the training data.
         """
         for batch_x, batch_y in loader:
-            batch_y_copy = batch_y.clone().detach()
-
-            '''preliminary fix for the dtype issue'''
-            if not isinstance(self.loss_function, nn.CrossEntropyLoss):
-                if batch_x.dtype != batch_y.dtype:
-                    batch_y_copy = batch_y_copy.to(batch_x.dtype)
-            else: 
-                batch_y_copy = batch_y_copy.to(torch.int64) #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
-            '''preliminary fix for the dtype issue'''
-            
-            if isinstance(self.loss_function, nn.CrossEntropyLoss) and model._custom_classes:
-                batch_y_copy = torch.searchsorted(model.classes, batch_y_copy).long()
-
             self._cons_optimizer_instance.zero_grad()
             pred = model(batch_x)
-            loss = self.loss_function(pred, batch_y_copy)
+            loss = _compute_loss(model, self.loss_function, pred, batch_y)
+            _check_finite_loss(loss)
             loss.backward()
             self._cons_optimizer_instance.step()
-
-            if torch.isnan(loss):
-                raise ValueError('Loss is NaN')
             
         for batch_x, batch_y in loader:
-            batch_y_copy = batch_y.clone().detach()
-
-            '''preliminary fix for the dtype issue'''
-            if not isinstance(self.loss_function, nn.CrossEntropyLoss):
-                if batch_x.dtype != batch_y.dtype:
-                    batch_y_copy = batch_y_copy.to(batch_x.dtype)
-            else: 
-                batch_y_copy = batch_y_copy.to(torch.int64) #cross_entropy function only accepts torch.long (torch.int64) dtype for target indices
-            '''preliminary fix for the dtype issue'''
-            
-            if isinstance(self.loss_function, nn.CrossEntropyLoss) and model._custom_classes:
-                batch_y_copy = torch.searchsorted(model.classes, batch_y_copy).long()
-
             self._prems_optimizer_instance.zero_grad()
             pred = model(batch_x)
-            loss = self.loss_function(pred, batch_y_copy)
+            loss = _compute_loss(model, self.loss_function, pred, batch_y)
+            _check_finite_loss(loss)
             loss.backward()
             self._prems_optimizer_instance.step()
-
-            if torch.isnan(loss):
-                raise ValueError('Loss is NaN')
             
     
     def _sonfis_init_optimizer(self, model, freezed_subnets):
