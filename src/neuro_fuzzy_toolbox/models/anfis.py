@@ -176,7 +176,7 @@ class base_ANFIS(nn.Module):
         if len(new_classes_ids) != outputs:
             raise ValueError(f"Provided list of length {len(new_classes_ids)} does not match the number of classes: {self._outputs}")
         
-        self._classes = torch.tensor(new_classes_ids, dtype=torch.long).sort().values
+        self._classes = torch.as_tensor(new_classes_ids, dtype=torch.long).sort().values # sort returns a new tensor
         
         if torch.equal(self._classes, torch.arange(outputs)):
             self._custom_classes = False
@@ -533,7 +533,7 @@ class ANFIS(base_ANFIS):
         
         
         # ANFIS structure info
-        self._mf_distribution = torch.tensor(mf_distribution)
+        self._mf_distribution = torch.as_tensor(mf_distribution).detach().clone() # accepts lists and tensors without aliasing the input
         self._rules = self._mf_distribution.prod().item()
         self._mfs = self._mf_distribution.sum().item()
         

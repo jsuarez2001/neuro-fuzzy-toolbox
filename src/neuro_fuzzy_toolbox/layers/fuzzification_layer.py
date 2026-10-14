@@ -40,7 +40,7 @@ class FuzzificationLayer(nn.Module):
         
         # Premise parameters
         self._max_n_mfs = max(mf_distribution)
-        self._mf_distribution = torch.tensor(mf_distribution)
+        self._mf_distribution = torch.as_tensor(mf_distribution).detach().clone() # accepts lists and tensors without aliasing the input
         
         premises = nn.ParameterList()
         for n_mfs in self._mf_distribution:
