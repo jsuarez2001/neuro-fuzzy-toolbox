@@ -598,14 +598,8 @@ class SONFIS(base_model_trainer):
                     idx += 1
                 
                 if verbose:
-                    subnets = rules_to_split.tolist()
-                    if rules_to_split[rules_to_split == True].size(0) == 1:
-                        subnets = [subnets]
-                    #if isinstance(self._rules_dataframe.index[subnets[0]], int):
-                    #    #print(f"\t-> self._rules_dataframe.index[i]: {self._rules_dataframe.index[subnets[0]]}")
-                    #    print(f"\t-> Splitting {rules_to_split.shape[subnets[0]]} subnets: {[self._rules_dataframe.index[i] for i in subnets]}")
-                    #else:
-                    #    print(f"\t-> Splitting {rules_to_split.shape[0]} subnets: {[self._rules_dataframe.index[i].item() for i in subnets]}")
+                    # Stable identifiers of the split subnets (the index of the rules DataFrame may hold Python or NumPy integers)
+                    subnets = [int(self._rules_dataframe.index[i]) for i in rules_to_split.long().tolist()]
                     print(f"\t-> Splitting {rules_to_split.shape[0]} subnets: {subnets}")
                     
                     self._drop_subnets_on_rules_dataframe_by_idxs(rules_to_split)
@@ -716,10 +710,9 @@ class SONFIS(base_model_trainer):
             ANFISmodel.set_consequents(new_consequents)
             
             if verbose:
-                subnets = (mask.nonzero().squeeze()).tolist()
-                if mask[mask == True].size(0) == 1:
-                    subnets = [subnets]
-                print(f"\t-> Vanishing {rules_to_eliminate.size(0)} subnets: {[self._rules_dataframe.index[i].item() for i in subnets]}")
+                # Stable identifiers of the removed subnets (the index of the rules DataFrame may hold Python or NumPy integers)
+                subnets = [int(self._rules_dataframe.index[i]) for i in rules_to_eliminate.tolist()]
+                print(f"\t-> Vanishing {rules_to_eliminate.size(0)} subnets: {subnets}")
                 self._drop_subnets_on_rules_dataframe(mask)
             
             return True
