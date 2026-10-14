@@ -18,4 +18,10 @@ You can install Neuro-Fuzzy Toolbox as follows:
    `requirements.txt <https://github.com/jsuarez2001/neuro-fuzzy-toolbox/blob/main/requirements.txt>`_
    file in the repository.
 
+.. note::
+   If a compatible version of PyTorch (>= 2.5) is already installed, it is not
+   reinstalled. To use a specific build of PyTorch (for instance, CPU-only or a
+   particular CUDA version), install it first following the instructions at
+   https://pytorch.org, and then install Neuro-Fuzzy Toolbox.
+
 For more information on how to use the toolbox, see the :ref:`Usage` section.
