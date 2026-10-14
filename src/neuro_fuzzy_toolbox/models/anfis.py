@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 
 from neuro_fuzzy_toolbox.func import GeneralizedBell_MF
+from neuro_fuzzy_toolbox.utils._least_squares import _global_consequents_estimation, _local_consequents_estimation
 from neuro_fuzzy_toolbox.layers import (
     FuzzificationLayer,
     h_FuzzificationLayer, 
@@ -95,55 +96,17 @@ class base_ANFIS(nn.Module):
         if estimation not in ('global', 'local'):
             raise ValueError(f"estimation='{estimation}' is not a valid option. Use 'global' or 'local'.")
         
-        if estimation == 'local':
-            if self._output_type == 'softmax' and not self._custom_classes:
-                observed_classes = torch.unique(y.to(torch.int64))
-                # Labels outside [0, outputs - 1] are treated as custom class labels
-                if not torch.all((observed_classes >= 0) & (observed_classes < self._outputs)):
-                    self.set_custom_classes_ids(observed_classes)
-                    print(f"Custom classes set to: {self._classes}")
-            from neuro_fuzzy_toolbox.training.update_strategies import _local_consequents_estimation
-            self.set_consequents(_local_consequents_estimation(self, x, y, driver, ridge_lambda))
-            return
+        if self._output_type == 'softmax' and not self._custom_classes:
+            observed_classes = torch.unique(y.to(torch.int64))
+            # Labels outside [0, outputs - 1] are treated as custom class labels
+            if not torch.all((observed_classes >= 0) & (observed_classes < self._outputs)):
+                self.set_custom_classes_ids(observed_classes)
+                print(f"Custom classes set to: {self._classes}")
         
-        w_norm = self.get_firing_levels(x, normalized=True)
-        xe = torch.cat([x, torch.ones(x.shape[0], 1, dtype=self._dtype)], dim=1)
-        fs = w_norm.unsqueeze(2).repeat(1, 1, xe.shape[1]).view(w_norm.shape[0], -1)
-        X = xe.repeat(1, self.rules)
-        
-        '''preliminary fix for the dtype issue'''
-        if self._output_type == 'softmax':
-            y = y.to(torch.int64)
-            if not self._custom_classes:
-                observed_classes = torch.unique(y)
-                # Labels outside [0, outputs - 1] are treated as custom class labels
-                if not torch.all((observed_classes >= 0) & (observed_classes < self._outputs)):
-                    self.set_custom_classes_ids(observed_classes)
-                    print(f"Custom classes set to: {self._classes}")
-            if self._custom_classes:
-                y = torch.searchsorted(self._classes, y)
-            y = torch.nn.functional.one_hot(y, self._outputs)
-        if y.dtype != X.dtype:
-            y = y.to(X.dtype)
-        '''preliminary fix for the dtype issue'''
-        
-        A = X * fs
-        
-        if ridge_lambda > 0.:
-            p = A.shape[1]
-            I = torch.eye(p, dtype=A.dtype) * torch.sqrt(torch.tensor(ridge_lambda, dtype=A.dtype))
-            A = torch.cat([A, I], dim=0)
-            if y.dim() > 1:
-                m = y.shape[1]
-                zeros = torch.zeros((p, m), dtype=A.dtype)
-            else:
-                zeros = torch.zeros(p, dtype=A.dtype)
-            y  = torch.cat([y, zeros], dim=0)
-        
-        # Solve least squares problem using QR decomposition with pivoting
-        C, _, _, _ = torch.linalg.lstsq(A, y, driver=driver)
-        new_consequents = C.t().reshape(self._outputs, self.rules, xe.shape[1])
-        
+        if estimation == 'global':
+            new_consequents = _global_consequents_estimation(self, x, y, driver, ridge_lambda)
+        else:
+            new_consequents = _local_consequents_estimation(self, x, y, driver, ridge_lambda)
         self.set_consequents(new_consequents)
         
     

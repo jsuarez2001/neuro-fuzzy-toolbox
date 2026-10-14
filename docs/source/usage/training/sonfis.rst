@@ -47,7 +47,8 @@ algorithm:
   counter of a subnet is incremented (it is reset to ``0`` otherwise). With
   ``Nvanish=1``, the age only increases when the subnet has no associated
   samples.
-- **lVanish** (``int``): Maximum age of a subnet before it is removed.
+- **lVanish** (``int``): Age at which a subnet is removed: a subnet is
+  removed as soon as its age reaches ``lVanish``.
 - **max_iterations** (``int``): Maximum number of structural adaptation
   iterations.
 - **ANFIStrainer** (``base_model_trainer``): Instantiated training algorithm
@@ -141,3 +142,64 @@ invoked as follows:
     The training batch size is determined by the DataLoader, so this should
     be taken into account when defining it (see
     :ref:`PyTorch DataLoaders <DataLoaders_usage>`).
+
+Reproducing the original formulation
+####################################
+Several choices of the toolbox differ from the original SONFIS formulation
+(Allende-Cid et al., 2016), but each of them is optional. The original
+formulation is obtained with the following configuration:
+
+- a ``rule_reduced_ANFIS`` model with a single rule and
+  ``nft.Gaussian_MF(sigma_is_std=False)``, the Gaussian form of the original
+  paper;
+- ``Hybrid_learning_algorithm`` with ``consequents_estimation='local'``
+  (weighted least squares for each rule) and
+  ``optimizer=nft.NormalizedGradientDescent`` (premise update with a step of
+  length :math:`\gamma`), trained with a single batch;
+- no early stopping, neither in SONFIS nor in the parameter trainer, and
+  ``last_training_iteration=True`` (all the subnets are trained after the
+  structure stabilizes).
+
+The values below are those reported for the first synthetic experiment of
+the original paper. The step size ``gamma`` and the number of ``epochs`` per
+iteration are not reported there, so they must be chosen by the user.
+
+.. code-block:: python
+
+    import neuro_fuzzy_toolbox as nft
+    import torch.nn as nn
+    from torch.utils.data import TensorDataset, DataLoader
+
+    model = nft.rule_reduced_ANFIS(
+        input_size=x_train.shape[1],
+        num_mfs=1,
+        membership_function=nft.Gaussian_MF(sigma_is_std=False)
+    )
+    model.init_premises(x_train)
+
+    ANFIStrainer = nft.Hybrid_learning_algorithm(
+        epochs=100,
+        loss_function=nn.MSELoss(),
+        optimizer=nft.NormalizedGradientDescent,
+        optimizer_params={'gamma': 0.1},
+        consequents_estimation='local'
+    )
+
+    sonfis = nft.SONFIS(
+        Ngrow=30, dGrow=0.8,
+        Nsplit=40, eSplit=0.5,
+        Nvanish=30, lVanish=2,
+        max_iterations=100,
+        ANFIStrainer=ANFIStrainer,
+        last_training_iteration=True
+    )
+
+    train_loader = DataLoader(TensorDataset(x_train, y_train), batch_size=len(x_train))
+    sonfis(model, train_loader)
+
+.. note::
+    The original paper describes the age counter of VanishNet as increasing
+    when a subnet has no associated samples, which corresponds to
+    ``Nvanish=1``, while its reported experiments use larger values of
+    ``Nvanish``. With ``Nvanish > 1``, the counter increases whenever the
+    subnet has fewer than ``Nvanish`` associated samples.

@@ -4,7 +4,8 @@ from neuro_fuzzy_toolbox.training import (
     base_model_trainer
 )
 from neuro_fuzzy_toolbox.models.anfis import rule_reduced_ANFIS
-from ._loader_utils import get_loader_tensors
+from neuro_fuzzy_toolbox.utils._loader import get_loader_tensors
+from neuro_fuzzy_toolbox.utils._least_squares import _rules_consequents_estimation
 
 import pandas as pd
 import numpy as np
@@ -33,7 +34,8 @@ class SONFIS(base_model_trainer):
             eSplit (float): Minimum loss value of the samples associated with a subnet for it to be considered for splitting.
             Nvanish (int): Number of associated samples below which the age counter of a subnet is incremented (the counter is
                 reset to ``0`` otherwise). With ``Nvanish=1``, the age only increases when the subnet has no associated samples.
-            lVanish (int): Maximum age of a subnet before it is removed.
+            lVanish (int): Age at which a subnet is removed: a subnet is removed as soon as its age reaches ``lVanish``
+                (threshold :math:`\\lambda` of the original formulation).
             max_iterations (int): Maximum number of structural adaptation iterations.
             ANFIStrainer (base_model_trainer): Instantiated ANFIS training algorithm that defines how the model parameters
                 are updated at each iteration.
@@ -400,7 +402,8 @@ class SONFIS(base_model_trainer):
         Identifies poorly modeled samples — those whose maximum firing level
         across all subnets is below ``dGrow ** input_size`` — and groups them
         by their associated subnet. For each group with more than ``Ngrow``
-        samples, a new subnet is created centered on the mean of those samples.
+        samples, a new subnet is created, whose MFs are initialized with the
+        mean and the (population) standard deviation of those samples.
         If ``lse_for_new_consequents`` is enabled, the consequent parameters
         of the new subnets are estimated using least squares.
         
@@ -439,7 +442,7 @@ class SONFIS(base_model_trainer):
             rules = [clusters == rule for rule in torch.unique(clusters)] # list of boolean masks (lenght: current number of subnets), each one with shape: (bad_samples.shape[0], ) 
             
             means = torch.stack([bad_samples[rule].mean(dim=0) for rule in rules]) # shape = (new_subnets, input_dim)
-            stds = torch.stack([bad_samples[rule].std(dim=0) for rule in rules]) # shape = (new_subnets, input_dim)
+            stds = torch.stack([bad_samples[rule].std(dim=0, correction=0) for rule in rules]) # population std (as in the original formulation), shape = (new_subnets, input_dim)
             
             new_premises = ANFISmodel._fuzzification_layer._membership_function._grow_new_premise_parameters(means, stds)
             ANFISmodel.set_premises(torch.cat((ANFISmodel.get_premises(), new_premises), dim=1))
@@ -480,46 +483,12 @@ class SONFIS(base_model_trainer):
         Returns:
             torch.Tensor: Estimated consequent parameters for the new subnets, of shape ``(outputs, n_new_rules, input_size + 1)``.
         """
-        new_consequents = torch.tensor([])
-        
-        i = 0
-        for rule in rules_mask:
-            x = samples[rule]
-            y = targets[rule]
-            
-            w_norm = ANFISmodel.get_firing_levels(x, normalized=True)
-            xe = torch.cat([x, torch.ones(x.shape[0], 1)], dim=1)
-            fs = w_norm[:, i - n_new_rules].unsqueeze(0).t()
-            
-            '''preliminary fix for the dtype issue'''
-            if ANFISmodel._output_type == 'softmax':
-                y = y.to(torch.int64)
-                if ANFISmodel._custom_classes:
-                    y = torch.searchsorted(ANFISmodel.classes, y)
-                y = torch.nn.functional.one_hot(y, ANFISmodel._outputs)
-            if y.dtype != xe.dtype:
-                y = y.to(xe.dtype)
-            '''preliminary fix for the dtype issue'''
-            
-            A = xe * fs
-            
-            if self.lse_for_new_consequents_lambda > 0.:
-                p = A.shape[1]
-                I = torch.eye(p, dtype=A.dtype) * torch.sqrt(torch.tensor(self.lse_for_new_consequents_lambda, dtype=A.dtype))
-                A = torch.cat([A, I], dim=0)
-                if y.dim() > 1:
-                    m = y.shape[1]
-                    zeros = torch.zeros((p, m), dtype=A.dtype)
-                else:
-                    zeros = torch.zeros(p, dtype=A.dtype)
-                y  = torch.cat([y, zeros], dim=0)
-            
-            C, _, _, _ = torch.linalg.lstsq(A, y, rcond=None, driver="gelsd")
-            new_consequents = torch.cat((new_consequents, C.t().reshape(ANFISmodel._outputs, 1, xe.shape[1])), dim=1)
-            
-            i += 1
-        
-        return new_consequents
+        first_new_rule = ANFISmodel.rules - n_new_rules
+        return torch.cat([
+            _rules_consequents_estimation(ANFISmodel, samples[rule], targets[rule], [first_new_rule + i],
+                                          "gelsd", self.lse_for_new_consequents_lambda)
+            for i, rule in enumerate(rules_mask)
+        ], dim=1)
     
     def _SplitNet(self, ANFISmodel, train_loader, verbose):
         """
@@ -691,43 +660,8 @@ class SONFIS(base_model_trainer):
         Returns:
             torch.Tensor: Estimated consequent parameters for the two new subnets, of shape ``(outputs, 2, input_size + 1)``.
         """
-        new_consequents = torch.tensor([])
-        
-        x = samples
-        y = targets
-        
-        w_norm = ANFISmodel.get_firing_levels(x, normalized=True)
-        x = torch.cat([x, torch.ones(x.shape[0], 1)], dim=1)
-        w_norm = w_norm[:, -2:].unsqueeze(2).repeat(1, 1, x.shape[1]).view(w_norm[:, -2:].shape[0], -1)
-        X = x.repeat(1, 2)
-        
-        '''preliminary fix for the dtype issue'''
-        if ANFISmodel._output_type == 'softmax':
-            y = y.to(torch.int64)
-            if ANFISmodel._custom_classes:
-                y = torch.searchsorted(ANFISmodel.classes, y)
-            y = torch.nn.functional.one_hot(y, ANFISmodel._outputs)
-        if y.dtype != X.dtype:
-            y = y.to(X.dtype)
-        '''preliminary fix for the dtype issue'''
-        
-        A = X * w_norm
-        
-        if self.lse_for_new_consequents_lambda > 0.:
-            p = A.shape[1]
-            I = torch.eye(p, dtype=A.dtype) * torch.sqrt(torch.tensor(self.lse_for_new_consequents_lambda, dtype=A.dtype))
-            A = torch.cat([A, I], dim=0)
-            if y.dim() > 1:
-                m = y.shape[1]
-                zeros = torch.zeros((p, m), dtype=A.dtype)
-            else:
-                zeros = torch.zeros(p, dtype=A.dtype)
-            y  = torch.cat([y, zeros], dim=0)
-        
-        C, _, _, _ = torch.linalg.lstsq(A, y, rcond=None, driver="gelsd")
-        new_consequents = C.t().reshape(ANFISmodel._outputs, 2, x.shape[1])
-        
-        return new_consequents
+        return _rules_consequents_estimation(ANFISmodel, samples, targets, [ANFISmodel.rules - 2, ANFISmodel.rules - 1],
+                                             "gelsd", self.lse_for_new_consequents_lambda)
     
     def _VanishNet(self, ANFISmodel, train_loader, verbose):
         """

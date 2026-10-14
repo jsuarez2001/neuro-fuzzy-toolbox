@@ -10,6 +10,7 @@ available in Neuro-Fuzzy Toolbox.
    :maxdepth: 2
 
    training/early_stopping
+   training/optimizers
    training/update_strategies
    training/training_algorithms
    training/sonfis

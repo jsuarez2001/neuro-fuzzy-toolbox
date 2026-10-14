@@ -41,8 +41,11 @@ algorithm:
   (Default: ``0.``).
 - **early_stopping**: Early stopping mechanism to use during training
   (Default: ``None``).
-- **optimizer**: Optimizer class to use during training
-  (Default: ``torch.optim.Adam``).
+- **optimizer**: Optimizer class used to update the premise parameters
+  (Default: ``torch.optim.Adam``). Besides the optimizers of PyTorch, the
+  toolbox provides ``nft.NormalizedGradientDescent``, the gradient descent
+  with normalized step used by the original SONFIS formulation (see
+  :ref:`NormalizedGradientDescent <NormalizedGradientDescent>`).
 - **optimizer_params**: Parameters to pass to the optimizer (Default: ``{}``).
 - **consequents_estimation**: How the consequent parameters are estimated
   (Default: ``'global'``).

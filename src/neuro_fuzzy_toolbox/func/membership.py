@@ -171,17 +171,39 @@ class Gaussian_MF(MembershipFunction):
 
         gaussian(x) = e^{-\\frac{(x - \\mu)^2}{2\\sigma^2}}
 
-    donde:
+    where:
         - :math:`x` is the input variable.
         - :math:`\\mu` is the center of the function.
         - :math:`\\sigma` is the standard deviation, controlling the width of the curve.
+
+    With ``sigma_is_std=False``, the function is instead defined as
+
+    .. math::
+
+        gaussian(x) = e^{-\\left(\\frac{x - \\mu}{\\sigma}\\right)^2}
+
+    which is the form used in the original SONFIS formulation (Allende-Cid et al., 2016, eq. 1). Both forms describe the
+    same family of functions, but the same value of :math:`\\sigma` yields a curve :math:`\\sqrt{2}` times narrower in the
+    second one. Since the premise initializations of the toolbox set :math:`\\sigma` from the spread of the data (for
+    instance, the GrowNet operator of SONFIS sets it to the standard deviation of the grouped samples), the chosen form
+    affects the resulting fuzzy sets.
+
+    Args:
+        sigma_is_std (bool): If ``True``, :math:`\\sigma` is the standard deviation of the curve. If ``False``, the form
+            of the original SONFIS formulation is used. Defaults to ``True``.
     """
-    def __init__(self):
+    def __init__(self, sigma_is_std=True):
         super(Gaussian_MF, self).__init__()
         self._params = ["mu", "sigma"]
+        self.sigma_is_std = sigma_is_std
         
         self._min_val_plot = -2
         self._max_val_plot = 2
+
+    @property
+    def _coef(self):
+        # Coefficient of the exponent (models saved before this option existed default to the standard deviation form)
+        return 0.5 if getattr(self, 'sigma_is_std', True) else 1.0
         
     def _simple_numpy_implementation(self, x, mu, sigma):
         """
@@ -195,7 +217,7 @@ class Gaussian_MF(MembershipFunction):
         Returns:
             numpy.ndarray: Membership degrees for each value in ``x``.
         """
-        return np.exp(-0.5 * np.power((x - mu)/sigma, 2))
+        return np.exp(-self._coef * np.power((x - mu)/sigma, 2))
     
     def _simple_alpha_cut(self, alpha, mu, sigma):
         """
@@ -210,7 +232,7 @@ class Gaussian_MF(MembershipFunction):
             np.array: Array of 2 elements representing the interval over which the membership degree is greater than ``alpha``.
         """
         sigma = abs(sigma)
-        r = np.sqrt(-2*np.log(alpha))
+        r = np.sqrt(-np.log(alpha)/self._coef)
         L = mu - sigma*r
         U = mu + sigma*r
         return np.array([L, U])
@@ -239,7 +261,7 @@ class Gaussian_MF(MembershipFunction):
         Returns:
             torch.Tensor: Membership degrees of shape ``(batch_size, input_size, num_mfs)``.
         """
-        return torch.exp(-0.5 * torch.pow((x.unsqueeze(x.dim()) - premises[:, :, 0])/torch.where(premises[:, :, 1] == 0, torch.tensor(1e-6), premises[:, :, 1]), 2))
+        return torch.exp(-self._coef * torch.pow((x.unsqueeze(x.dim()) - premises[:, :, 0])/torch.where(premises[:, :, 1] == 0, torch.tensor(1e-6), premises[:, :, 1]), 2))
 
     def initialize_premises(self, x_train, num_mfs):
         """

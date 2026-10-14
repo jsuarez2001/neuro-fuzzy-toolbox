@@ -62,6 +62,10 @@ The membership functions (MFs) available for the ANFIS model are the following:
     +----------------------+-----------------------------------------------------------------+
 
 .. note::
+    ``Gaussian_MF(sigma_is_std=False)`` uses instead the form
+    :math:`e^{-\left(\frac{x - \mu}{\sigma}\right)^2}`.
+
+.. note::
     For more information on the membership functions implemented in Neuro-Fuzzy
     Toolbox, see :ref:`API Reference - Membership Functions <Membership Functions>`.
 

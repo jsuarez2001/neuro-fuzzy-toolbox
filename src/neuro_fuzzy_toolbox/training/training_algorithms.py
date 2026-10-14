@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from ._loader_utils import get_loader_tensors
+from neuro_fuzzy_toolbox.utils._loader import get_loader_tensors
 
 from neuro_fuzzy_toolbox.training import (
     classical_consequents_estimation_with_OLS,

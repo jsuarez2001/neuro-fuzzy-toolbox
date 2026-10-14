@@ -292,7 +292,7 @@ Instantiating the model with 3 MFs per feature for a 4-class problem:
         input_size=x_train.shape[1],       # 2 features
         num_mfs=3,                         # 3 MFs per feature
         outputs=4,                         # 4 classes
-        membership_function=nft.Gaussian_MF,
+        membership_function=nft.Gaussian_MF(),
         output_type='softmax'
     )
 
