@@ -36,10 +36,10 @@ pip install neuro-fuzzy-toolbox
 
 ## Requirements
 
-- torch >= 2.5 (tested with 2.5.1)
-- numpy >= 2.2 (tested with 2.2.1)
-- pandas >= 2.2 (tested with 2.2.3)
-- matplotlib >= 3.10 (tested with 3.10.0)
+- torch >= 2.5 (tested with 2.5.1, also with 2.14.1)
+- numpy >= 2.2 (tested with 2.2.1, also with 2.5.4)
+- pandas >= 2.2 (tested with 2.2.3, also with 3.0.6)
+- matplotlib >= 3.10 (tested with 3.10.0, also with 3.11.2)
 
 ## Documentation
 
