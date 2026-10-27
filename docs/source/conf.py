@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.abspath('../../src'))
 project = 'Neuro-Fuzzy Toolbox'
 copyright = '2026, Juan Suárez'
 author = 'Juan Suárez'
-release = '0.3.0'
+release = '0.4.0'
 
 language = "en"
 
