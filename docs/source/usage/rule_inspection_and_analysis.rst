@@ -44,8 +44,9 @@ contains the following keys:
 
 .. code-block:: text
 
-    ['membership values', 'firing levels', 'norm firing levels',
-     'consequent outputs', 'rules contribution', 'final output']
+    ['membership values', 'firing levels', 'log firing levels',
+     'norm firing levels', 'consequent outputs', 'rules contribution',
+     'final output']
 
 For a **classification** model (``output_type='softmax'``), the key
 ``'logits'`` is also included, and ``'final output'`` contains the
@@ -53,8 +54,9 @@ softmax probabilities:
 
 .. code-block:: text
 
-    ['membership values', 'firing levels', 'norm firing levels',
-     'consequent outputs', 'rules contribution', 'logits', 'final output']
+    ['membership values', 'firing levels', 'log firing levels',
+     'norm firing levels', 'consequent outputs', 'rules contribution',
+     'logits', 'final output']
 
 Each value is a tensor whose shape reflects the batch dimension (always 1
 for a single sample), the number of rules, and the number of outputs or
@@ -70,6 +72,7 @@ MFs per feature, and 3 output classes:
 
     membership values:  shape=torch.Size([1, 4, 3])
     firing levels:      shape=torch.Size([1, 81])
+    log firing levels:  shape=torch.Size([1, 81])
     norm firing levels: shape=torch.Size([1, 81])
     consequent outputs: shape=torch.Size([3, 1, 81])
     rules contribution: shape=torch.Size([3, 1, 81])

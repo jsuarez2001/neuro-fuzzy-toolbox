@@ -46,11 +46,45 @@ class base_ANFIS(nn.Module):
             return_probs (bool): If ``True``, the output is passed through a Softmax
                 function to obtain class probabilities. Only applies when the model's
                 output type is ``'softmax'``; ignored otherwise. Defaults to ``False``.
+
+        Note:
+            The firing levels are computed and normalized in the logarithmic domain (see :meth:`_log_firing_levels`),
+            which gives the same result as the product of membership degrees followed by a division by their sum, but
+            without underflow for samples far from every rule.
         """
-        output = self._fuzzification_layer(x)
-        output = self._consequent_layer(x, self._normalization_layer(self._firing_levels_layer(output)))
+        output = self._consequent_layer(x, self._normalized_firing_levels(x))
         output = self._output_layer(output, return_probs)
         return output
+
+    def _log_firing_levels(self, x):
+        """
+        Computes the logarithm of the firing levels (including the default rule, if the model has one).
+
+        The logarithm of each membership degree is computed in closed form by the membership function, and the
+        product of membership degrees of each rule becomes a sum. This avoids the underflow of the firing levels
+        for samples far from every rule.
+
+        Args:
+            x (torch.Tensor): Input data tensor of shape ``(batch_size, input_size)``.
+
+        Returns:
+            torch.Tensor: Logarithm of the firing levels, of shape ``(batch_size, num_rules)`` (one more column if the
+            model has a default rule).
+        """
+        return self._firing_levels_layer(self._fuzzification_layer(x, log=True), log=True)
+
+    def _normalized_firing_levels(self, x):
+        """
+        Computes the normalized firing levels in the logarithmic domain (softmax of the logarithm of the firing
+        levels). The column of the default rule, if any, is removed.
+
+        Args:
+            x (torch.Tensor): Input data tensor of shape ``(batch_size, input_size)``.
+
+        Returns:
+            torch.Tensor: Normalized firing levels of shape ``(batch_size, num_rules)``.
+        """
+        return self._normalization_layer(self._log_firing_levels(x), log=True)
     
     
     # ---- Initialize parameters ----
@@ -186,23 +220,32 @@ class base_ANFIS(nn.Module):
         
     
     # ---- Intermediate values ----
-    def get_firing_levels(self, x, normalized=False):
+    def get_firing_levels(self, x, normalized=False, log=False):
         """
         Returns the firing levels of the model for the given input data.
         
         Args:
             x (torch.Tensor): Input data tensor of shape ``(batch_size, input_size)``.
-            normalized (bool): If ``True``, returns the normalized firing levels. Defaults to ``False``.
+            normalized (bool): If ``True``, returns the normalized firing levels (computed in the logarithmic domain,
+                as in the forward pass). Defaults to ``False``.
+            log (bool): If ``True``, returns the logarithm of the (non-normalized) firing levels, which remains
+                informative for samples whose firing levels underflow to zero. Cannot be combined with
+                ``normalized=True``. Defaults to ``False``.
 
         Returns:
             torch.Tensor: Firing levels of shape ``(batch_size, num_rules)``.
+
+        Raises:
+            ValueError: If both ``normalized`` and ``log`` are ``True``.
         """
+        if normalized and log:
+            raise ValueError("'normalized' and 'log' cannot both be True.")
         with torch.no_grad():
-            w = self._fuzzification_layer(x)
-            w = self._firing_levels_layer(w)
             if normalized:
-                w = self._normalization_layer(w)
-        return w
+                return self._normalized_firing_levels(x)
+            if log:
+                return self._log_firing_levels(x)
+            return self._firing_levels_layer(self._fuzzification_layer(x))
     
     def get_all_consequents_outputs(self, x, weighted=True):
         """
@@ -217,10 +260,7 @@ class base_ANFIS(nn.Module):
         """
         if weighted:
             with torch.no_grad():
-                w = self._fuzzification_layer(x)
-                w = self._firing_levels_layer(w)
-                w_norm = self._normalization_layer(w)
-                outputs = self._consequent_layer(x, w_norm)
+                outputs = self._consequent_layer(x, self._normalized_firing_levels(x))
         else:
             outputs = self._consequent_layer.get_consequents_outputs(x)
         return outputs

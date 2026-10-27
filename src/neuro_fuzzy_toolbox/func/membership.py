@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 import torch.nn as nn
 import numpy as np
 
@@ -69,6 +70,25 @@ class MembershipFunction(nn.Module, metaclass=ABCMeta):
             torch.tensor: Membership degrees of shape ``(batch_size, input_size, num_mfs)``.
         """
         pass
+    
+    def log_forward(self, x, premises):
+        """
+        Logarithm of the membership degrees.
+        
+        The models compute their firing levels in the logarithmic domain, which avoids the underflow of the product of
+        many small membership degrees. This default implementation takes the logarithm of :meth:`forward`, clamped to
+        the smallest positive normal number of the dtype. Subclasses should override it with a closed form whenever
+        one exists, so that membership degrees far below that number are also represented exactly.
+        
+        Args:
+            x (torch.Tensor): Input tensor of shape ``(batch_size, input_size)``.
+            premises (torch.tensor): Premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
+            
+        Returns:
+            torch.tensor: Logarithm of the membership degrees, of shape ``(batch_size, input_size, num_mfs)``.
+        """
+        mu = self.forward(x, premises)
+        return torch.log(torch.clamp(mu, min=torch.finfo(mu.dtype).tiny))
     
     @abstractmethod
     def initialize_premises(self, x_train, num_mfs):
@@ -262,6 +282,19 @@ class Gaussian_MF(MembershipFunction):
             torch.Tensor: Membership degrees of shape ``(batch_size, input_size, num_mfs)``.
         """
         return torch.exp(-self._coef * torch.pow((x.unsqueeze(x.dim()) - premises[:, :, 0])/torch.where(premises[:, :, 1] == 0, torch.tensor(1e-6), premises[:, :, 1]), 2))
+
+    def log_forward(self, x, premises):
+        """
+        Logarithm of the membership degrees of the Gaussian MF, computed in closed form.
+        
+        Args:
+            x (torch.Tensor): Input tensor of shape ``(batch_size, input_size)``.
+            premises (torch.Tensor): Premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
+        
+        Returns:
+            torch.Tensor: Logarithm of the membership degrees, of shape ``(batch_size, input_size, num_mfs)``.
+        """
+        return -self._coef * torch.pow((x.unsqueeze(x.dim()) - premises[:, :, 0])/torch.where(premises[:, :, 1] == 0, torch.tensor(1e-6), premises[:, :, 1]), 2)
 
     def initialize_premises(self, x_train, num_mfs):
         """
@@ -483,6 +516,21 @@ class GeneralizedBell_MF(MembershipFunction):
         # Numerically stable form of 1/(1 + u^(2b)): computing u^(2b) directly overflows for very narrow functions
         # (small width a), which produces infinite values and NaN gradients during training.
         return torch.sigmoid(-2*premises[:, :, 1]*torch.log(torch.clamp(u, min=1e-12)))
+
+    def log_forward(self, x, premises):
+        """
+        Logarithm of the membership degrees of the Generalized Bell MF, computed in closed form as
+        :math:`\\log \\sigma(-2b \\ln|u|)`, with :math:`u = (x - c)/a`.
+        
+        Args:
+            x (torch.Tensor): Input tensor of shape ``(batch_size, input_size)``.
+            premises (torch.Tensor): Premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
+        
+        Returns:
+            torch.Tensor: Logarithm of the membership degrees, of shape ``(batch_size, input_size, num_mfs)``.
+        """
+        u = torch.abs((x.unsqueeze(x.dim()) - premises[:, :, 2])/torch.where(premises[:, :, 0] == 0, torch.tensor(1e-6), premises[:, :, 0]))
+        return F.logsigmoid(-2*premises[:, :, 1]*torch.log(torch.clamp(u, min=1e-12)))
 
     def initialize_premises(self, x_train, num_mfs):
         """
@@ -712,6 +760,21 @@ class HighSlopeBell_MF(MembershipFunction):
         u = torch.abs((x.unsqueeze(x.dim()) - premises[:, :, 1])/torch.where(premises[:, :, 0] == 0, torch.tensor(1e-6), premises[:, :, 0]))
         # Numerically stable form of 1/(1 + u^16) (see GeneralizedBell_MF.forward)
         return torch.sigmoid(-16.0*torch.log(torch.clamp(u, min=1e-12)))
+
+    def log_forward(self, x, premises):
+        """
+        Logarithm of the membership degrees of the High-Slope Bell MF, computed in closed form
+        (see :meth:`GeneralizedBell_MF.log_forward`).
+        
+        Args:
+            x (torch.Tensor): Input tensor of shape ``(batch_size, input_size)``.
+            premises (torch.Tensor): Premise parameters of shape ``(input_size, num_mfs, len(self._params))``.
+        
+        Returns:
+            torch.Tensor: Logarithm of the membership degrees, of shape ``(batch_size, input_size, num_mfs)``.
+        """
+        u = torch.abs((x.unsqueeze(x.dim()) - premises[:, :, 1])/torch.where(premises[:, :, 0] == 0, torch.tensor(1e-6), premises[:, :, 0]))
+        return F.logsigmoid(-16.0*torch.log(torch.clamp(u, min=1e-12)))
 
     def initialize_premises(self, x_train, num_mfs):
         """

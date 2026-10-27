@@ -148,7 +148,8 @@ class SONFIS(base_model_trainer):
         self._best_rules_dataframe_iter = 0
         
         iter_width = len(str(self.max_iterations))
-        print(f'ITERATION: {0:{iter_width}}/{self.max_iterations}')
+        if verbose:
+            print(f'ITERATION: {0:{iter_width}}/{self.max_iterations}')
         
         self.trainer._sonfis_update_parameters(ANFISmodel, train_loader, val_loader, self._freezed)
         
@@ -162,12 +163,7 @@ class SONFIS(base_model_trainer):
                 self._current_best_rules_dataframe = self._rules_dataframe.copy()
             print("\nSTARTING STATE:")
             print(self._rules_dataframe.to_string())
-
-        if val_loader is not None:
-            print(f'\n\tloss: {self.history["loss"][-1]:.6f} - validation loss: {self.val_history["loss"][-1]:.6f}')
-        else:
-            print(f'\n\tloss: {self.history["loss"][-1]:.6f}')
-        print(f'\t --> ANFIS rules: {ANFISmodel.rules}\n')
+            self._print_loss(ANFISmodel, val_loader)
         
         # The initial model is the first candidate of the early stopping mechanism
         if use_early_stopping:
@@ -177,7 +173,8 @@ class SONFIS(base_model_trainer):
         i = 0
         while(model_updated and i < self.max_iterations):
             
-            print(f'\nITERATION: {i+1:{iter_width}}/{self.max_iterations}')
+            if verbose:
+                print(f'\nITERATION: {i+1:{iter_width}}/{self.max_iterations}')
             
             self._freeze_subnets()
             
@@ -193,15 +190,13 @@ class SONFIS(base_model_trainer):
                     
                 self._register_loss(ANFISmodel, train_loader, val_loader)
                 
-                if val_loader is not None:
-                    print(f'\n\tloss: {self.history["loss"][-1]:.6f} - validation loss: {self.val_history["loss"][-1]:.6f}')
-                else:
-                    print(f'\n\tloss: {self.history["loss"][-1]:.6f}')
-                print(f'\t --> ANFIS rules: {ANFISmodel.rules}\n')
+                if verbose:
+                    self._print_loss(ANFISmodel, val_loader)
             
                 if use_early_stopping:
-                    if self._check_early_stop(ANFISmodel, self.val_history["loss"][-1]):
-                        print(f'found on the {self._best_rules_dataframe_iter}° iteration.')
+                    if self._check_early_stop(ANFISmodel, self.val_history["loss"][-1], verbose):
+                        if verbose:
+                            print(f'found on the {self._best_rules_dataframe_iter}° iteration.')
                         early_stop_flag = True
                         if verbose:
                             # The restored model is the best one: its rules keep their identifiers
@@ -212,17 +207,19 @@ class SONFIS(base_model_trainer):
                         if verbose:
                             self._current_best_rules_dataframe = self._rules_dataframe.copy()
             
-            else:
+            elif verbose:
                 print('NO MORE UPDATES')
             
             i += 1
             
-        if i == self.max_iterations: print('MAX ITERATIONS REACHED')
+        if verbose and i == self.max_iterations:
+            print('MAX ITERATIONS REACHED')
             
         self._unfreeze_subnets()
         
         if self.last_training_iteration:
-            print('\nLast training iteration (all subnets are being trained again)')
+            if verbose:
+                print('\nLast training iteration (all subnets are being trained again)')
             
             self.trainer._sonfis_update_parameters(ANFISmodel, train_loader, val_loader, self._freezed)
             
@@ -233,14 +230,12 @@ class SONFIS(base_model_trainer):
             
             self._register_loss(ANFISmodel, train_loader, val_loader)
 
-            if val_loader is not None:
-                print(f'\tloss: {self.history["loss"][-1]:.6f} - validation loss: {self.val_history["loss"][-1]:.6f}')
-            else:
-                print(f'\tloss: {self.history["loss"][-1]:.6f}')
+            if verbose:
+                self._print_loss(ANFISmodel, val_loader, show_rules=False, leading_newline=False)
             
-        print('\nTRAINING FINISHED')
-        print(f'\t --> ANFIS rules: {ANFISmodel.rules}\n')
         if verbose:
+            print('\nTRAINING FINISHED')
+            print(f'\t --> ANFIS rules: {ANFISmodel.rules}\n')
             print(self._rules_dataframe.to_string())
         
         
@@ -259,7 +254,25 @@ class SONFIS(base_model_trainer):
     
     
     # ----- Early Stopping -----
-    def _check_early_stop(self, ANFISmodel, loss):
+    def _print_loss(self, ANFISmodel, val_loader, show_rules=True, leading_newline=True):
+        """
+        Prints the last registered training (and validation) loss and, optionally, the current number of rules.
+
+        Args:
+            ANFISmodel (rule_reduced_ANFIS): Rule-reduced ANFIS model being trained.
+            val_loader (DataLoader | None): DataLoader containing the validation data.
+            show_rules (bool): If ``True``, also prints the number of rules. Defaults to ``True``.
+            leading_newline (bool): If ``True``, prints an empty line before the loss. Defaults to ``True``.
+        """
+        prefix = '\n\t' if leading_newline else '\t'
+        if val_loader is not None:
+            print(f'{prefix}loss: {self.history["loss"][-1]:.6f} - validation loss: {self.val_history["loss"][-1]:.6f}')
+        else:
+            print(f'{prefix}loss: {self.history["loss"][-1]:.6f}')
+        if show_rules:
+            print(f'\t --> ANFIS rules: {ANFISmodel.rules}\n')
+
+    def _check_early_stop(self, ANFISmodel, loss, verbose=True):
         """
         Checks whether the SONFIS early stopping criterion is met.
 
@@ -269,12 +282,13 @@ class SONFIS(base_model_trainer):
         Args:
             ANFISmodel (rule_reduced_ANFIS): Rule-reduced ANFIS model being trained.
             loss (float): Current validation loss value.
+            verbose (bool): If ``True``, prints a message when early stopping is triggered. Defaults to ``True``.
 
         Returns:
             bool: ``True`` if training should be stopped, ``False`` otherwise.
         """
         if self.sonfis_early_stopping is not None:
-            self.sonfis_early_stopping(ANFISmodel, loss, verbose=True)
+            self.sonfis_early_stopping(ANFISmodel, loss, verbose=verbose)
             if self.sonfis_early_stopping.stop:
                 self._ages = torch.zeros(ANFISmodel.rules, dtype=torch.int)
                 self._freezed = torch.zeros(ANFISmodel.rules, dtype=torch.int).bool()

@@ -21,7 +21,7 @@ class FiringLevelsLayer(nn.Module):
         self._firing_level_mask = (torch.arange(mf_distribution.max()).unsqueeze(1) < mf_distribution).t()
         self._rules = mf_distribution.prod()
 
-    def forward(self, membership_values):
+    def forward(self, membership_values, log=False):
         """
         Forward pass of the firing levels layer.
 
@@ -30,12 +30,17 @@ class FiringLevelsLayer(nn.Module):
         Args:
             membership_values (torch.Tensor): Membership degrees of shape ``(batch_size, input_size, max_num_mfs)``,
                 where ``max_num_mfs`` is the maximum number of MFs across all input features.
+            log (bool): If ``True``, ``membership_values`` holds the logarithm of the membership degrees and the
+                logarithm of the firing levels is returned (the product becomes a sum). Defaults to ``False``.
 
         Returns:
             torch.Tensor: Firing levels of shape ``(batch_size, num_mfs_1 * num_mfs_2 * ... * num_mfs_n)``,
             where the number of rules is the product of the number of MFs across all input features.
         """
-        return torch.cat([torch.cartesian_prod(*[dim_mvs[dim_mask] for dim_mvs, dim_mask in zip(mvs, self._firing_level_mask)]).prod(dim=-1) for mvs in membership_values]).reshape(-1, self._rules)
+        combinations = [torch.cartesian_prod(*[dim_mvs[dim_mask] for dim_mvs, dim_mask in zip(mvs, self._firing_level_mask)]) for mvs in membership_values]
+        if log:
+            return torch.cat([c.sum(dim=-1) for c in combinations]).reshape(-1, self._rules)
+        return torch.cat([c.prod(dim=-1) for c in combinations]).reshape(-1, self._rules)
 
 
 
@@ -60,12 +65,9 @@ class h_FiringLevelsLayer(nn.Module):
                 Defaults to ``False``.
         """
         super(h_FiringLevelsLayer, self).__init__()
-        if rule_reduced:
-            self._get_firing_levels = lambda membership_values: membership_values.prod(dim=membership_values.dim()-2)
-        else:
-            self._get_firing_levels = lambda membership_values: torch.cat([torch.cartesian_prod(*torch.unbind(t, dim=0)).prod(dim=-1) for t in membership_values]).reshape(-1, membership_values.shape[-1]**membership_values.shape[-2])
+        self._rule_reduced = rule_reduced
 
-    def forward(self, membership_values):
+    def forward(self, membership_values, log=False):
         """
         Forward pass of the homogeneous firing levels layer.
 
@@ -74,12 +76,18 @@ class h_FiringLevelsLayer(nn.Module):
 
         Args:
             membership_values (torch.Tensor): Membership degrees of shape ``(batch_size, input_size, num_mfs)``.
+            log (bool): If ``True``, ``membership_values`` holds the logarithm of the membership degrees and the
+                logarithm of the firing levels is returned (the product becomes a sum). Defaults to ``False``.
 
         Returns:
             torch.Tensor: Firing levels of shape ``(batch_size, num_mfs ** input_size)`` in standard mode, or
             ``(batch_size, num_mfs)`` in rule-reduced mode.
         """
-        return self._get_firing_levels(membership_values)
+        reduce = (lambda t, dim: t.sum(dim=dim)) if log else (lambda t, dim: t.prod(dim=dim))
+        if self._rule_reduced:
+            return reduce(membership_values, membership_values.dim()-2)
+        n_rules = membership_values.shape[-1]**membership_values.shape[-2]
+        return torch.cat([reduce(torch.cartesian_prod(*torch.unbind(t, dim=0)), -1) for t in membership_values]).reshape(-1, n_rules)
     
     
     
@@ -111,12 +119,9 @@ class rule_reduced_FiringLevelsLayer(nn.Module):
             The ``default_rule`` option is experimental and not fully supported.
         """
         super(rule_reduced_FiringLevelsLayer, self).__init__()
-        if default_rule:
-            self._get_firing_levels = lambda firing_levels, input_size: torch.cat((firing_levels, torch.pow(1 - firing_levels.max(dim=1).values.unsqueeze(1), input_size)), dim=1)
-        else:
-            self._get_firing_levels = lambda firing_levels, input_size: firing_levels
+        self._default_rule = default_rule
             
-    def forward(self, membership_values):
+    def forward(self, membership_values, log=False):
         """
         Forward pass of the rule-reduced firing levels layer.
 
@@ -124,12 +129,28 @@ class rule_reduced_FiringLevelsLayer(nn.Module):
 
         Args:
             membership_values (torch.Tensor): Membership degrees of shape ``(batch_size, input_size, num_mfs)``.
+            log (bool): If ``True``, ``membership_values`` holds the logarithm of the membership degrees and the
+                logarithm of the firing levels is returned (the product becomes a sum). Defaults to ``False``.
 
         Returns:
             torch.Tensor: Firing levels of shape ``(batch_size, num_mfs)``, or ``(batch_size, num_mfs + 1)`` if the default rule is enabled.
         """
-        firing_levels = membership_values.prod(dim=membership_values.dim()-2)
-        return self._get_firing_levels(firing_levels, membership_values.shape[1])
+        input_size = membership_values.shape[1]
+        if not log:
+            firing_levels = membership_values.prod(dim=membership_values.dim()-2)
+            if self._default_rule:
+                default = torch.pow(1 - firing_levels.max(dim=1).values.unsqueeze(1), input_size)
+                firing_levels = torch.cat((firing_levels, default), dim=1)
+            return firing_levels
+        log_firing_levels = membership_values.sum(dim=membership_values.dim()-2)
+        if self._default_rule:
+            # log((1 - max_k w_k)^n), computed from the logarithm of the largest firing level. The argument is kept
+            # below one so that the logarithm (and its gradient) stays finite when a rule is fully activated
+            max_w = torch.exp(log_firing_levels.max(dim=1).values.unsqueeze(1))
+            eps = torch.finfo(max_w.dtype).eps
+            log_default = input_size * torch.log1p(-torch.clamp(max_w, max=1. - eps))
+            log_firing_levels = torch.cat((log_firing_levels, log_default), dim=1)
+        return log_firing_levels
 
 
 
@@ -166,7 +187,7 @@ class NormalizationLayer(nn.Module):
         else:
             self._get_firing_levels = lambda firing_levels: firing_levels
 
-    def forward(self, w):
+    def forward(self, w, log=False):
         """
         Forward pass of the normalization layer.
 
@@ -180,6 +201,12 @@ class NormalizationLayer(nn.Module):
             torch.Tensor: Normalized firing levels of shape ``(batch_size, num_rules)``, or ``(batch_size, num_rules - 1)`` 
             if the default rule is enabled.
         """
+        if log:
+            # Normalization in the logarithmic domain (softmax): exact for any magnitude of the firing levels, so it does
+            # not underflow for samples far from every rule and its gradient never overflows
+            all_minus_inf = torch.isneginf(w.max(dim=-1, keepdim=True).values)
+            w = torch.where(all_minus_inf, torch.zeros_like(w), w)
+            return self._get_firing_levels(torch.softmax(w, dim=-1))
         total = torch.sum(w, dim=-1, keepdim=True)
         total[total == 0] += 1
         norm_firing_levels = self._get_firing_levels(w)/total

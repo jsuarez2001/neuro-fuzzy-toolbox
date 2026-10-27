@@ -48,7 +48,7 @@ class FuzzificationLayer(nn.Module):
         self._premises = premises
         
     
-    def forward(self, x):
+    def forward(self, x, log=False):
         """
         Forward pass of the fuzzification layer.
 
@@ -56,6 +56,8 @@ class FuzzificationLayer(nn.Module):
 
         Args:
             x (torch.Tensor): Input data of shape ``(batch_size, input_size)``.
+            log (bool): If ``True``, returns the logarithm of the membership degrees (see
+                :meth:`~neuro_fuzzy_toolbox.func.membership.MembershipFunction.log_forward`). Defaults to ``False``.
 
         Returns:
             torch.Tensor: Membership degrees of shape ``(batch_size, input_size, max_n_mfs)``, where ``max_n_mfs`` is the maximum number of MFs across all input features.
@@ -74,7 +76,8 @@ class FuzzificationLayer(nn.Module):
                 mf = torch.cat((mf, torch.zeros(self._max_n_mfs - mf.size(0), mf.size(1), dtype=self._dtype)), 0)
             reshaped_premises = torch.cat((reshaped_premises, mf.unsqueeze(dim=0)), 0)
             
-        return self._membership_function(x, reshaped_premises)
+        membership_function = self._membership_function.log_forward if log else self._membership_function
+        return membership_function(x, reshaped_premises)
     
     
     def init_premises(self, x_train):
@@ -319,7 +322,7 @@ class h_FuzzificationLayer(nn.Module):
         self._premises = Parameter(self._membership_function.random_premises(input_size, num_mfs, dtype), requires_grad=True)
 
 
-    def forward(self, x):
+    def forward(self, x, log=False):
         """
         Forward pass of the homogeneous fuzzification layer.
 
@@ -327,11 +330,14 @@ class h_FuzzificationLayer(nn.Module):
 
         Args:
             x (torch.Tensor): Input data of shape ``(batch_size, input_size)``.
+            log (bool): If ``True``, returns the logarithm of the membership degrees (see
+                :meth:`~neuro_fuzzy_toolbox.func.membership.MembershipFunction.log_forward`). Defaults to ``False``.
 
         Returns:
             torch.Tensor: Membership degrees of shape ``(batch_size, input_size, num_mfs)``.
         """
-        return self._membership_function(x, self._premises)
+        membership_function = self._membership_function.log_forward if log else self._membership_function
+        return membership_function(x, self._premises)
     
     
     def init_premises(self, x_train):
@@ -582,7 +588,7 @@ class rule_reduced_FuzzificationLayer(nn.Module):
         ])
 
 
-    def forward(self, x):
+    def forward(self, x, log=False):
         """
         Forward pass of the rule-reduced fuzzification layer.
 
@@ -590,11 +596,14 @@ class rule_reduced_FuzzificationLayer(nn.Module):
 
         Args:
             x (torch.Tensor): Input data of shape ``(batch_size, input_size)``.
+            log (bool): If ``True``, returns the logarithm of the membership degrees (see
+                :meth:`~neuro_fuzzy_toolbox.func.membership.MembershipFunction.log_forward`). Defaults to ``False``.
 
         Returns:
             torch.Tensor: Membership degrees of shape ``(batch_size, input_size, num_mfs)``.
         """
-        return self._membership_function(x, torch.stack([premise for premise in self._premises], 1))
+        membership_function = self._membership_function.log_forward if log else self._membership_function
+        return membership_function(x, torch.stack([premise for premise in self._premises], 1))
 
 
     def init_premises(self, x_train):

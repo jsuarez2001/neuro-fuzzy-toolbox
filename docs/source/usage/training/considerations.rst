@@ -156,6 +156,31 @@ The ``EarlyStopping`` class takes the following arguments:
     algorithm. If no validation set is provided, early stopping has no effect
     on training.
 
+.. _numerical-stability:
+
+Numerical stability of the firing levels
+-----------------------------------------
+For a sample far from every rule, the firing levels (products of membership
+degrees) can become smaller than the smallest number representable in
+floating point, especially with ``Gaussian_MF`` and ``torch.float32``. If they
+were normalized by dividing by their sum, such samples would produce a model
+output of zero, or infinite gradients that stop training.
+
+To avoid this, the models compute the firing levels and their normalization in
+the logarithmic domain: each membership function provides the logarithm of its
+membership degrees in closed form (``log_forward``), the product of membership
+degrees of each rule becomes a sum, and the normalization becomes a softmax.
+The result is the same as the usual normalization, but it is valid for any
+magnitude of the firing levels: a sample far from every rule is assigned to the
+rules closest to it, and its
+gradients remain finite.
+
+.. note::
+    A custom membership function only needs to implement ``forward``. If it
+    does not override ``log_forward``, the logarithm of ``forward`` is used,
+    which works but keeps the underflow of ``forward``; implementing
+    ``log_forward`` in closed form is recommended.
+
 Available training algorithms
 ------------------------------
 The training algorithms available in Neuro-Fuzzy Toolbox are:

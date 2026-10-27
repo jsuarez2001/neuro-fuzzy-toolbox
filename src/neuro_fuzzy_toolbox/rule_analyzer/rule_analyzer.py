@@ -63,7 +63,7 @@ class RulesAnalyzer:
         Note:
             If the model has ``output_type='default'``, the output dictionary
             includes: ``'membership values'``, ``'firing levels'``,
-            ``'norm firing levels'``, ``'consequent outputs'``,
+            ``'log firing levels'``, ``'norm firing levels'``, ``'consequent outputs'``,
             ``'rules contribution'``, and ``'final output'``. If the model
             has ``output_type='softmax'``, the dictionary additionally includes
             ``'logits'`` (the output before the softmax function).
@@ -79,13 +79,15 @@ class RulesAnalyzer:
         with torch.no_grad():
             membership_values = self.model._fuzzification_layer(x)
             firing_levels = self.model._firing_levels_layer(membership_values)
-            norm_firing_levels = self.model._normalization_layer(firing_levels)
+            log_firing_levels = self.model._log_firing_levels(x)
+            norm_firing_levels = self.model._normalization_layer(log_firing_levels, log=True)
             weighted_rules_outputs = self.model._consequent_layer(x, norm_firing_levels)
             output = self.model._output_layer(weighted_rules_outputs, return_probs=False)
             
         dict_output = {
             'membership values': membership_values,
             'firing levels': firing_levels,
+            'log firing levels': log_firing_levels,
             'norm firing levels': norm_firing_levels,
             'consequent outputs': self.model.get_all_consequents_outputs(x, weighted=False),
             'rules contribution': weighted_rules_outputs,
@@ -102,32 +104,38 @@ class RulesAnalyzer:
         return dict_output
     
     
-    def _leave_one_rule_out_logits(self, firing_levels, consequent_outputs):
+    def _leave_one_rule_out_logits(self, log_firing_levels, consequent_outputs):
         """
         Computes, for each rule, the logits that the model would produce for the analyzed sample if that rule were
         removed from the model.
         
         Removing a rule changes the normalization of the firing levels, so the normalized firing levels of the
         remaining rules are recomputed (including the default rule, if the model has one). The result is exactly
-        the output of the model after removing the rule, without building a new model or retraining it.
+        the output of the model after removing the rule, without building a new model or retraining it. As in the
+        forward pass of the model, the normalization is computed in the logarithmic domain.
         
         Args:
-            firing_levels (torch.Tensor): Firing levels of the rules for the analyzed sample, before normalization and
-                without the default rule, of shape ``(n_rules,)``.
+            log_firing_levels (torch.Tensor): Logarithm of the firing levels of the rules for the analyzed sample,
+                before normalization and without the default rule, of shape ``(n_rules,)``.
             consequent_outputs (torch.Tensor): Unweighted output of each rule for each class, of shape ``(n_classes, n_rules)``.
         
         Returns:
             torch.Tensor: Tensor of shape ``(n_rules, n_classes)`` whose ``r``-th row contains the logits of the model
             without rule ``r``.
         """
-        n_rules = firing_levels.shape[0]
-        keep = ~torch.eye(n_rules, dtype=torch.bool)
-        w = firing_levels.unsqueeze(0) * keep # (n_rules, n_rules): row r contains the firing levels without rule r
-        total = w.sum(dim=1, keepdim=True)
+        n_rules = log_firing_levels.shape[0]
+        removed = torch.eye(n_rules, dtype=torch.bool)
+        # row r contains the logarithm of the firing levels without rule r
+        log_w = log_firing_levels.unsqueeze(0).expand(n_rules, n_rules).masked_fill(removed, float('-inf'))
         if getattr(self.model, '_default_rule', False):
-            total = total + torch.pow(1 - w.max(dim=1, keepdim=True).values, self.model._input_size)
-        total = torch.where(total == 0, torch.ones_like(total), total) # same safeguard as the normalization layer
-        return (w / total) @ consequent_outputs.t()
+            max_w = torch.exp(log_w.max(dim=1, keepdim=True).values)
+            eps = torch.finfo(max_w.dtype).eps
+            log_default = self.model._input_size * torch.log1p(-torch.clamp(max_w, max=1. - eps)) # as in the model
+            log_w = torch.cat((log_w, log_default), dim=1)
+        empty = torch.isneginf(log_w.max(dim=1, keepdim=True).values) # no remaining rule (model with a single rule)
+        norm_w = torch.softmax(torch.where(empty, torch.zeros_like(log_w), log_w), dim=1)
+        norm_w = torch.where(empty, torch.zeros_like(norm_w), norm_w)[:, :n_rules] # same output as a model without rules
+        return norm_w @ consequent_outputs.t()
     
     def _classification_rule_scores(self, logits, probs, rules_contributions, class_idx, logits_without_rule):
         """
@@ -278,8 +286,8 @@ class RulesAnalyzer:
         if self.is_classification:
             logits = all_layers_outputs['logits'].squeeze(0)  # (C,)
             pred_probs = all_layers_outputs['final output'].squeeze(0)  # (C,)
-            raw_firing_levels = all_layers_outputs['firing levels'].squeeze(0)[:self.model.rules]  # (R,), without default rule
-            logits_without_rule = self._leave_one_rule_out_logits(raw_firing_levels, consequent_outputs)  # (R, C)
+            log_firing_levels = all_layers_outputs['log firing levels'].squeeze(0)[:self.model.rules]  # (R,), without default rule
+            logits_without_rule = self._leave_one_rule_out_logits(log_firing_levels, consequent_outputs)  # (R, C)
             
             for out_idx in outputs_to_analyze:
                 I_logit_margin_max, I_logit_margin_mean, I_prob = self._classification_rule_scores(

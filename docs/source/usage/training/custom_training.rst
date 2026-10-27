@@ -141,9 +141,10 @@ connecting a model to downstream components in a deep architecture.
 
 Firing levels
 ^^^^^^^^^^^^^
-The ``get_firing_levels(x, normalized=False)`` method returns the firing
-levels produced by the T-norm layer for a given input batch. If
-``normalized=True``, the normalized firing levels are returned instead:
+The ``get_firing_levels(x, normalized=False, log=False)`` method returns the
+firing levels produced by the T-norm layer for a given input batch. If
+``normalized=True``, the normalized firing levels are returned instead, and if
+``log=True``, the logarithm of the (unnormalized) firing levels is returned:
 
 .. code-block:: python
 
@@ -152,6 +153,12 @@ levels produced by the T-norm layer for a given input batch. If
 
     # Normalized firing levels
     firing_levels_norm = model.get_firing_levels(x_train, normalized=True)
+
+    # Logarithm of the unnormalized firing levels
+    log_firing_levels = model.get_firing_levels(x_train, log=True)
+
+The logarithm remains informative for samples far from every rule, whose
+firing levels underflow to zero (see :ref:`numerical-stability`).
 
 This is useful, for example, to identify which rules are most active for a
 given set of samples — as done internally by the SONFIS algorithm to drive

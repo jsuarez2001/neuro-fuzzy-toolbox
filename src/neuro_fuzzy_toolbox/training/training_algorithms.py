@@ -95,7 +95,8 @@ class base_model_trainer():
                     
             ep += 1
         
-        print('Training finished')
+        if verbose:
+            print('Training finished')
             
             
     def _loss_function(self, model, pred, y):
