@@ -186,6 +186,14 @@ class Hybrid_learning_algorithm(base_model_trainer):
         This algorithm is based on the hybrid training algorithm proposed by Jang in 1993. For more information, see:
         `ANFIS: adaptive-network-based fuzzy inference system <https://doi.org/10.1109/21.256541>`_.
 
+    Note:
+        In classification (``output_type='softmax'`` or ``'sigmoid'``), the least-squares estimation fits the logits of
+        the model, so the class labels are encoded as the logits of a smoothed label distribution that gives probability
+        0.99 to the target class (see :meth:`~neuro_fuzzy_toolbox.models.anfis.base_ANFIS.init_consequents`). The
+        premises are still updated with the gradient of ``loss_function`` (e.g., the cross-entropy), so the two steps
+        minimize different objectives: the squared error of the logits and the loss of the model. With
+        ``output_type='softmax'``, the targets must be class labels (class probabilities are not supported).
+
     Pseudocode:
     
     .. image:: ../../_static/Hybrid_learning_algorithm_pseudocode.png

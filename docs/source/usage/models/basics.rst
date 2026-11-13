@@ -408,6 +408,11 @@ separately by least squares weighted by the rule's firing level:
 
     model.init_consequents(x_train, y_train, estimation='local')
 
+In classification models, the estimation fits the logits of the model, and
+each class label is encoded as the logits of a smoothed label distribution
+that gives probability 0.99 to the target class (see
+:ref:`Hybrid Learning Algorithm <hybrid_learning_usage>`).
+
 .. note::
     For more information on this method and its implementation, see
     :ref:`ANFIS API reference <ANFIS>`.

@@ -61,6 +61,30 @@ algorithm:
     interpreted on its own, and its cost grows linearly with the number of
     rules.
 
+.. note::
+    In classification (``output_type='softmax'`` or ``'sigmoid'``), the least
+    squares estimation fits the logits of the model, that is, its output before
+    the softmax or the sigmoid. The class labels are therefore not fitted as
+    one-hot vectors (or as 0/1), which would bound the probability of the
+    target class, but as the logits of a smoothed label distribution that gives
+    probability 0.99 to the target class:
+
+    - With ``'softmax'`` and :math:`K` classes, the target class gets the logit
+      :math:`c (K - 1) / K` and every other class :math:`-c / K`, with
+      :math:`c = \log(0.99 (K - 1) / 0.01)` (for instance, :math:`2.30` and
+      :math:`-2.30` with two classes). These logits sum to zero, so the
+      consequents of each rule also sum to zero across classes.
+    - With ``'sigmoid'``, each target :math:`q \in [0, 1]` becomes
+      :math:`\operatorname{logit}(0.01 + 0.98 q)`, that is, about :math:`4.6`
+      and :math:`-4.6` for the labels 1 and 0.
+
+    The premise parameters are still updated with the gradient of
+    ``loss_function`` (e.g., ``nn.CrossEntropyLoss()``), so the two steps of
+    the algorithm minimize different objectives: the squared error of the
+    logits and the loss of the model. With ``'softmax'``, the targets must be
+    class labels: class probabilities are not supported by the least squares
+    estimation.
+
 .. code-block:: python
 
     import neuro_fuzzy_toolbox as nft

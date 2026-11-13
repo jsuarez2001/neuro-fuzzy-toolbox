@@ -49,7 +49,8 @@ class SONFIS(base_model_trainer):
                 each new rule is estimated separately by weighted least squares, weighted by its (unnormalized) firing
                 level. With ``'global'``, the new rules are estimated jointly on the residual left by the existing rules.
                 This option only matters with gradient-based trainers, since the hybrid trainer re-estimates the
-                consequents in its first epoch. Defaults to ``None``.
+                consequents in its first epoch. In classification, the class labels are encoded as in the hybrid trainer
+                (see :meth:`~neuro_fuzzy_toolbox.models.anfis.base_ANFIS.init_consequents`). Defaults to ``None``.
             lse_for_new_consequents_samples (str): Samples used by that estimation. With ``'origin'``, each group of
                 rules created from the same samples (one rule in GrowNet, the two halves of a split rule in SplitNet) is
                 estimated only on those samples. With ``'all'``, all the new rules of the operator are estimated together

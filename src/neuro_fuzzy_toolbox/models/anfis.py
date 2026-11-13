@@ -122,10 +122,21 @@ class base_ANFIS(nn.Module):
         
         Important:
             If the model has ``output_type='softmax'``, the class labels in ``y`` are expected to be integers representing
-            the target classes, and a one-hot encoding of these labels will be performed internally for the least-squares
-            estimation. If the labels are not of the form ``[0, 1, 2, ...]``, the model will automatically adjust to the labels
-            present in ``y`` and set them as the classes it will attempt to predict. This is useful when users prefer to work
-            with custom class labels directly. The target class labels can also be set manually using :meth:`set_custom_classes_ids`.
+            the target classes (class probabilities are not supported by the least-squares estimation). If the labels are
+            not of the form ``[0, 1, 2, ...]``, the model will automatically adjust to the labels present in ``y`` and set
+            them as the classes it will attempt to predict. This is useful when users prefer to work with custom class
+            labels directly. The target class labels can also be set manually using :meth:`set_custom_classes_ids`.
+            If the model has ``output_type='sigmoid'``, the targets must be between 0 and 1.
+
+        Note:
+            In classification, the least-squares estimation fits the logits of the model (its output before the softmax
+            or the sigmoid). Each class label is therefore replaced by the logits of a smoothed label distribution that
+            gives probability 0.99 to the target class. With ``output_type='softmax'`` and :math:`K` classes, the target
+            class gets the logit :math:`c (K - 1) / K` and every other class :math:`-c / K`, with
+            :math:`c = \\log(0.99 (K - 1) / 0.01)`; these logits sum to zero, so the consequents of each rule also sum to
+            zero across classes. With ``output_type='sigmoid'``, each target :math:`q` becomes
+            :math:`\\operatorname{logit}(0.01 + 0.98 q)`, that is, :math:`\\pm \\operatorname{logit}(0.99) \\approx \\pm 4.6`
+            for the labels 1 and 0.
         """
         if estimation not in ('global', 'local'):
             raise ValueError(f"estimation='{estimation}' is not a valid option. Use 'global' or 'local'.")
