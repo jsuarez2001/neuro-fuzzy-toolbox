@@ -88,6 +88,20 @@ algorithm:
 - **last_training_iteration** (``bool``): If ``True``, performs a final
   parameter update over all subnets after the SONFIS algorithm finishes
   (Default: ``False``).
+- **grow_min_std_ratio** (``float``): Lower bound for the spread of the MFs
+  of the subnets created by GrowNet, relative to the spread of the training
+  data. The (population) standard deviation of each input feature in the
+  group of poorly modeled samples is replaced by
+  ``max(std, grow_min_std_ratio * s_j)``, where ``s_j`` is the (population)
+  standard deviation of feature ``j`` in the whole training set. If ``0.``,
+  no bound is applied, as in the original formulation (Default: ``0.``).
+
+  This prevents subnets with a zero spread, which appear when a feature is
+  constant within the group (for instance, a discrete feature or one with
+  many repeated values). The spread of such a subnet cannot be updated by
+  gradient descent, so the subnet only fires on that exact value. The bound
+  only affects GrowNet (neither SplitNet nor the initial subnets), and with a
+  positive value every input feature must vary in the training set.
 
 Example
 #######
@@ -178,7 +192,10 @@ formulation is obtained with the following configuration:
   length :math:`\gamma`), trained with a single batch;
 - no early stopping, neither in SONFIS nor in the parameter trainer, and
   ``last_training_iteration=True`` (all the subnets are trained after the
-  structure stabilizes).
+  structure stabilizes);
+- ``grow_min_std_ratio=0.`` (the default), so that the MFs of the subnets
+  created by GrowNet take the standard deviation of their samples without
+  any lower bound.
 
 The values below are those reported for the first synthetic experiment of
 the original paper. The step size ``gamma`` and the number of ``epochs`` per

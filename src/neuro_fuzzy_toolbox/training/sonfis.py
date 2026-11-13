@@ -22,7 +22,7 @@ class SONFIS(base_model_trainer):
     Note:
         This algorithm is only applicable to instances of :class:`rule_reduced_ANFIS`.
     """
-    def __init__(self, Ngrow, dGrow, Nsplit, eSplit, Nvanish, lVanish, max_iterations, ANFIStrainer, early_stopping=None, lse_for_new_consequents=None, lse_for_new_consequents_samples='origin', lse_for_new_consequents_lambda=0., last_training_iteration=False):
+    def __init__(self, Ngrow, dGrow, Nsplit, eSplit, Nvanish, lVanish, max_iterations, ANFIStrainer, early_stopping=None, lse_for_new_consequents=None, lse_for_new_consequents_samples='origin', lse_for_new_consequents_lambda=0., last_training_iteration=False, grow_min_std_ratio=0.):
         """
         Initializes a new SONFIS instance.
         
@@ -58,6 +58,14 @@ class SONFIS(base_model_trainer):
                 of new consequent parameters. If ``0.``, no regularization is applied. Defaults to ``0.``.
             last_training_iteration (bool): If ``True``, performs a final parameter update over all subnets after the SONFIS 
                 algorithm finishes. Defaults to ``False``.
+            grow_min_std_ratio (float): Lower bound for the spread of the MFs of the subnets created by GrowNet, relative to
+                the spread of the training data. The (population) standard deviation of each input feature in the group of
+                poorly modeled samples is replaced by ``max(std, grow_min_std_ratio * s_j)``, where ``s_j`` is the
+                (population) standard deviation of feature ``j`` in the whole training set passed to ``__call__``. This
+                prevents subnets with a zero spread (for instance, when a discrete feature is constant within the group),
+                whose spread cannot be updated by gradient descent. With ``0.``, no bound is applied, as in the original
+                formulation. It only affects GrowNet (neither SplitNet nor the initial subnets). Must be a non-negative
+                number; if it is positive, every input feature must vary in the training set. Defaults to ``0.``.
         """
         # ------------- SONFIS -------------
         # Hyperparameters
@@ -78,6 +86,11 @@ class SONFIS(base_model_trainer):
         self.lse_for_new_consequents_samples = lse_for_new_consequents_samples
         self.lse_for_new_consequents_lambda = lse_for_new_consequents_lambda
         self.last_training_iteration = last_training_iteration
+        if (isinstance(grow_min_std_ratio, bool) or not isinstance(grow_min_std_ratio, (int, float))
+                or not 0. <= grow_min_std_ratio < float('inf')):
+            raise ValueError(f"grow_min_std_ratio={grow_min_std_ratio!r} is not valid. Use a finite number greater than "
+                             "or equal to 0.")
+        self.grow_min_std_ratio = float(grow_min_std_ratio)
         
         # Early stopping
         self.sonfis_early_stopping = early_stopping
@@ -100,6 +113,7 @@ class SONFIS(base_model_trainer):
         self._ages = torch.tensor([], dtype=torch.int)
         
         self._get_max_firing_level = None
+        self._feature_stds = None
         
         
         # ------ Rules Dataframe ------
@@ -135,6 +149,7 @@ class SONFIS(base_model_trainer):
                 'even with rule_reduced=True).'
             )
         self._set_max_firing_level_method(ANFISmodel)
+        self._set_feature_stds(train_loader)
         
         self._current_max_idx = ANFISmodel.rules - 1
         
@@ -395,6 +410,30 @@ class SONFIS(base_model_trainer):
             self._get_max_firing_level = lambda firing_levels: torch.max(firing_levels[:, :-1], dim=1)
         else: 
             self._get_max_firing_level = lambda firing_levels: torch.max(firing_levels, dim=1)
+    
+    def _set_feature_stds(self, train_loader):
+        """
+        Computes the (population) standard deviation of each input feature in the whole training set, used by GrowNet
+        as the reference of ``grow_min_std_ratio``. It is only computed if ``grow_min_std_ratio`` is positive (otherwise,
+        it is set to ``None``).
+        
+        Args:
+            train_loader (DataLoader): DataLoader containing the training data.
+        
+        Raises:
+            ValueError: If ``grow_min_std_ratio`` is positive and some input feature is constant in the training set.
+        """
+        if self.grow_min_std_ratio == 0:
+            self._feature_stds = None
+            return
+        
+        X, _ = get_loader_tensors(train_loader)
+        feature_stds = X.std(dim=0, correction=0)
+        constant = (feature_stds == 0).nonzero().flatten().tolist()
+        if constant:
+            raise ValueError(f"grow_min_std_ratio={self.grow_min_std_ratio} requires every input feature to vary in the "
+                             f"training set, but the features {constant} are constant.")
+        self._feature_stds = feature_stds
         
     
     
@@ -436,6 +475,9 @@ class SONFIS(base_model_trainer):
         by their associated subnet. For each group with more than ``Ngrow``
         samples, a new subnet is created, whose MFs are initialized with the
         mean and the (population) standard deviation of those samples.
+        If ``grow_min_std_ratio`` is positive, each standard deviation is
+        bounded below by ``grow_min_std_ratio`` times the standard deviation
+        of that feature in the whole training set.
         If ``lse_for_new_consequents`` is set, the consequent parameters
         of the new subnets are estimated by least squares
         (see :meth:`_init_new_consequents`).
@@ -476,6 +518,8 @@ class SONFIS(base_model_trainer):
             
             means = torch.stack([bad_samples[rule].mean(dim=0) for rule in rules]) # shape = (new_subnets, input_dim)
             stds = torch.stack([bad_samples[rule].std(dim=0, correction=0) for rule in rules]) # population std (as in the original formulation), shape = (new_subnets, input_dim)
+            if self.grow_min_std_ratio > 0:
+                stds = torch.maximum(stds, self.grow_min_std_ratio * self._feature_stds.to(stds.dtype)) # using grow_min_std_ratio
             
             new_premises = ANFISmodel._fuzzification_layer._membership_function._grow_new_premise_parameters(means, stds)
             ANFISmodel.set_premises(torch.cat((ANFISmodel.get_premises(), new_premises), dim=1))
